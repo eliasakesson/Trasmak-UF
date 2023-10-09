@@ -1,6 +1,7 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { stripe } from "@/utils/stripe";
 import Image from "next/image";
+import toast from "react-hot-toast";
 import { FaStar, FaHeart, FaCreditCard } from "react-icons/fa";
 import { FaEarthAmericas } from "react-icons/fa6";
 import { MdDiscount, MdLocalShipping } from "react-icons/md";
@@ -62,14 +63,19 @@ function ProductInfo({ product }: { product: any }) {
 			</div>
 			<div className="flex gap-4">
 				<button
-					onClick={() => addItem(product)}
+					onClick={() => {
+						addItem(product);
+						toast.success(`${product.name} tillagd i varukorgen`);
+					}}
 					type="button"
-					className="bg-amber-800 text-white px-12 py-4 rounded-lg font-semibold">
-					Add to cart
+					className="bg-amber-800 text-white px-12 py-4 rounded-lg font-semibold"
+				>
+					Lägg i varukorgen
 				</button>
 				<button
 					type="button"
-					className="border-2 border-muted_light px-4 rounded-lg">
+					className="border-2 border-muted_light px-4 rounded-lg"
+				>
 					<FaHeart size={20} />
 				</button>
 			</div>

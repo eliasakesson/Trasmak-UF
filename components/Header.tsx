@@ -16,17 +16,6 @@ import { motion, useAnimationControls } from "framer-motion";
 import { useShoppingCart } from "use-shopping-cart";
 
 const Header = () => {
-	const [isCartOpen, setIsCartOpen] = useState(false);
-	const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-	const toggleCart = () => {
-		setIsCartOpen(!isCartOpen);
-	};
-
-	const toggleSearch = () => {
-		setIsSearchOpen(!isSearchOpen);
-	};
-
 	return (
 		<>
 			<Announcement />
@@ -65,14 +54,15 @@ function Navbar() {
 				<div className="flex-1">
 					<Link
 						href="/"
-						className="flex items-center gap-4 md:justify-start justify-center">
+						className="flex items-center gap-4 md:justify-start justify-center"
+					>
 						<Image
 							src="https://secure.webtoolhub.com/static/resources/icons/set85/6f09cff8.png"
 							alt="Logo"
 							width={40}
 							height={40}
 						/>
-						<span className="text-lg font-semibold">Logo</span>
+						<span className="text-lg font-semibold">Träsmak</span>
 					</Link>
 				</div>
 				<div className="hidden md:flex items-center">
@@ -124,34 +114,32 @@ function CartButton() {
 	}, [isCartOpen]);
 
 	return (
-		<div
-			className="relative z-20"
-			onPointerLeave={() => setIsCartOpen(false)}>
-			{/* Mobile version */}
+		<div className="relative z-20">
+			<div
+				onClick={() => setIsCartOpen(false)}
+				className={`${
+					isCartOpen ? "" : "hidden"
+				} fixed top-0 left-0 right-0 bottom-0`}
+			></div>
 			<button
-				className="md:hidden relative p-2 text-gray-700 hover:text-gray-900 focus:outline-none"
-				onClick={() => setIsCartOpen((open) => !open)}>
+				className="p-2 text-gray-700 hover:text-gray-900 focus:outline-none"
+				onClick={() => setIsCartOpen((open) => !open)}
+			>
 				<FaShoppingCart className="h-6 w-6" />
 				<span className="absolute top-2 right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-amber-600 rounded-full">
 					{cartCount}
 				</span>
 			</button>
-			<div
-				className="hidden md:block p-2 relative text-gray-700 hover:text-gray-900 focus:outline-none"
-				onPointerEnter={() => setIsCartOpen(true)}>
-				<FaShoppingCart className="h-6 w-6" />
-				<span className="absolute top-2 right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-amber-600 rounded-full">
-					{cartCount}
-				</span>
-			</div>
 			<motion.div
 				initial={{ scaleY: 0 }}
 				animate={controls}
-				className="origin-top absolute top-8 right-0 min-w-[256px] bg-white border rounded-xl">
+				className="origin-top absolute top-8 right-0 min-w-[256px] bg-white border rounded-xl"
+			>
 				<motion.div
 					initial={{ opacity: 0, translateY: -20 }}
 					animate={innerControls}
-					className="p-4 space-y-4">
+					className="p-4 space-y-4"
+				>
 					<span className="font-semibold whitespace-nowrap text-xl">
 						Min varukorg
 						<span className="font-normal"> ({cartCount})</span>
@@ -161,7 +149,8 @@ function CartButton() {
 							([key, item]) => (
 								<li
 									key={key}
-									className="flex gap-4 py-2 border-b">
+									className="flex gap-4 py-2 border-b"
+								>
 									<div className="bg-gray-100 rounded-lg border">
 										<Image
 											src={item.image ?? ""}
@@ -191,7 +180,9 @@ function CartButton() {
 					<div className="flex gap-2">
 						<Link
 							href="/cart"
-							className="whitespace-nowrap bg-gray-400 text-white px-8 py-2 rounded-lg">
+							onClick={() => setIsCartOpen(false)}
+							className="whitespace-nowrap border-2 px-8 py-2 rounded-lg"
+						>
 							Varukorg
 						</Link>
 						<button className="whitespace-nowrap bg-amber-800 text-white px-8 py-2 rounded-lg">
@@ -232,14 +223,16 @@ function Navigation() {
 	return (
 		<div
 			className="hidden md:block relative bg-gray-100 py-2 border-y border-border"
-			onPointerLeave={handleMouseLeave}>
+			onPointerLeave={handleMouseLeave}
+		>
 			<ul className="max-w-7xl mx-auto flex px-8 gap-16 md:justify-start justify-center">
 				<li
 					className="text-gray-600 hover:text-gray-800 cursor-pointer"
 					onPointerEnter={() => {
 						handleMouseEnter();
 						setWhichNavOpen("products");
-					}}>
+					}}
+				>
 					Våra produkter
 				</li>
 				<li
@@ -247,23 +240,27 @@ function Navigation() {
 					onPointerEnter={() => {
 						handleMouseEnter();
 						setWhichNavOpen("design");
-					}}>
+					}}
+				>
 					Designa din egen
 				</li>
 				<li
 					className="text-gray-600 hover:text-gray-800 cursor-pointer"
-					onPointerEnter={handleMouseLeave}>
+					onPointerEnter={handleMouseLeave}
+				>
 					Om oss
 				</li>
 			</ul>
 			<motion.div
 				initial={{ scaleY: 0 }}
 				animate={controls}
-				className="absolute z-10 top-10 left-0 bg-gray-100 w-full border-b origin-top overflow-hidden">
+				className="absolute z-50 top-10 left-0 bg-gray-100 w-full border-b origin-top overflow-hidden"
+			>
 				<motion.div
 					initial={{ opacity: 0, translateX: -20 }}
 					animate={innerControls}
-					className="max-w-7xl mx-auto relative px-8 py-8 origin-top">
+					className="max-w-7xl mx-auto relative px-8 py-8 origin-top"
+				>
 					{whichNavOpen === "products" ? (
 						<ProductsNav />
 					) : whichNavOpen === "design" ? (
@@ -280,12 +277,14 @@ function ProductsNav() {
 		<motion.div
 			className="flex gap-4"
 			initial={{ opacity: 0, translateX: -20 }}
-			animate={{ opacity: 1, translateX: 0 }}>
+			animate={{ opacity: 1, translateX: 0 }}
+		>
 			<ul className="flex gap-4">
 				<li>
 					<Link
 						href="/"
-						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
+						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl"
+					>
 						<FaCrown className="text-4xl" />
 						<span className="text-lg">Bästsäljare</span>
 					</Link>
@@ -293,7 +292,8 @@ function ProductsNav() {
 				<li>
 					<Link
 						href="/"
-						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
+						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl"
+					>
 						<FaStar className="text-4xl" />
 						<span className="text-lg">Utvalda</span>
 					</Link>
@@ -301,7 +301,8 @@ function ProductsNav() {
 				<li>
 					<Link
 						href="/"
-						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
+						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl"
+					>
 						<FaExclamation className="text-4xl" />
 						<span className="text-lg">Nya</span>
 					</Link>
@@ -344,11 +345,13 @@ function DesignNav() {
 		<motion.ul
 			className="flex items-center gap-4"
 			initial={{ opacity: 0, translateX: -20 }}
-			animate={{ opacity: 1, translateX: 0 }}>
+			animate={{ opacity: 1, translateX: 0 }}
+		>
 			<li>
 				<Link
 					href="/"
-					className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
+					className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl"
+				>
 					<AiFillLayout className="text-4xl" />
 					<span className="text-lg">Starta från mall</span>
 				</Link>
@@ -356,7 +359,8 @@ function DesignNav() {
 			<li>
 				<Link
 					href="/"
-					className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
+					className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl"
+				>
 					<FaPencilRuler className="text-4xl" />
 					<span className="text-lg">Designa fritt</span>
 				</Link>
@@ -377,7 +381,8 @@ function MobileSearch() {
 							className="h-6 w-6"
 							fill="none"
 							viewBox="0 0 24 24"
-							stroke="currentColor">
+							stroke="currentColor"
+						>
 							<path
 								strokeLinecap="round"
 								strokeLinejoin="round"

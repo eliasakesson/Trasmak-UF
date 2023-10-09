@@ -10,6 +10,7 @@ export default function Cart() {
 		decrementItem,
 		removeItem,
 		totalPrice,
+		redirectToCheckout,
 	} = useShoppingCart();
 
 	return (
@@ -24,6 +25,7 @@ export default function Cart() {
 				<CartSummary
 					cartDetails={cartDetails}
 					totalPrice={totalPrice || 0}
+					redirectToCheckout={redirectToCheckout}
 				/>
 			</div>
 		</div>
@@ -106,7 +108,8 @@ function CartItem({
 					<div className="px-2 flex gap-4 items-center border rounded-lg font-mono">
 						<button
 							className="md:p-2 p-1 font-semibold md:text-xl"
-							onClick={() => decrementItem(cartItem.id)}>
+							onClick={() => decrementItem(cartItem.id)}
+						>
 							-
 						</button>
 						<span className="font-semibold">
@@ -114,14 +117,16 @@ function CartItem({
 						</span>
 						<button
 							className="md:p-2 p-1 font-semibold md:text-xl"
-							onClick={() => incrementItem(cartItem.id)}>
+							onClick={() => incrementItem(cartItem.id)}
+						>
 							+
 						</button>
 					</div>
 					<button
 						type="button"
 						className="p-2 text-muted"
-						onClick={() => removeItem(cartItem.id)}>
+						onClick={() => removeItem(cartItem.id)}
+					>
 						<FaTrash />
 					</button>
 				</div>
@@ -133,15 +138,37 @@ function CartItem({
 function CartSummary({
 	cartDetails,
 	totalPrice,
+	redirectToCheckout,
 }: {
 	cartDetails: any;
 	totalPrice: number;
+	redirectToCheckout: any;
 }) {
 	const currency =
 		cartDetails[Object.keys(cartDetails)[0]] &&
 		"currency" in cartDetails[Object.keys(cartDetails)[0]]
 			? cartDetails[Object.keys(cartDetails)[0]].currency
 			: "SEK";
+
+	async function Checkout(e: any) {
+		e.preventDefault();
+		try {
+			const result = await redirectToCheckout({
+				mode: "payment",
+				lineItems: Object.keys(cartDetails).map((item) => ({
+					price: cartDetails[item].id,
+					quantity: cartDetails[item].quantity,
+				})),
+				successUrl: `${window.location.origin}/success`,
+				cancelUrl: `${window.location.origin}/cart`,
+				shippingAddressCollection: "required",
+			});
+
+			if (result.error) console.log(result.error.message);
+		} catch (error) {
+			console.log(error);
+		}
+	}
 
 	return (
 		<div className="p-8 bg-gray-100 space-y-8">
@@ -171,14 +198,17 @@ function CartSummary({
 			</div>
 			<div className="flex flex-col items-stretch gap-4">
 				<button
+					onClick={Checkout}
 					type="button"
-					className="py-4 px-8 bg-amber-800 text-white rounded-lg font-semibold">
+					className="py-4 px-8 bg-amber-800 text-white rounded-lg font-semibold"
+				>
 					Gå till kassan
 				</button>
 
 				<Link
 					href="/products"
-					className="py-4 px-8 border-2 rounded-lg font-semibold text-center">
+					className="py-4 px-8 border-2 rounded-lg font-semibold text-center"
+				>
 					Fortsätt handla
 				</Link>
 			</div>
