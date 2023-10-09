@@ -1,5 +1,7 @@
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
 
@@ -16,33 +18,17 @@ export default function Cart() {
 	return (
 		<div className="max-w-7xl mx-auto px-8 py-16 space-y-8">
 			<div className="grid lg:grid-cols-3 grid-cols-1 lg:gap-x-16 gap-x-0 gap-y-16">
-				<CartItems
-					cartDetails={cartDetails}
-					incrementItem={incrementItem}
-					decrementItem={decrementItem}
-					removeItem={removeItem}
-				/>
-				<CartSummary
-					cartDetails={cartDetails}
-					totalPrice={totalPrice || 0}
-					redirectToCheckout={redirectToCheckout}
-				/>
+				<CartItems />
+				<CartSummary />
 			</div>
 		</div>
 	);
 }
 
-function CartItems({
-	cartDetails,
-	incrementItem,
-	decrementItem,
-	removeItem,
-}: {
-	cartDetails: any;
-	incrementItem: any;
-	decrementItem: any;
-	removeItem: any;
-}) {
+function CartItems() {
+	const { cartDetails, incrementItem, decrementItem, removeItem }: any =
+		useShoppingCart();
+
 	return (
 		<div className="col-span-2">
 			<div className="flex justify-between items-center py-4 border-b pb-8">
@@ -108,8 +94,7 @@ function CartItem({
 					<div className="px-2 flex gap-4 items-center border rounded-lg font-mono">
 						<button
 							className="md:p-2 p-1 font-semibold md:text-xl"
-							onClick={() => decrementItem(cartItem.id)}
-						>
+							onClick={() => decrementItem(cartItem.id)}>
 							-
 						</button>
 						<span className="font-semibold">
@@ -117,16 +102,14 @@ function CartItem({
 						</span>
 						<button
 							className="md:p-2 p-1 font-semibold md:text-xl"
-							onClick={() => incrementItem(cartItem.id)}
-						>
+							onClick={() => incrementItem(cartItem.id)}>
 							+
 						</button>
 					</div>
 					<button
 						type="button"
 						className="p-2 text-muted"
-						onClick={() => removeItem(cartItem.id)}
-					>
+						onClick={() => removeItem(cartItem.id)}>
 						<FaTrash />
 					</button>
 				</div>
@@ -135,38 +118,37 @@ function CartItem({
 	);
 }
 
-function CartSummary({
-	cartDetails,
-	totalPrice,
-	redirectToCheckout,
-}: {
-	cartDetails: any;
-	totalPrice: number;
-	redirectToCheckout: any;
-}) {
+function CartSummary() {
+	const { cartCount, cartDetails, totalPrice, redirectToCheckout }: any =
+		useShoppingCart();
+
+	const [isRedirecting, setIsRedirecting] = useState(false);
+
 	const currency =
 		cartDetails[Object.keys(cartDetails)[0]] &&
 		"currency" in cartDetails[Object.keys(cartDetails)[0]]
 			? cartDetails[Object.keys(cartDetails)[0]].currency
 			: "SEK";
 
-	async function Checkout(e: any) {
+	async function onCheckout(e: any) {
 		e.preventDefault();
-		try {
-			const result = await redirectToCheckout({
-				mode: "payment",
-				lineItems: Object.keys(cartDetails).map((item) => ({
-					price: cartDetails[item].id,
-					quantity: cartDetails[item].quantity,
-				})),
-				successUrl: `${window.location.origin}/success`,
-				cancelUrl: `${window.location.origin}/cart`,
-				shippingAddressCollection: "required",
-			});
 
-			if (result.error) console.log(result.error.message);
+		if (cartCount <= 0) return;
+		setIsRedirecting(true);
+
+		try {
+			const { id } = await axios
+				.post("/api/checkout_sessions", cartDetails)
+				.then((res) => res.data);
+
+			const result = await redirectToCheckout(id);
+			if (result?.error) {
+				console.error(result);
+			}
 		} catch (error) {
-			console.log(error);
+			console.error(error);
+		} finally {
+			setIsRedirecting(false);
 		}
 	}
 
@@ -198,17 +180,16 @@ function CartSummary({
 			</div>
 			<div className="flex flex-col items-stretch gap-4">
 				<button
-					onClick={Checkout}
+					disabled={isRedirecting}
+					onClick={onCheckout}
 					type="button"
-					className="py-4 px-8 bg-amber-800 text-white rounded-lg font-semibold"
-				>
+					className="py-4 px-8 bg-primary text-white rounded-lg font-semibold">
 					Gå till kassan
 				</button>
 
 				<Link
 					href="/products"
-					className="py-4 px-8 border-2 rounded-lg font-semibold text-center"
-				>
+					className="py-4 px-8 border-2 rounded-lg font-semibold text-center">
 					Fortsätt handla
 				</Link>
 			</div>
