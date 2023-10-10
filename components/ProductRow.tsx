@@ -5,16 +5,25 @@ import { formatCurrencyString } from "use-shopping-cart/core";
 
 export default function ProductRow({
 	title,
+	description,
 	products,
+	left,
 }: {
 	title: string;
+	description: string;
 	products: any;
+	left?: boolean;
 }) {
 	return (
-		<div className="flex flex-col space-y-8 max-w-7xl w-full mx-auto px-4">
-			<h2 className="text-3xl font-bold">{title}</h2>
+		<div
+			className={`flex flex-col ${
+				!left ? "items-center" : ""
+			} space-y-4 w-full`}>
+			{title && <h2 className="text-4xl font-bold">{title}</h2>}
+			{description && <p className="text-muted text-lg">{description}</p>}
+			<br />
 			<div className="w-full grid lg:grid-cols-4 lg:gap-8 grid-cols-2 gap-4">
-				{products.map((product: any) => (
+				{products?.map((product: any) => (
 					<ProductCard key={product.id} {...product} />
 				))}
 			</div>

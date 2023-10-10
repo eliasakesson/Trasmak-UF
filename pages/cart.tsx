@@ -31,7 +31,7 @@ function CartItems() {
 
 	return (
 		<div className="col-span-2">
-			<div className="flex justify-between items-center py-4 border-b pb-8">
+			<div className="flex justify-between items-center py-4 pb-8">
 				<h1 className="text-4xl font-bold">Min Varukorg</h1>
 				<p className="text-gray-500">
 					{Object.keys(cartDetails).length}{" "}
@@ -81,9 +81,15 @@ function CartItem({
 
 			<div className="flex md:flex-row flex-col flex-1">
 				<div className="flex-1">
-					<p className="text-xl font-semibold">{cartItem.name}</p>
+					<Link
+						href={`products/${cartItem.id.substring(
+							6,
+							cartItem.id.length
+						)}`}
+						className="text-xl font-semibold">
+						{cartItem.name}
+					</Link>
 				</div>
-
 				<div className="flex items-center md:gap-8 gap-2">
 					<p className="font-semibold text-xl md:flex-grow-0 flex-grow">
 						{formatCurrencyString({

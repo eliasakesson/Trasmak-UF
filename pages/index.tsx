@@ -4,19 +4,18 @@ import { useShoppingCart, formatCurrencyString } from "use-shopping-cart";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
 import ProductRow from "@/components/ProductRow";
+import Hero from "@/components/Hero";
 
 export default function Home({ products }: { products: any }) {
-	const { addItem } = useShoppingCart();
-
-	function onAddToCart(product: any) {
-		const id = toast.loading("Adding 1 item...");
-		addItem(product);
-		toast.success(`${product.name} added`, { id });
-	}
-
 	return (
-		<main className="flex flex-col items-center min-h-screen py-16">
-			<ProductRow title="Bästsäljare" products={products} />
+		<main className="max-w-7xl mx-auto px-8 sm:space-y-32 space-y-8 pb-16">
+			<Hero />
+			<ProductRow
+				title="Bästsäljare"
+				description="Detta är de brickor som säljs som bäst. Passa på innan de tar
+				slut!"
+				products={products}
+			/>
 		</main>
 	);
 }

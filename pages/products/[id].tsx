@@ -1,4 +1,5 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
+import ProductRow from "@/components/ProductRow";
 import { stripe } from "@/utils/stripe";
 import Image from "next/image";
 import toast from "react-hot-toast";
@@ -7,7 +8,13 @@ import { FaEarthAmericas } from "react-icons/fa6";
 import { MdDiscount, MdLocalShipping } from "react-icons/md";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
 
-export default function Product({ product }: { product: any }) {
+export default function Product({
+	product,
+	products,
+}: {
+	product: any;
+	products: any;
+}) {
 	return (
 		<div className="max-w-7xl mx-auto px-8 py-16 space-y-8">
 			<Breadcrumbs productName={product.name} />
@@ -16,6 +23,12 @@ export default function Product({ product }: { product: any }) {
 				<ProductInfo product={product} />
 				<div className="col-span-1">{product.description}</div>
 			</div>
+			<ProductRow
+				title="Liknande produkter"
+				description=""
+				products={products}
+				left
+			/>
 		</div>
 	);
 }
@@ -68,14 +81,12 @@ function ProductInfo({ product }: { product: any }) {
 						toast.success(`${product.name} tillagd i varukorgen`);
 					}}
 					type="button"
-					className="bg-amber-800 text-white px-12 py-4 rounded-lg font-semibold"
-				>
+					className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold">
 					Lägg i varukorgen
 				</button>
 				<button
 					type="button"
-					className="border-2 border-muted_light px-4 rounded-lg"
-				>
+					className="border-2 hover:bg-gray-100 px-4 rounded-lg">
 					<FaHeart size={20} />
 				</button>
 			</div>
@@ -120,20 +131,33 @@ export async function getStaticProps({ params }: { params: { id: string } }) {
 		expand: ["data.product"],
 	});
 
-	const product: any = inventory.data.find(
+	const inventoryProduct: any = inventory.data.find(
 		(item) => item.id === "price_" + params.id
 	);
 
+	const product = {
+		id: inventoryProduct.id,
+		name: inventoryProduct.product.name,
+		price: inventoryProduct.unit_amount,
+		currency: inventoryProduct.currency,
+		image: inventoryProduct.product.images[0],
+		description: inventoryProduct.product.description,
+	};
+
+	const products = inventory.data
+		.map((product: any) => ({
+			id: product.id,
+			price: product.unit_amount,
+			currency: product.currency,
+			name: product.product.name,
+			image: product.product.images[0],
+		}))
+		.sort(() => Math.random() - 0.5);
+
 	return {
 		props: {
-			product: {
-				id: product.id,
-				name: product.product.name,
-				price: product.unit_amount,
-				currency: product.currency,
-				image: product.product.images[0],
-				description: product.product.description,
-			},
+			product,
+			products,
 		},
 		revalidate: 3600,
 	};
