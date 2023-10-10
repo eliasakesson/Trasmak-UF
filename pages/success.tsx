@@ -27,11 +27,13 @@ export default function Success() {
 					<svg
 						className="w-12 h-12 fill-green-400 mb-2"
 						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 20 20">
+						viewBox="0 0 20 20"
+					>
 						<path
 							fillRule="evenodd"
 							d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-							clipRule="evenodd"></path>
+							clipRule="evenodd"
+						></path>
 					</svg>
 					<h1 className="font-bold text-2xl">
 						Vi har mottagit din order!
@@ -104,7 +106,8 @@ export default function Success() {
 																.unit_amount,
 															currency:
 																item.price
-																	.currency,
+																	.currency ??
+																"sek",
 													  })
 													: "0"}
 											</p>
@@ -124,7 +127,7 @@ export default function Success() {
 							<p>
 								{formatCurrencyString({
 									value: data?.amount_subtotal,
-									currency: data?.currency,
+									currency: data?.currency ?? "sek",
 								})}
 							</p>
 						</li>
@@ -137,7 +140,7 @@ export default function Success() {
 							<p className="text-2xl font-semibold">
 								{formatCurrencyString({
 									value: data?.amount_total,
-									currency: data?.currency,
+									currency: data?.currency ?? "sek",
 								})}
 							</p>
 						</li>
