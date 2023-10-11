@@ -23,9 +23,20 @@ export default function ProductRow({
 			{description && <p className="text-muted text-lg">{description}</p>}
 			<br />
 			<div className="w-full grid lg:grid-cols-4 lg:gap-8 grid-cols-2 gap-4">
-				{products?.map((product: any) => (
-					<ProductCard key={product.id} {...product} />
-				))}
+				{products?.map((product: any) => {
+					if (product?.metadata?.best_seller === "true") {
+						return (
+							<ProductCard
+								key={product.id}
+								id={product.id}
+								name={product.name}
+								price={product.price}
+								image={product.image}
+								currency={product.currency}
+							/>
+						);
+					}
+				})}
 			</div>
 		</div>
 	);
@@ -70,8 +81,7 @@ function ProductCard({
 							{formatCurrencyString({
 								value: price,
 								currency,
-							})}{" "}
-							SEK
+							})}
 						</p>
 					</div>
 				</div>
