@@ -1,9 +1,21 @@
 import { stripe } from "@/utils/stripe";
 import { validateCartItems } from "use-shopping-cart/utilities";
+import { db } from "../firebase";
 
 export default async function handler(req, res) {
-	if (req.method === "POST") {
+	if (req.method === "POST") {	
 		try {
+			const ref = db.ref('config');
+			let data = {};
+			await ref.once('value', (snapshot) => {
+			  data = snapshot.val();
+			});
+
+			if (!data || data.length === 0 || !data.shippingCost || !data.freeShippingThreshold) {
+				res.status(500).json({ statusCode: 500, message: "Something went wrong!" });
+				return;
+			}
+
 			const cartDetails = req.body;
 			const inventory = await stripe.prices.list({
 				expand: ["data.product"],
@@ -22,9 +34,9 @@ export default async function handler(req, res) {
 			const lineItems = validateCartItems(products, cartDetails);
 
 			const isFreeShipping = lineItems.reduce(
-				(acc, price) => acc + price.price * price.quantity,
+				(acc, product) => acc + product.price_data.unit_amount * product.quantity,
 				0
-			) >= 49000;
+			) >= data.freeShippingThreshold;
 			
 			const session = await stripe.checkout.sessions.create({
 				mode: "payment",
@@ -38,7 +50,7 @@ export default async function handler(req, res) {
 					  shipping_rate_data: {
 						type: 'fixed_amount',
 						fixed_amount: {
-						  amount: isFreeShipping ? 0 : 5900,
+						  amount: isFreeShipping ? 0 : data.shippingCost,
 						  currency: 'sek',
 						},
 						display_name: isFreeShipping ? "Gratis leverans" : 'Standardleverans',
@@ -57,7 +69,7 @@ export default async function handler(req, res) {
 				  ],
 			});
 			res.status(200).json({ id: session.id });
-		} catch {
+		} catch (error) {
 			console.error(error);
 			res.status(500).json({ statusCode: 500, message: error.message });
 		}
