@@ -33,6 +33,7 @@ export async function getStaticProps() {
 		name: product.product.name,
 		description: product.product.description,
 		image: product.product.images[0],
+		metadata: product.product.metadata,
 	}));
 
 	return {
