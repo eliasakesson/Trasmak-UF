@@ -20,6 +20,12 @@ export default async function handler(req, res) {
 			});
 
 			const lineItems = validateCartItems(products, cartDetails);
+
+			const isFreeShipping = lineItems.reduce(
+				(acc, price) => acc + price.price * price.quantity,
+				0
+			) >= 49000;
+			
 			const session = await stripe.checkout.sessions.create({
 				mode: "payment",
 				payment_method_types: ["card", "klarna"],
@@ -27,6 +33,28 @@ export default async function handler(req, res) {
 				success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
 				cancel_url: `${req.headers.origin}/cart`,
 				shipping_address_collection: { allowed_countries: ["SE"] },
+				shipping_options: [
+					{
+					  shipping_rate_data: {
+						type: 'fixed_amount',
+						fixed_amount: {
+						  amount: isFreeShipping ? 0 : 5900,
+						  currency: 'sek',
+						},
+						display_name: isFreeShipping ? "Gratis leverans" : 'Standardleverans',
+						delivery_estimate: {
+						  minimum: {
+							unit: 'business_day',
+							value: 3,
+						  },
+						  maximum: {
+							unit: 'business_day',
+							value: 7,
+						  },
+						},
+					  },
+					},
+				  ],
 			});
 			res.status(200).json({ id: session.id });
 		} catch {
