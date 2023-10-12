@@ -36,6 +36,10 @@ export async function getStaticProps() {
 		metadata: product.product.metadata,
 	}));
 
+	products.sort((a, b) => {
+		return Math.random() - 0.5;
+	});
+
 	return {
 		props: {
 			products,

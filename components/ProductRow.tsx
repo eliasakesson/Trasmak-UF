@@ -22,8 +22,8 @@ export default function ProductRow({
 			{title && <h2 className="text-4xl font-bold">{title}</h2>}
 			{description && <p className="text-muted text-lg">{description}</p>}
 			<br />
-			<div className="w-full grid lg:grid-cols-4 lg:gap-8 grid-cols-2 gap-4">
-				{products?.map((product: any) => {
+			<div className="w-full grid lg:grid-cols-3 lg:gap-8 grid-cols-2 gap-4">
+				{products?.slice(0, 3).map((product: any) => {
 					if (product?.metadata?.best_seller === "true") {
 						return (
 							<ProductCard
@@ -58,15 +58,16 @@ function ProductCard({
 	return (
 		<Link href={`/products/${id.substring(6, id.length)}`}>
 			<div className="bg-white rounded-xl overflow-hidden border border-gray-100">
-				<div className="relative overflow-hidden bg-gray-100 aspect-[4/3]">
-					<Image
-						className="mix-blend-multiply object-contain"
-						src={image}
-						alt=""
-						fill
-						sizes="100%"
-						layout="fill"
-					/>
+				<div className="relative overflow-hidden bg-gray-100 aspect-[4/3] p-4">
+					<div className="w-full h-full">
+						<Image
+							className="mix-blend-multiply object-contain w-full h-full"
+							src={image}
+							alt=""
+							width={500}
+							height={400}
+						/>
+					</div>
 				</div>
 				<div className="p-4 sm:space-y-2 space-y-1">
 					<h3 className="font-medium sm:text-xl text-base">{name}</h3>

@@ -6,17 +6,8 @@ import { FaTrash } from "react-icons/fa";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
 
 export default function Cart() {
-	const {
-		cartDetails,
-		incrementItem,
-		decrementItem,
-		removeItem,
-		totalPrice,
-		redirectToCheckout,
-	} = useShoppingCart();
-
 	return (
-		<div className="max-w-7xl mx-auto px-8 py-16 space-y-8">
+		<div className="max-w-7xl mx-auto px-8 py-16 space-y-8 min-h-[calc(100vh-108px)]">
 			<div className="grid lg:grid-cols-3 grid-cols-1 lg:gap-x-16 gap-x-0 gap-y-16">
 				<CartItems />
 				<CartSummary />
@@ -172,13 +163,20 @@ function CartSummary() {
 				</div>
 				<div className="flex items-center justify-between py-4 border-b border-border_dark">
 					<p className="font-semibold text-xl">Frakt</p>
-					<p className="font-semibold text-xl">59,00 kr</p>
+					<p className="font-semibold text-xl">
+						{totalPrice > 0 && totalPrice < 50000
+							? `59,00 kr`
+							: `0,00 kr`}
+					</p>
 				</div>
 				<div className="flex items-center justify-between py-4 border-b border-border_dark">
 					<p className="font-semibold text-xl">Totalt</p>
 					<p className="font-semibold text-xl">
 						{formatCurrencyString({
-							value: totalPrice + 5900,
+							value:
+								totalPrice > 0 && totalPrice < 50000
+									? totalPrice + 5900
+									: totalPrice,
 							currency,
 						})}
 					</p>
