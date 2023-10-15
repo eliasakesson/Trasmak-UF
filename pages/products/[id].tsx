@@ -84,11 +84,6 @@ function ProductInfo({ product }: { product: any }) {
 					className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold">
 					Lägg i varukorgen
 				</button>
-				<button
-					type="button"
-					className="border-2 hover:bg-gray-100 px-4 rounded-lg">
-					<FaHeart size={20} />
-				</button>
 			</div>
 
 			<ul className="space-y-2 text-muted">
