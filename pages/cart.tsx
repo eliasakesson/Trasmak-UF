@@ -4,13 +4,15 @@ import Link from "next/link";
 import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
+import { ref, get } from "firebase/database";
+import { db } from "../firebase";
 
-export default function Cart() {
+export default function Cart({ config }: any) {
 	return (
 		<div className="max-w-7xl mx-auto px-8 py-16 space-y-8 min-h-[calc(100vh-108px)]">
 			<div className="grid lg:grid-cols-3 grid-cols-1 lg:gap-x-16 gap-x-0 gap-y-16">
 				<CartItems />
-				<CartSummary />
+				<CartSummary config={config} />
 			</div>
 		</div>
 	);
@@ -77,7 +79,8 @@ function CartItem({
 							6,
 							cartItem.id.length
 						)}`}
-						className="text-xl font-semibold">
+						className="text-xl font-semibold"
+					>
 						{cartItem.name}
 					</Link>
 				</div>
@@ -91,7 +94,8 @@ function CartItem({
 					<div className="px-2 flex gap-4 items-center border rounded-lg font-mono">
 						<button
 							className="md:p-2 p-1 font-semibold md:text-xl"
-							onClick={() => decrementItem(cartItem.id)}>
+							onClick={() => decrementItem(cartItem.id)}
+						>
 							-
 						</button>
 						<span className="font-semibold">
@@ -99,14 +103,16 @@ function CartItem({
 						</span>
 						<button
 							className="md:p-2 p-1 font-semibold md:text-xl"
-							onClick={() => incrementItem(cartItem.id)}>
+							onClick={() => incrementItem(cartItem.id)}
+						>
 							+
 						</button>
 					</div>
 					<button
 						type="button"
 						className="p-2 text-muted"
-						onClick={() => removeItem(cartItem.id)}>
+						onClick={() => removeItem(cartItem.id)}
+					>
 						<FaTrash />
 					</button>
 				</div>
@@ -115,7 +121,7 @@ function CartItem({
 	);
 }
 
-function CartSummary() {
+function CartSummary({ config }: { config: any }) {
 	const { cartCount, cartDetails, totalPrice, redirectToCheckout }: any =
 		useShoppingCart();
 
@@ -164,9 +170,14 @@ function CartSummary() {
 				<div className="flex items-center justify-between py-4 border-b border-border_dark">
 					<p className="font-semibold text-xl">Frakt</p>
 					<p className="font-semibold text-xl">
-						{totalPrice > 0 && totalPrice < 50000
-							? `59,00 kr`
-							: `0,00 kr`}
+						{formatCurrencyString({
+							value:
+								totalPrice > 0 &&
+								totalPrice < config?.freeShippingThreshold
+									? config?.shippingCost
+									: 0,
+							currency,
+						})}
 					</p>
 				</div>
 				<div className="flex items-center justify-between py-4 border-b border-border_dark">
@@ -174,8 +185,9 @@ function CartSummary() {
 					<p className="font-semibold text-xl">
 						{formatCurrencyString({
 							value:
-								totalPrice > 0 && totalPrice < 50000
-									? totalPrice + 5900
+								totalPrice > 0 &&
+								totalPrice < config?.freeShippingThreshold
+									? totalPrice + config?.shippingCost
 									: totalPrice,
 							currency,
 						})}
@@ -187,16 +199,31 @@ function CartSummary() {
 					disabled={isRedirecting}
 					onClick={onCheckout}
 					type="button"
-					className="py-4 px-8 bg-primary text-white rounded-lg font-semibold">
+					className="py-4 px-8 bg-primary text-white rounded-lg font-semibold"
+				>
 					Gå till kassan
 				</button>
 
 				<Link
 					href="/products"
-					className="py-4 px-8 border-2 rounded-lg font-semibold text-center">
+					className="py-4 px-8 border-2 rounded-lg font-semibold text-center"
+				>
 					Fortsätt handla
 				</Link>
 			</div>
 		</div>
 	);
+}
+
+export async function getStaticProps() {
+	const configRef = ref(db, "config");
+
+	const configSnap = await get(configRef);
+	const config = configSnap.val();
+
+	return {
+		props: {
+			config: config,
+		},
+	};
 }
