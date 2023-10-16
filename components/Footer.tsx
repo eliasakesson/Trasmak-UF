@@ -1,9 +1,11 @@
+import Link from "next/link";
+
 export default function Footer() {
 	return (
 		<footer className="bg-gray-100">
 			<div className="max-w-7xl mx-auto px-8 py-16">
-				<div className="grid md:grid-cols-2 gap-8">
-					<div className="space-y-8">
+				<div className="grid lg:grid-cols-4 sm:grid-cols-2 gap-8">
+					<div className="sm:col-span-2 space-y-8">
 						<svg
 							width="200"
 							height="40"
@@ -30,6 +32,17 @@ export default function Footer() {
 							scelerisque, at rutrum nulla dictum. Ut ac ligula
 							sapien. Suspendisse cursus faucibus finibus.
 						</p>
+					</div>
+					<div className="space-y-8">
+						<h3 className="text-2xl font-semibold">Navigation</h3>
+						<ul className="space-y-2">
+							<li>
+								<Link href="/">Hem</Link>
+							</li>
+							<li>
+								<Link href="/products">Produkter</Link>
+							</li>
+						</ul>
 					</div>
 					<div className="space-y-8">
 						<h3 className="text-2xl font-semibold">Kontakt</h3>

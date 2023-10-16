@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { FaHeart } from "react-icons/fa";
 
 export default function Hero() {
 	return (
-		<div className="min-h-[75vh] w-full flex lg:flex-row flex-col-reverse lg:justify-between items-center relative py-8">
+		<section className="min-h-[75vh] w-full flex lg:flex-row flex-col-reverse lg:justify-between items-center relative py-8">
 			<div className="sm:space-y-8 space-y-4 max-w-prose py-8">
 				<h1 className="md:text-6xl sm:text-5xl text-4xl font-bold leading-tight text-gray-900">
 					Personlig touch till ditt hem med graverad bricka.
@@ -19,9 +20,11 @@ export default function Hero() {
 					<button className="bg-primary text-white px-12 py-3 font-semibold rounded-md hover:bg-primary_light transition-colors">
 						Designa din bricka
 					</button>
-					<button className="border-2 px-12 py-3 font-semibold rounded-md hover:bg-gray-100 transition-colors">
+					<Link
+						href="/products"
+						className="border-2 px-12 py-3 font-semibold rounded-md hover:bg-gray-100 transition-colors">
 						Se våra brickor
-					</button>
+					</Link>
 				</div>
 			</div>
 			<div className="flex flex-col items-end -space-y-8">
@@ -57,6 +60,6 @@ export default function Hero() {
 					</div>
 				</motion.div>
 			</div>
-		</div>
+		</section>
 	);
 }

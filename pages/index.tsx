@@ -1,10 +1,7 @@
-import { checkout } from "../checkout";
-import { stripe } from "../utils/stripe";
-import { useShoppingCart, formatCurrencyString } from "use-shopping-cart";
-import { toast } from "react-hot-toast";
-import Link from "next/link";
 import ProductRow from "@/components/ProductRow";
 import Hero from "@/components/Hero";
+import GetProducts from "@/utils/getProducts";
+import PersonalSection from "@/components/PersonalSection";
 
 export default function Home({ products }: { products: any }) {
 	return (
@@ -15,30 +12,21 @@ export default function Home({ products }: { products: any }) {
 				description="Detta är de brickor som säljs som bäst. Passa på innan de tar
 				slut!"
 				products={products}
+				metadata="best_seller"
+			/>
+			<PersonalSection />
+			<ProductRow
+				title="Våra favoritmallar"
+				description="Skapa personliga brickor baserat på våra bästa mallar!"
+				products={products}
+				metadata=""
 			/>
 		</main>
 	);
 }
 
 export async function getStaticProps() {
-	const inventory = await stripe.prices.list({
-		expand: ["data.product"],
-		limit: 8,
-	});
-
-	const products = inventory.data.map((product: any) => ({
-		id: product.id,
-		price: product.unit_amount,
-		currency: product.currency,
-		name: product.product.name,
-		description: product.product.description,
-		image: product.product.images[0],
-		metadata: product.product.metadata,
-	}));
-
-	products.sort((a, b) => {
-		return Math.random() - 0.5;
-	});
+	const products = await GetProducts(true);
 
 	return {
 		props: {
