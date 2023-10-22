@@ -142,13 +142,20 @@ function Search() {
 						.map((product: any) => (
 							<li key={product.id}>
 								<Link
-									href={`/products?search_input=${product.name}`}
+									href={`/products/${product.id.substring(
+										6,
+										product.id.length
+									)}`}
 									onClick={() => {
 										setIsSearchOpen(false);
-										setSearchInput(product.name);
 									}}>
-									<div className="w-full py-2">
-										{product.name}
+									<div className="w-full py-2 flex gap-4 items-center">
+										<img
+											src={product.image}
+											alt={product.name}
+											className="w-8 h-8 object-contain"
+										/>
+										<span>{product.name}</span>
 									</div>
 								</Link>
 							</li>

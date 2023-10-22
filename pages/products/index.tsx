@@ -113,7 +113,7 @@ function Filters({ setFilters }: { setFilters: any }) {
 			</div>
 			<div>
 				<h4 className="border-b py-1">Motiv</h4>
-				<ul className="space-y-2 mt-2">
+				<ul className="mt-2 flex md:flex-col gap-2">
 					<li className="flex items-center gap-2">
 						<input
 							type="checkbox"
