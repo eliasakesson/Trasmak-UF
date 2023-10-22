@@ -23,3 +23,19 @@ export default async function GetProducts(randomize = false) {
 
 	return products;
 }
+
+export async function GetProduct(id) {
+	const product = await stripe.prices.retrieve(id, {
+		expand: ["product"],
+	});
+
+	return {
+		id: product.id,
+		price: product.unit_amount,
+		currency: product.currency,
+		name: product.product.name,
+		description: product.product.description,
+		image: product.product.images[0],
+		metadata: product.product.metadata,
+	};
+}

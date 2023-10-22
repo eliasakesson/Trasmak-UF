@@ -34,7 +34,7 @@ function Announcement() {
 		<div className="bg-primary text-white py-2">
 			<div className="container mx-auto flex justify-center items-center">
 				<p className="text-sm font-semibold">
-					JUST NU: KÖP 3 FÅ 1 EXTRA PÅ KÖPET
+					FRI FRAKT VID KÖP ÖVER 500 KR
 				</p>
 			</div>
 		</div>
@@ -113,7 +113,7 @@ function Search() {
 					onBlur={() => setIsSearchOpen(false)}
 					value={searchInput}
 					onChange={(e) => setSearchInput(e.target.value)}
-					className="w-full border border-gray-300 rounded-md py-2 pr-10 pl-4 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+					className="w-full border border-gray-300 rounded-md py-2 pr-10 pl-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
 				/>
 			</form>
 			<Link
@@ -406,7 +406,7 @@ function DesignNav() {
 			animate={{ opacity: 1, translateX: 0 }}>
 			<li>
 				<Link
-					href="/"
+					href="/design"
 					className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
 					<AiFillLayout className="text-4xl" />
 					<span className="text-lg">Starta från mall</span>
@@ -414,7 +414,7 @@ function DesignNav() {
 			</li>
 			<li>
 				<Link
-					href="/"
+					href="/design"
 					className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
 					<FaPencilRuler className="text-4xl" />
 					<span className="text-lg">Designa fritt</span>

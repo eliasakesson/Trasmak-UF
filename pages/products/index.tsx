@@ -36,7 +36,7 @@ export default function Products({ products }: { products: any }) {
 
 function ProductsAndFilterGrid({ products }: { products: any }) {
 	const [sortVal, setSortVal] = useState("1");
-	const [filters, setFilters] = useState([]);
+	const [filters, setFilters] = useState({ type: [], category: [] });
 
 	return (
 		<div className="w-full">
@@ -65,19 +65,52 @@ function ProductsAndFilterGrid({ products }: { products: any }) {
 }
 
 function Filters({ setFilters }: { setFilters: any }) {
-	function onFilterChange(e: any) {
+	function onFilterChange(e: any, type: string) {
 		if (e.target.checked) {
-			setFilters((prev: any) => [...prev, e.target.value]);
+			setFilters((prev: any) => ({
+				...prev,
+				[type]: [...prev[type], e.target.value],
+			}));
 		} else {
-			setFilters((prev: any) =>
-				prev.filter((filter: any) => filter !== e.target.value)
-			);
+			setFilters((prev: any) => {
+				const newFilters = prev[type].filter(
+					(filter: string) => filter !== e.target.value
+				);
+
+				return {
+					...prev,
+					[type]: newFilters,
+				};
+			});
 		}
 	}
 
 	return (
 		<div className="space-y-4">
 			<h3 className="text-2xl font-bold text-gray-900">Filter</h3>
+			<div>
+				<h4 className="border-b py-1">Typ</h4>
+				<ul className="space-y-2 mt-2">
+					<li className="flex items-center gap-2">
+						<input
+							type="checkbox"
+							className="w-4 h-4"
+							value="common"
+							onChange={(e) => onFilterChange(e, "type")}
+						/>
+						<label>Färdiga</label>
+					</li>
+					<li className="flex items-center gap-2">
+						<input
+							type="checkbox"
+							className="w-4 h-4"
+							value="template"
+							onChange={(e) => onFilterChange(e, "type")}
+						/>
+						<label>Mallar</label>
+					</li>
+				</ul>
+			</div>
 			<div>
 				<h4 className="border-b py-1">Motiv</h4>
 				<ul className="space-y-2 mt-2">
@@ -86,7 +119,7 @@ function Filters({ setFilters }: { setFilters: any }) {
 							type="checkbox"
 							className="w-4 h-4"
 							value="city"
-							onChange={onFilterChange}
+							onChange={(e) => onFilterChange(e, "category")}
 						/>
 						<label>Städer</label>
 					</li>
@@ -95,7 +128,7 @@ function Filters({ setFilters }: { setFilters: any }) {
 							type="checkbox"
 							className="w-4 h-4"
 							value="family"
-							onChange={onFilterChange}
+							onChange={(e) => onFilterChange(e, "category")}
 						/>
 						<label>Familj</label>
 					</li>
@@ -104,7 +137,7 @@ function Filters({ setFilters }: { setFilters: any }) {
 							type="checkbox"
 							className="w-4 h-4"
 							value="animal"
-							onChange={onFilterChange}
+							onChange={(e) => onFilterChange(e, "category")}
 						/>
 						<label>Djur</label>
 					</li>
@@ -121,7 +154,7 @@ function ProductGrid({
 }: {
 	products: any;
 	sortVal: string;
-	filters: string[];
+	filters: { type: string[]; category: string[] };
 }) {
 	const router = useRouter();
 
@@ -138,11 +171,12 @@ function ProductGrid({
 			}
 		})
 		.filter((product: any) => {
-			if (filters.length === 0) {
-				return true;
-			} else {
-				return filters.includes(product.metadata.category);
-			}
+			return (
+				(filters.category.length === 0 ||
+					filters.category.includes(product.metadata.category)) &&
+				(filters.type.length === 0 ||
+					filters.type.includes(product.metadata.type))
+			);
 		})
 		.sort((a: any, b: any) => {
 			return sortVal === "4"
@@ -171,6 +205,7 @@ function ProductGrid({
 						price={product.price}
 						image={product.image}
 						currency={product.currency}
+						cartBtn={product.metadata["type"] !== "template"}
 					/>
 				))}
 			</>
@@ -185,6 +220,7 @@ function ProductGrid({
 			price={product.price}
 			image={product.image}
 			currency={product.currency}
+			cartBtn={product.metadata["type"] !== "template"}
 		/>
 	));
 }

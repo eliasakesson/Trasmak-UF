@@ -11,12 +11,16 @@ export default function ProductRow({
 	products,
 	left,
 	metadata,
+	type,
+	ignore,
 }: {
 	title: string;
 	description: string;
 	products: any;
 	left?: boolean;
 	metadata?: string;
+	type?: string;
+	ignore?: string;
 }) {
 	return (
 		<section
@@ -30,7 +34,10 @@ export default function ProductRow({
 				{products
 					?.filter(
 						(product: any) =>
-							!metadata || product?.metadata[metadata] === "true"
+							product.id !== ignore &&
+							(!type || product?.metadata["type"] === type) &&
+							(!metadata ||
+								product?.metadata[metadata] === "true")
 					)
 					.slice(0, document.body.clientWidth < 1024 ? 2 : 3)
 					.map((product: any) => (
@@ -41,6 +48,7 @@ export default function ProductRow({
 							price={product.price}
 							image={product.image}
 							currency={product.currency}
+							cartBtn={product?.metadata["type"] !== "template"}
 						/>
 					))}
 			</div>
@@ -54,12 +62,14 @@ export function ProductCard({
 	price,
 	image,
 	currency,
+	cartBtn = true,
 }: {
 	id: string;
 	name: string;
 	price: number;
 	image: string;
 	currency: string;
+	cartBtn?: boolean;
 }) {
 	const { addItem } = useShoppingCart();
 
@@ -96,15 +106,25 @@ export function ProductCard({
 								</p>
 							</div>
 						</div>
-						<button
-							className="bg-primary text-white sm:p-4 p-2 sm:rounded-lg rounded-md"
-							onClick={(e) => {
-								e.preventDefault();
-								addItem({ id, name, price, image, currency });
-								toast.success(`${name} tillagd i varukorgen`);
-							}}>
-							<FaPlus className="mx-auto" />
-						</button>
+						{cartBtn && (
+							<button
+								className="bg-primary text-white sm:p-4 p-2 sm:rounded-lg rounded-md"
+								onClick={(e) => {
+									e.preventDefault();
+									addItem({
+										id,
+										name,
+										price,
+										image,
+										currency,
+									});
+									toast.success(
+										`${name} tillagd i varukorgen`
+									);
+								}}>
+								<FaPlus className="mx-auto" />
+							</button>
+						)}
 					</div>
 				</div>
 			</div>
