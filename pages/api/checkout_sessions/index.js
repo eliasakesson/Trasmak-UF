@@ -44,6 +44,12 @@ export default async function handler(req, res) {
 				line_items: lineItems,
 				success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
 				cancel_url: `${req.headers.origin}/cart`,
+				metadata: {data: Object.values(cartDetails)?.map((item) => {
+					return {
+						"name": item.name,
+						"data": item.product_data
+					}
+				})},
 				shipping_address_collection: { allowed_countries: ["SE"] },
 				shipping_options: [
 					{
@@ -68,6 +74,7 @@ export default async function handler(req, res) {
 					},
 				  ],
 			});
+			console.log("Session: " + session);
 			res.status(200).json({ id: session.id });
 		} catch (error) {
 			console.error(error);
