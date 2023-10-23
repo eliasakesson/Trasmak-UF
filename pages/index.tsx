@@ -13,13 +13,14 @@ export default function Home({ products }: { products: any }) {
 				slut!"
 				products={products}
 				metadata="best_seller"
+				type="common"
 			/>
 			<PersonalSection />
 			<ProductRow
 				title="Våra favoritmallar"
 				description="Skapa personliga brickor baserat på våra bästa mallar!"
 				products={products}
-				metadata=""
+				type="template"
 			/>
 		</main>
 	);

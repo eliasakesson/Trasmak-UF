@@ -1,5 +1,6 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductRow from "@/components/ProductRow";
+import GetProducts, { GetProduct } from "@/utils/getProducts";
 import { stripe } from "@/utils/stripe";
 import Image from "next/image";
 import toast from "react-hot-toast";
@@ -18,7 +19,7 @@ export default function Product({
 	return (
 		<div className="max-w-7xl mx-auto px-8 py-16 space-y-8">
 			<Breadcrumbs productName={product.name} />
-			<div className="grid grid-cols-2 grid-rows-2 gap-16">
+			<div className="grid md:grid-cols-2 md:grid-rows-2 gap-16">
 				<Images image={product.image} />
 				<ProductInfo product={product} />
 				<div className="col-span-1">{product.description}</div>
@@ -28,6 +29,8 @@ export default function Product({
 				description=""
 				products={products}
 				left
+				type={product.metadata.type}
+				ignore={product.id}
 			/>
 		</div>
 	);
@@ -53,7 +56,7 @@ function ProductInfo({ product }: { product: any }) {
 	const { addItem } = useShoppingCart();
 
 	return (
-		<div className="row-span-2 row-end-2 space-y-8">
+		<div className="md:row-span-2 row-end-2 space-y-8">
 			<div className="space-y-2">
 				<h1 className="text-4xl font-semibold">{product.name}</h1>
 				<div className="flex items-center gap-4">
@@ -126,32 +129,8 @@ function Stars({ rating }: { rating: number }) {
 }
 
 export async function getStaticProps({ params }: { params: { id: string } }) {
-	const inventory = await stripe.prices.list({
-		expand: ["data.product"],
-	});
-
-	const inventoryProduct: any = inventory.data.find(
-		(item) => item.id === "price_" + params.id
-	);
-
-	const product = {
-		id: inventoryProduct.id,
-		name: inventoryProduct.product.name,
-		price: inventoryProduct.unit_amount,
-		currency: inventoryProduct.currency,
-		image: inventoryProduct.product.images[0],
-		description: inventoryProduct.product.description,
-	};
-
-	const products = inventory.data
-		.map((product: any) => ({
-			id: product.id,
-			price: product.unit_amount,
-			currency: product.currency,
-			name: product.product.name,
-			image: product.product.images[0],
-		}))
-		.sort(() => Math.random() - 0.5);
+	const product = await GetProduct("price_" + params.id);
+	const products = await GetProducts(true);
 
 	return {
 		props: {
