@@ -205,7 +205,7 @@ function ProductGrid({
 						price={product.price}
 						image={product.image}
 						currency={product.currency}
-						cartBtn={product.metadata["type"] !== "template"}
+						type={product.metadata["type"]}
 					/>
 				))}
 			</>
@@ -220,7 +220,7 @@ function ProductGrid({
 			price={product.price}
 			image={product.image}
 			currency={product.currency}
-			cartBtn={product.metadata["type"] !== "template"}
+			type={product.metadata["type"]}
 		/>
 	));
 }

@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import designs from "../../data/designs.json";
+import { useRouter } from "next/router";
 
 export default function Design() {
 	const standardTexts = [
@@ -12,9 +14,13 @@ export default function Design() {
 			id: 0,
 		},
 	];
+	const router = useRouter();
 
 	const [texts, setTexts] = useState<TextProps[]>(standardTexts);
+	const [currentDesign, setCurrentDesign] = useState(designs[0]);
 	const [selectedTextObj, setSelectedTextObj] = useState<TextProps | null>();
+
+	console.log(currentDesign);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -32,8 +38,13 @@ export default function Design() {
 			setSelectedTextObj(CanvasClick(e, canvas, tray, texts));
 		});
 
+		if (router.query.d) {
+			const design = designs.find((d) => d.id === router.query.d);
+			if (design) setCurrentDesign(design);
+		}
+
 		return unsub;
-	}, []);
+	}, [router]);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -62,8 +73,13 @@ export default function Design() {
 				</div>
 				<div className="row-span-2">
 					<ul className="flex flex-col gap-4">
-						<li className="w-full aspect-video bg-gray-100 rounded-xl"></li>
-						<li className="w-full aspect-video bg-gray-100 rounded-xl"></li>
+						{designs.map((design) => (
+							<li key={design.id}>
+								<button
+									onClick={() => setCurrentDesign(design)}
+									className="w-full aspect-video bg-gray-100 rounded-xl"></button>
+							</li>
+						))}
 					</ul>
 				</div>
 				<div>

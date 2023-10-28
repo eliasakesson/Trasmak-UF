@@ -48,7 +48,7 @@ export default function ProductRow({
 							price={product.price}
 							image={product.image}
 							currency={product.currency}
-							cartBtn={product?.metadata["type"] !== "template"}
+							type={product?.metadata["type"]}
 						/>
 					))}
 			</div>
@@ -62,19 +62,24 @@ export function ProductCard({
 	price,
 	image,
 	currency,
-	cartBtn = true,
+	type,
 }: {
 	id: string;
 	name: string;
 	price: number;
 	image: string;
 	currency: string;
-	cartBtn?: boolean;
+	type: string;
 }) {
 	const { addItem } = useShoppingCart();
 
 	return (
-		<Link href={`/products/${id.substring(6, id.length)}`}>
+		<Link
+			href={
+				type === "template"
+					? `/design?d=${id.substring(6, id.length)}`
+					: `/products/${id.substring(6, id.length)}`
+			}>
 			<div className="bg-white rounded-xl overflow-hidden border border-gray-100">
 				<div className="relative overflow-hidden bg-gray-100 aspect-[4/3] p-4">
 					<div className="w-full h-full">
@@ -106,7 +111,7 @@ export function ProductCard({
 								</p>
 							</div>
 						</div>
-						{cartBtn && (
+						{type !== "template" && (
 							<button
 								className="bg-primary text-white sm:p-4 p-2 sm:rounded-lg rounded-md"
 								onClick={(e) => {
