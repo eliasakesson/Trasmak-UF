@@ -6,14 +6,29 @@ export default function Design() {
 			x: 0.5,
 			y: 0.5,
 			text: "SUP",
-			font: "Pacifico",
+			font: "Sans-serif",
 			fontSize: 72,
+			textAlign: "center",
 			color: "rgb(255, 255, 255)",
 			id: 0,
 		},
 	];
 
+	const standardImages = [
+		{
+			x: 0.25,
+			y: 0.25,
+			width: 0.5,
+			height: 0.5,
+			src: "https://i.natgeofe.com/n/2a832501-483e-422f-985c-0e93757b7d84/6_3x2.jpg",
+			color: "rgb(255, 255, 255)",
+			radius: 48,
+			id: 0,
+		},
+	];
+
 	const [texts, setTexts] = useState<TextProps[]>(standardTexts);
+	const [images, setImages] = useState<ObjectProps[]>(standardImages);
 	const [selectedTextObj, setSelectedTextObj] = useState<TextProps | null>();
 
 	useEffect(() => {
@@ -28,26 +43,27 @@ export default function Design() {
 			borderWidth: 32,
 		};
 
+		const timer = setTimeout(() => {
+			Draw(canvas, tray, texts, images);
+		}, 100);
+
 		const unsub = canvas.addEventListener("click", (e) => {
-			setSelectedTextObj(CanvasClick(e, canvas, tray, texts));
+			setSelectedTextObj(HoveredCanvasText(e, canvas, tray, texts));
 		});
 
-		return unsub;
-	}, []);
+		const unsub2 = canvas.addEventListener("mousemove", (e) => {
+			if (HoveredCanvasText(e, canvas, tray, texts)) {
+				canvas.style.cursor = "pointer";
+			} else {
+				canvas.style.cursor = "default";
+			}
+		});
 
-	useEffect(() => {
-		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-
-		const tray = {
-			x: (canvas.width - (canvas.height * 0.85 * 4) / 3) / 2,
-			y: (canvas.height - canvas.height * 0.85) / 2,
-			width: (canvas.height * 0.85 * 4) / 3,
-			height: canvas.height * 0.85,
-			radius: 128,
-			borderWidth: 32,
+		return () => {
+			clearTimeout(timer);
+			unsub;
+			unsub2;
 		};
-
-		Draw(canvas, tray, texts);
 	}, [texts]);
 
 	return (
@@ -58,7 +74,8 @@ export default function Design() {
 						id="canvas"
 						className="bg-gray-100 rounded-xl w-full"
 						width={1280}
-						height={720}></canvas>
+						height={720}
+					></canvas>
 				</div>
 				<div className="row-span-2">
 					<ul className="flex flex-col gap-4">
@@ -117,7 +134,8 @@ function TextEditor({ text, setText }: { text: TextProps; setText: Function }) {
 						value={text.font}
 						onChange={(e) =>
 							setText({ ...text, font: e.target.value })
-						}>
+						}
+					>
 						<option value="sans-serif">Sans-serif</option>
 						<option value="serif">Serif</option>
 						<option value="Pacifico">Pacifico</option>
@@ -140,6 +158,22 @@ function TextEditor({ text, setText }: { text: TextProps; setText: Function }) {
 					/>
 				</div>
 				<div className="flex flex-col gap-1">
+					<label htmlFor="textAlign">Text Align</label>
+					<select
+						name="textAlign"
+						id="textAlign"
+						className="border border-gray-300 rounded-md p-2"
+						value={text.textAlign}
+						onChange={(e) =>
+							setText({ ...text, textAlign: e.target.value })
+						}
+					>
+						<option value="left">Left</option>
+						<option value="center">Center</option>
+						<option value="right">Right</option>
+					</select>
+				</div>
+				<div className="flex flex-col gap-1">
 					<label htmlFor="color">Color</label>
 					<input
 						type="color"
@@ -155,28 +189,40 @@ function TextEditor({ text, setText }: { text: TextProps; setText: Function }) {
 			</div>
 			<div className="flex flex-row gap-2">
 				<div className="flex flex-col gap-1">
-					<label htmlFor="x">X</label>
+					<label htmlFor="x">X (%)</label>
 					<input
 						type="number"
 						name="x"
 						id="x"
 						className="border border-gray-300 rounded-md p-2"
-						value={text.x}
+						value={text.x * 100}
 						onChange={(e) =>
-							setText({ ...text, x: e.target.value })
+							setText({
+								...text,
+								x:
+									e.target.value.length !== 0
+										? Number(e.target.value) / 100
+										: undefined,
+							})
 						}
 					/>
 				</div>
 				<div className="flex flex-col gap-1">
-					<label htmlFor="y">Y</label>
+					<label htmlFor="y">Y (%)</label>
 					<input
 						type="number"
 						name="y"
 						id="y"
 						className="border border-gray-300 rounded-md p-2"
-						value={text.y}
+						value={text.y * 100}
 						onChange={(e) =>
-							setText({ ...text, y: e.target.value })
+							setText({
+								...text,
+								y:
+									e.target.value.length !== 0
+										? Number(e.target.value) / 100
+										: undefined,
+							})
 						}
 					/>
 				</div>
@@ -185,7 +231,7 @@ function TextEditor({ text, setText }: { text: TextProps; setText: Function }) {
 	);
 }
 
-function CanvasClick(
+function HoveredCanvasText(
 	e: any,
 	canvas: HTMLCanvasElement,
 	tray: ObjectProps,
@@ -201,7 +247,14 @@ function CanvasClick(
 
 	return texts.filter((text) => {
 		const { width } = MeasureText(ctx, text);
-		const x = tray.x + tray.width * text.x;
+		const x =
+			tray.x +
+			tray.width * text.x +
+			(text.textAlign === "left"
+				? width / 2
+				: text.textAlign === "right"
+				? -width / 2
+				: 0);
 		const y = tray.y + tray.height * text.y;
 
 		if (
@@ -218,7 +271,8 @@ function CanvasClick(
 async function Draw(
 	canvas: HTMLCanvasElement,
 	tray: ObjectProps,
-	texts: TextProps[]
+	texts: TextProps[],
+	images: ObjectProps[]
 ) {
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
@@ -227,18 +281,7 @@ async function Draw(
 
 	DrawTray(ctx, tray);
 
-	const images = [
-		{
-			x: tray.x + (tray.borderWidth ?? 0) * 3,
-			y: tray.y + (tray.borderWidth ?? 0) * 3,
-			width: tray.width - (tray.borderWidth ?? 0) * 6,
-			height: tray.height - (tray.borderWidth ?? 0) * 6,
-			src: "https://i.natgeofe.com/n/2a832501-483e-422f-985c-0e93757b7d84/6_3x2.jpg",
-			radius: 48,
-		},
-	];
-
-	await DrawImages(ctx, images);
+	await DrawImages(ctx, tray, images);
 
 	DrawTexts(ctx, tray, texts);
 
@@ -256,8 +299,9 @@ interface TextProps {
 	x: number;
 	y: number;
 	text: string;
-	font?: string;
+	font: string;
 	fontSize: number;
+	textAlign: string;
 	color: string;
 	id: number;
 }
@@ -270,6 +314,7 @@ interface ObjectProps {
 	radius?: number;
 	borderWidth?: number;
 	src?: string;
+	color?: string;
 }
 
 function MeasureText(ctx: CanvasRenderingContext2D, text: TextProps) {
@@ -285,18 +330,19 @@ function DrawTexts(
 	texts.forEach((text) => {
 		ctx.fillStyle = text.color;
 		ctx.font = `bold ${text.fontSize}px ${text.font ?? "sans-serif"}`;
-		ctx.textAlign = "center";
+		ctx.textAlign = text.textAlign as CanvasTextAlign;
 		ctx.textBaseline = "middle";
 		ctx.fillText(
 			text.text,
-			tray.x + tray.width * text.x,
-			tray.y + tray.height * text.y
+			(tray.x ?? 0) + tray.width * text.x,
+			(tray.y ?? 0) + tray.height * text.y
 		);
 	});
 }
 
 async function DrawImages(
 	ctx: CanvasRenderingContext2D,
+	tray: ObjectProps,
 	images: ObjectProps[]
 ) {
 	const loadImage = (image: ObjectProps): Promise<void> => {
@@ -306,17 +352,24 @@ async function DrawImages(
 			img.onload = () => {
 				ctx.save();
 
-				GetRoundedRect(
-					ctx,
-					image.x,
-					image.y,
-					image.width,
-					image.height,
-					image.radius ?? 0
-				);
-				ctx.clip();
+				const x = tray.x + tray.width * image.x;
+				const y = tray.y + tray.height * image.y;
+				const width = image.width * tray.width;
+				const height = image.height * tray.height;
 
-				ctx.drawImage(img, image.x, image.y, image.width, image.height);
+				GetRoundedRect(ctx, x, y, width, height, image.radius ?? 0);
+				ctx.clip();
+				if (image.color) {
+					ctx.fillStyle = image.color;
+					ctx.fillRect(
+						tray.x + tray.width * image.x,
+						tray.y + tray.height * image.y,
+						image.width * tray.width,
+						image.height * tray.height
+					);
+				}
+
+				ctx.drawImage(img, x, y, width, height);
 				ctx.restore();
 				resolve();
 			};
