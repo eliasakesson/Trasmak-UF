@@ -13,7 +13,8 @@ export default function App({ Component, pageProps }: AppProps) {
 			cartMode="checkout-session"
 			stripe={stripeKey}
 			currency="SEK"
-			shouldPersist>
+			shouldPersist
+		>
 			<Toaster />
 			<Header />
 			<Component {...pageProps} />
