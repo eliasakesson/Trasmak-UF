@@ -2,7 +2,11 @@
 const nextConfig = {
 	reactStrictMode: true,
 	images: {
-		domains: ["files.stripe.com", "secure.webtoolhub.com"],
+		domains: [
+			"files.stripe.com",
+			"secure.webtoolhub.com",
+			"firebasestorage.googleapis.com",
+		],
 	},
 };
 

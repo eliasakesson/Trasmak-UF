@@ -231,7 +231,7 @@ function CartButton() {
 											alt={item.name}
 											width={56}
 											height={56}
-											className="object-cover mix-blend-multiply"
+											className="object-contain mix-blend-multiply aspect-square"
 										/>
 									</div>
 									<div className="flex flex-col justify-center">

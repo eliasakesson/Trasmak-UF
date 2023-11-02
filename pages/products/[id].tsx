@@ -87,8 +87,7 @@ function ProductInfo({ product }: { product: any }) {
 						toast.success(`${product.name} tillagd i varukorgen`);
 					}}
 					type="button"
-					className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold"
-				>
+					className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold">
 					Lägg i varukorgen
 				</button>
 			</div>

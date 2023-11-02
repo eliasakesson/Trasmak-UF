@@ -1,14 +1,13 @@
-import {
-	useEffect,
-	useState,
-	useContext,
-	createContext,
-	createElement,
-} from "react";
+import { useEffect, useState, useContext, createContext } from "react";
 import designs from "../../data/designs.json";
 import defaultDesign from "../../data/defaultdesign.json";
 import { useRouter } from "next/router";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaDownload, FaPlus, FaTrash } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { useShoppingCart } from "use-shopping-cart";
+import GetProducts from "@/utils/getProducts";
+import { uploadFromCanvas } from "@/utils/firebase";
+import { Product } from "use-shopping-cart/core";
 
 const SelectedObjectContext = createContext({
 	object: null as ObjectProps | null,
@@ -38,7 +37,7 @@ interface ObjectProps {
 	radius?: number;
 }
 
-export default function Design() {
+export default function Design({ products }: { products: any }) {
 	const router = useRouter();
 
 	const [currentDesign, setCurrentDesign] = useState<DesignProps>(designs[0]);
@@ -46,20 +45,27 @@ export default function Design() {
 		null
 	);
 
-	console.log(currentDesign);
+	const { cartDetails, addItem } = useShoppingCart();
+
+	useEffect(() => {
+		// if (localStorage.getItem("design")) {
+		// 	setCurrentDesign(
+		// 		JSON.parse(localStorage.getItem("design") as string)
+		// 	);
+		// } else
+		if (router.query.d) {
+			const rtDesign = designs.find((d) => d.id === router.query.d);
+			if (rtDesign) setCurrentDesign(rtDesign);
+		}
+	}, [router.query.d]);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-
 		const tray = GetTrayObjFromCanvas(canvas);
-
-		if (router.query.d) {
-			const design = designs.find((d) => d.id === router.query.d);
-			if (design) setCurrentDesign(design);
-		}
 
 		const timer = setTimeout(() => {
 			Draw(canvas, tray, currentDesign, selectedObjectID);
+			localStorage.setItem("design", JSON.stringify(currentDesign));
 		}, 100);
 
 		function onClick(e: any) {
@@ -84,20 +90,90 @@ export default function Design() {
 			canvas.removeEventListener("click", onClick);
 			canvas.removeEventListener("mousemove", onHover);
 		};
-	}, [currentDesign, router.query.d, selectedObjectID]);
+	}, [currentDesign, selectedObjectID]);
 
 	async function addToCart() {
-		// Create a new canvas
-		const canvas = document.createElement("canvas");
-		canvas.width = 960;
-		canvas.height = 720;
+		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
-		// Draw the design on the canvas
-		await DrawRender(canvas, currentDesign);
+		const newCanvas = document.createElement("canvas");
+		newCanvas.width = 960;
+		newCanvas.height = 720;
 
-		// Convert the canvas to a base64 image
-		const image = canvas.toDataURL("image/png");
-		console.log(image);
+		const toastID = toast.loading("Laddar upp bilder...");
+
+		await DrawRender(newCanvas, currentDesign);
+
+		try {
+			const coverImage = uploadFromCanvas(canvas);
+			const renderImage = uploadFromCanvas(newCanvas);
+
+			Promise.all([renderImage, coverImage]).then((values) => {
+				toast.loading("Lägger till i kundvagnen...", { id: toastID });
+				const product = products.find(
+					(product: any) => product.id == "price_" + currentDesign.id
+				);
+
+				if (product) {
+					addProduct(
+						product,
+						{
+							image: values[0],
+							cover: values[1],
+						},
+						toastID
+					);
+				} else {
+					toast.error("Något gick fel", { id: toastID });
+				}
+			});
+		} catch (error) {
+			toast.error("Något gick fel", { id: toastID });
+			console.error(error);
+		}
+	}
+
+	function addProduct(
+		product: any,
+		images: { image: string; cover: string },
+		toastID: string
+	) {
+		if (cartDetails?.[product.id]) {
+			// Find a product that isn't in the cart yet
+			const newProduct = products.find((p: any) => !cartDetails?.[p.id]);
+
+			// If there is one, add it to the cart
+			if (newProduct) {
+				addItem(
+					{ ...newProduct, image: images.cover, name: product.name },
+					{
+						count: 1,
+						product_metadata: {
+							...newProduct.metadata,
+							image: images.image,
+							cover: images.cover,
+						},
+					}
+				);
+				toast.success("Produkten lades till i kundvagnen", {
+					id: toastID,
+				});
+			} else {
+				toast.error("Kundvagnen är full", { id: toastID });
+			}
+		} else {
+			addItem(
+				{ ...product, image: images.cover },
+				{
+					count: 1,
+					product_metadata: {
+						...product.metadata,
+						image: images.image,
+						cover: images.cover,
+					},
+				}
+			);
+			toast.success("Produkten lades till i kundvagnen", { id: toastID });
+		}
 	}
 
 	function addObject(type: "text" | "image") {
@@ -138,6 +214,21 @@ export default function Design() {
 								onClick={() => addObject("image")}
 								className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 								<FaPlus /> Bild
+							</button>
+							<button
+								onClick={() => {
+									const canvas = document.getElementById(
+										"canvas"
+									) as HTMLCanvasElement;
+
+									const image = canvas.toDataURL("image/png");
+									const link = document.createElement("a");
+									link.download = "design.png";
+									link.href = image;
+									link.click();
+								}}
+								className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+								<FaDownload /> Ladda ner
 							</button>
 						</div>
 						<button
@@ -183,12 +274,17 @@ export default function Design() {
 					<h2 className="text-xl font-bold border-b pb-2 mb-4">
 						Designs
 					</h2>
-					<MiniCanvases
-						designs={designs}
-						setCurrentDesign={(design) => {
-							setCurrentDesign(design);
-							setSelectedObjectID(null);
-						}}
+					<DesignTemplates
+						designs={designs.filter((design) =>
+							products.find(
+								(product: Product) =>
+									product.id.substring(
+										6,
+										product.id.length
+									) === design.id
+							)
+						)}
+						onSelect={() => setSelectedObjectID(null)}
 					/>
 				</div>
 			</div>
@@ -196,13 +292,15 @@ export default function Design() {
 	);
 }
 
-function MiniCanvases({
+function DesignTemplates({
 	designs,
-	setCurrentDesign,
+	onSelect,
 }: {
 	designs: DesignProps[];
-	setCurrentDesign: (design: DesignProps) => void;
+	onSelect?: () => void;
 }) {
+	const router = useRouter();
+
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			const canvases = document.querySelectorAll(".minicanvas");
@@ -217,12 +315,18 @@ function MiniCanvases({
 		};
 	}, [designs]);
 
+	function onClick(design: DesignProps) {
+		localStorage.setItem("design", JSON.stringify(design));
+		onSelect?.();
+		router.push(`?d=${design.id}`, undefined, { shallow: true });
+	}
+
 	return (
 		<div className="grid grid-cols-3 gap-4">
 			{designs.map((design) => (
 				<li key={design.id} className="list-none">
 					<button
-						onClick={() => setCurrentDesign(design)}
+						onClick={() => onClick(design)}
 						className="w-full aspect-video bg-gray-100 rounded-xl">
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
@@ -257,10 +361,14 @@ function DesignEditor({
 						onClick={() => removeObject()}
 					/>
 				</h2>
-				<TextArea
-					label={object?.type === "text" ? "Text" : "Bildkälla"}
-					objKey="content"
-				/>
+				{object?.type === "image" ? (
+					<Input label="Bildkälla" objKey="content" type="file" />
+				) : (
+					<TextArea
+						label={object?.type === "text" ? "Text" : "Bildkälla"}
+						objKey="content"
+					/>
+				)}
 				<Select
 					label="Font"
 					objKey="font"
@@ -325,7 +433,15 @@ function Input({
 	type = "text",
 }: {
 	label: string;
-	objKey: "x" | "y" | "width" | "height" | "radius" | "size" | "color";
+	objKey:
+		| "x"
+		| "y"
+		| "width"
+		| "height"
+		| "radius"
+		| "size"
+		| "color"
+		| "content";
 	type?: string;
 }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
@@ -356,6 +472,29 @@ function Input({
 							backgroundColor: object[objKey] as string,
 						}}></div>
 				</div>
+			</div>
+		);
+
+	if (type === "file")
+		return (
+			<div className="flex flex-col gap-1 grow">
+				<label htmlFor={label}>{label}</label>
+				<input
+					type="file"
+					name={label}
+					id={label}
+					className="border border-gray-300 rounded-md p-2"
+					onChange={(e) => {
+						if (e.target.files) {
+							setObject({
+								...(object as ObjectProps),
+								[objKey]: URL.createObjectURL(
+									e.target.files[0]
+								),
+							});
+						}
+					}}
+				/>
 			</div>
 		);
 
@@ -566,31 +705,28 @@ async function DrawImages(
 ) {
 	const loadImage = (image: ObjectProps): Promise<void> => {
 		return new Promise((resolve) => {
-			const { x, y, width, height } = GetObjectDimensions(
-				ctx,
-				tray,
-				image
-			);
-
-			ctx.save();
-			GetRoundedRect(ctx, x, y, width, height, image.radius ?? 0);
-			ctx.clip();
-
 			const img = new Image();
 			img.crossOrigin = "anonymous";
 			img.src = image.content;
 			img.onload = () => {
-				ctx.fillStyle = image.color;
-				ctx.fillRect(x, y, width, height);
+				const { x, y, width, height } = GetObjectDimensions(
+					ctx,
+					tray,
+					image
+				);
 
-				ctx.drawImage(img, x, y, width, height);
+				ctx.save();
+				GetRoundedRect(ctx, x, y, width, height, image.radius ?? 0);
+				ctx.clip();
+
+				const { offsetX, offsetY, newWidth, newHeight } =
+					GetCoverImageDimensions(img, x, y, width, height);
+
+				ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
 				ctx.restore();
 				resolve();
 			};
 			img.onerror = () => {
-				ctx.fillStyle = image.color;
-				ctx.fillRect(x, y, width, height);
-				ctx.restore();
 				resolve();
 			};
 		});
@@ -606,6 +742,31 @@ async function DrawImages(
 	} catch (error) {
 		console.error(error);
 	}
+}
+
+function GetCoverImageDimensions(
+	image: HTMLImageElement,
+	x: number,
+	y: number,
+	width: number,
+	height: number
+) {
+	// Calculate scaling factors for width and height
+	const scaleX = width / image.width;
+	const scaleY = height / image.height;
+
+	// Choose the larger scale to cover the target area
+	const scale = Math.max(scaleX, scaleY);
+
+	// Calculate the new image dimensions
+	const newWidth = image.width * scale;
+	const newHeight = image.height * scale;
+
+	// Calculate the position to center the image on the target area
+	const offsetX = x + (width - newWidth) / 2;
+	const offsetY = y + (height - newHeight) / 2;
+
+	return { offsetX, offsetY, newWidth, newHeight };
 }
 
 function HighlightSelectedObject(
@@ -694,5 +855,18 @@ function GetTrayObjFromCanvas(
 		width: (canvas.height * heightProcentage * 4) / 3,
 		height: canvas.height * heightProcentage,
 		radius: 128,
+	};
+}
+
+export async function getStaticProps() {
+	const products = await GetProducts(true);
+
+	return {
+		props: {
+			products: products.filter(
+				(product) => product.metadata.type === "template"
+			),
+		},
+		revalidate: 3600,
 	};
 }

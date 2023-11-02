@@ -19,19 +19,21 @@ export default function Cart({ config }: any) {
 }
 
 function CartItems() {
-	const { cartDetails, incrementItem, decrementItem, removeItem }: any =
-		useShoppingCart();
+	const {
+		cartDetails,
+		incrementItem,
+		decrementItem,
+		removeItem,
+		cartCount,
+	}: any = useShoppingCart();
 
 	return (
 		<div className="col-span-2">
 			<div className="flex justify-between items-center py-4 pb-8">
 				<h1 className="text-4xl font-bold">Min Varukorg</h1>
 				<p className="text-gray-500">
-					{Object.keys(cartDetails).length}{" "}
-					{Object.keys(cartDetails).length > 1
-						? "produkter"
-						: "produkt"}{" "}
-					i varukorgen
+					{cartCount} {cartCount > 1 ? "produkter" : "produkt"} i
+					varukorgen
 				</p>
 			</div>
 			<ul>
@@ -64,7 +66,7 @@ function CartItem({
 		<li className="flex md:gap-8 gap-4 py-4 border-b">
 			<div className="-z-10 bg-gray-100 rounded-lg border">
 				<Image
-					className="mix-blend-multiply"
+					className="mix-blend-multiply object-contain aspect-square"
 					src={cartItem.image}
 					alt=""
 					width={64}
@@ -72,17 +74,23 @@ function CartItem({
 				/>
 			</div>
 
-			<div className="flex md:flex-row flex-col flex-1">
+			<div className="flex items-center md:flex-row flex-col flex-1">
 				<div className="flex-1">
 					<Link
 						href={`products/${cartItem.id.substring(
 							6,
 							cartItem.id.length
 						)}`}
-						className="text-xl font-semibold"
-					>
+						className="text-xl font-semibold">
 						{cartItem.name}
 					</Link>
+					<p className="text-gray-500">
+						{cartItem.quantity} x{" "}
+						{formatCurrencyString({
+							value: cartItem.price,
+							currency: cartItem.currency,
+						})}
+					</p>
 				</div>
 				<div className="flex items-center md:gap-8 gap-2">
 					<p className="font-semibold text-xl md:flex-grow-0 flex-grow">
@@ -94,8 +102,7 @@ function CartItem({
 					<div className="px-2 flex gap-4 items-center border rounded-lg font-mono">
 						<button
 							className="md:p-2 p-1 font-semibold md:text-xl"
-							onClick={() => decrementItem(cartItem.id)}
-						>
+							onClick={() => decrementItem(cartItem.id)}>
 							-
 						</button>
 						<span className="font-semibold">
@@ -103,16 +110,14 @@ function CartItem({
 						</span>
 						<button
 							className="md:p-2 p-1 font-semibold md:text-xl"
-							onClick={() => incrementItem(cartItem.id)}
-						>
+							onClick={() => incrementItem(cartItem.id)}>
 							+
 						</button>
 					</div>
 					<button
 						type="button"
 						className="p-2 text-muted"
-						onClick={() => removeItem(cartItem.id)}
-					>
+						onClick={() => removeItem(cartItem.id)}>
 						<FaTrash />
 					</button>
 				</div>
@@ -199,15 +204,13 @@ function CartSummary({ config }: { config: any }) {
 					disabled={isRedirecting}
 					onClick={onCheckout}
 					type="button"
-					className="py-4 px-8 bg-primary text-white rounded-lg font-semibold"
-				>
+					className="py-4 px-8 bg-primary text-white rounded-lg font-semibold">
 					Gå till kassan
 				</button>
 
 				<Link
 					href="/products"
-					className="py-4 px-8 border-2 rounded-lg font-semibold text-center"
-				>
+					className="py-4 px-8 border-2 rounded-lg font-semibold text-center">
 					Fortsätt handla
 				</Link>
 			</div>

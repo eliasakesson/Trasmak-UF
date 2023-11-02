@@ -4,7 +4,7 @@
         "objects": []
     },
     {
-        "id": "1",
+        "id": "1O7d9KBwTscfW232N3qoTc3Q",
         "objects": [
             {
                 "id": 1,
@@ -72,7 +72,7 @@
                 "type": "text",
                 "content": "Hello, world!",
                 "x": 0.5,
-                "y": 0.35,
+                "y": 0.45,
                 "color": "#000000",
                 "font": "Arial",
                 "size": 64,
@@ -89,11 +89,23 @@
                 "width": 1,
                 "height": 1,
                 "radius": 48
+            },
+            {
+                "id": 3,
+                "type": "text",
+                "content": "Lorem ipsum dolar",
+                "x": 0.5,
+                "y": 0.55,
+                "color": "#434343",
+                "font": "Arial",
+                "size": 28,
+                "align": "center",
+                "baseline": "top"
             }
         ]
     },
     {
-        "id": "4",
+        "id": "1O7cfqBwTscfW232XpFdevga",
         "objects": [
             {
                 "id": 1,

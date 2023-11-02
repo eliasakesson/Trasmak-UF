@@ -3,8 +3,8 @@ import Link from "next/link";
 export default function Footer() {
 	return (
 		<footer className="bg-gray-100">
-			<div className="max-w-7xl mx-auto px-8 py-16">
-				<div className="grid lg:grid-cols-4 sm:grid-cols-2 gap-8">
+			<div className="max-w-7xl mx-auto px-8 ">
+				<div className="grid lg:grid-cols-4 sm:grid-cols-2 gap-8 py-16">
 					<div className="sm:col-span-2 space-y-8">
 						<svg
 							width="200"
@@ -59,6 +59,21 @@ export default function Footer() {
 							</a>
 						</div>
 					</div>
+				</div>
+				<div className="py-4 border-t flex sm:flex-row flex-col-reverse gap-2 justify-between items-center">
+					<p className="text-gray-500">
+						© 2023 Träsmak. All rights reserved.
+					</p>
+					<p className="text-gray-500">
+						Created by{" "}
+						<a
+							href="https://eliasakesson.me"
+							className="text-gray-600"
+							rel="noopener noreferrer"
+							target="_blank">
+							Elias Åkesson
+						</a>
+					</p>
 				</div>
 			</div>
 		</footer>
