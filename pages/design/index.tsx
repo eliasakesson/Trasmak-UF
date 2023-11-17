@@ -35,6 +35,7 @@ interface ObjectProps {
 	width?: number;
 	height?: number;
 	radius?: number;
+	image?: HTMLImageElement;
 }
 
 export default function Design({ products }: { products: any }) {
@@ -61,6 +62,7 @@ export default function Design({ products }: { products: any }) {
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+		const ctx = canvas.getContext("2d");
 		const tray = GetTrayObjFromCanvas(canvas);
 
 		const timer = setTimeout(() => {
@@ -68,27 +70,167 @@ export default function Design({ products }: { products: any }) {
 			localStorage.setItem("design", JSON.stringify(currentDesign));
 		}, 100);
 
-		function onClick(e: any) {
-			setSelectedObjectID(
-				HoveredCanvasText(e, canvas, tray, currentDesign)?.id ?? null
-			);
+		let dragObject: ObjectProps | undefined = undefined;
+		let dragObjectOffset: { x: number; y: number } = { x: 0, y: 0 };
+
+		currentDesign.objects.forEach((obj) => {
+			if (obj.type === "image" && !obj.image) {
+				const img = new Image();
+				img.crossOrigin = "anonymous";
+				img.src = obj.content;
+				img.onload = () => {
+					obj.image = img;
+				};
+			}
+		});
+
+		let input: HTMLInputElement | null = null;
+
+		if (selectedObjectID) {
+			input = document.createElement("input");
+
+			// Set the initial value of the input to the current text
+			input.value =
+				currentDesign.objects.find((obj) => obj.id === selectedObjectID)
+					?.content || "";
+			input.style.opacity = "0";
+			input.style.pointerEvents = "none";
+			input.style.position = "absolute";
+			input.style.top = "50vh";
+
+			// Append the input to the body
+			document.body.appendChild(input);
+
+			// Focus on the input and select its text
+			input.focus();
+
+			// Event listener to handle the input changes
+			input.addEventListener("input", function () {
+				setCurrentDesign((design) => ({
+					...design,
+					objects: design.objects.map((obj) =>
+						obj.id === selectedObjectID
+							? {
+									...obj,
+									content: input ? input.value : obj.content,
+							  }
+							: obj
+					),
+				}));
+			});
 		}
 
-		function onHover(e: any) {
-			if (HoveredCanvasText(e, canvas, tray, currentDesign)) {
-				canvas.style.cursor = "pointer";
-			} else {
-				canvas.style.cursor = "default";
+		function onMouseDown(e: any) {
+			dragObject = GetObjectFromPointer(e, canvas, tray, currentDesign);
+
+			if (dragObject && ctx) {
+				const rect = canvas.getBoundingClientRect();
+
+				const clickX = e.offsetX * (canvas.width / rect.width);
+				const clickY = e.offsetY * (canvas.height / rect.height);
+
+				const { x, y, width, height } = GetObjectDimensions(
+					ctx,
+					tray,
+					dragObject
+				);
+
+				dragObjectOffset = {
+					x:
+						clickX -
+						x -
+						(dragObject.align === "center" ? width / 2 : 0) -
+						(dragObject.align === "right" ? width : 0),
+					y:
+						clickY -
+						y -
+						(dragObject.baseline === "middle" ? height / 2 : 0) -
+						(dragObject.baseline === "bottom" ? height : 0),
+				};
 			}
 		}
 
+		function onMouseUp() {
+			setCurrentDesign((current) => ({
+				...current,
+				objects: current.objects.map((obj) =>
+					dragObject && obj.id === dragObject.id ? dragObject : obj
+				),
+			}));
+			dragObject = undefined;
+		}
+
+		function onClick(e: any) {
+			setSelectedObjectID(
+				GetObjectFromPointer(e, canvas, tray, currentDesign)?.id ?? null
+			);
+		}
+
+		function onMouseMove(e: any) {
+			const object = GetObjectFromPointer(e, canvas, tray, currentDesign);
+			canvas.style.cursor = object ? "pointer" : "default";
+
+			if (dragObject && ctx) {
+				const rect = canvas.getBoundingClientRect();
+
+				const clickX = e.offsetX * (canvas.width / rect.width);
+				const clickY = e.offsetY * (canvas.height / rect.height);
+
+				dragObject.x =
+					(clickX - dragObjectOffset.x - tray.x) / (tray.width || 1);
+				dragObject.y =
+					(clickY - dragObjectOffset.y - tray.y) / (tray.height || 1);
+
+				const distanceToXSnapPoint =
+					(dragObject.width
+						? dragObject.x + dragObject.width / 2
+						: dragObject.x) % 0.25;
+				if (distanceToXSnapPoint > 0 && distanceToXSnapPoint <= 0.05) {
+					dragObject.x -= distanceToXSnapPoint;
+				} else if (distanceToXSnapPoint >= 0.2) {
+					dragObject.x += 0.25 - distanceToXSnapPoint;
+				}
+
+				const distanceToYSnapPoint =
+					(dragObject.height
+						? dragObject.y + dragObject.height / 2
+						: dragObject.y) % 0.5;
+				if (distanceToYSnapPoint > 0 && distanceToYSnapPoint <= 0.05) {
+					dragObject.y -= distanceToYSnapPoint;
+				} else if (distanceToYSnapPoint >= 0.45) {
+					dragObject.y += 0.5 - distanceToYSnapPoint;
+				}
+
+				Draw(
+					canvas,
+					tray,
+					{
+						...currentDesign,
+						objects: currentDesign.objects.map((obj) =>
+							dragObject && obj.id === dragObject.id
+								? dragObject
+								: obj
+						),
+					},
+					selectedObjectID
+				);
+			}
+		}
+
+		canvas.addEventListener("mousedown", onMouseDown);
+		canvas.addEventListener("mouseup", onMouseUp);
+		canvas.addEventListener("mousemove", onMouseMove);
 		canvas.addEventListener("click", onClick);
-		canvas.addEventListener("mousemove", onHover);
 
 		return () => {
 			clearTimeout(timer);
+			canvas.removeEventListener("mousedown", onMouseDown);
+			canvas.removeEventListener("mouseup", onMouseUp);
+			canvas.removeEventListener("mousemove", onMouseMove);
 			canvas.removeEventListener("click", onClick);
-			canvas.removeEventListener("mousemove", onHover);
+			if (input) {
+				document.body.removeChild(input);
+			}
 		};
 	}, [currentDesign, selectedObjectID]);
 
@@ -202,20 +344,23 @@ export default function Design({ products }: { products: any }) {
 						id="canvas"
 						className="bg-gray-100 rounded-xl w-full"
 						width={1280}
-						height={720}></canvas>
+						height={720}
+					></canvas>
 					<div className="absolute left-4 right-4 bottom-4 flex justify-between">
 						<div className="flex gap-4">
 							<button
 								onClick={() => addObject("text")}
-								className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+								className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
+							>
 								<FaPlus /> Text
 							</button>
 							<button
 								onClick={() => addObject("image")}
-								className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+								className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
+							>
 								<FaPlus /> Bild
 							</button>
-							<button
+							{/* <button
 								onClick={() => {
 									const canvas = document.getElementById(
 										"canvas"
@@ -227,13 +372,15 @@ export default function Design({ products }: { products: any }) {
 									link.href = image;
 									link.click();
 								}}
-								className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+								className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
+							>
 								<FaDownload /> Ladda ner
-							</button>
+							</button> */}
 						</div>
 						<button
 							onClick={addToCart}
-							className="bg-primary text-white rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+							className="bg-primary text-white rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
+						>
 							Lägg till i kundvagn
 						</button>
 					</div>
@@ -327,11 +474,13 @@ function DesignTemplates({
 				<li key={design.id} className="list-none">
 					<button
 						onClick={() => onClick(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl">
+						className="w-full aspect-video bg-gray-100 rounded-xl"
+					>
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
 							width={1280}
-							height={720}></canvas>
+							height={720}
+						></canvas>
 					</button>
 				</li>
 			))}
@@ -470,7 +619,8 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}></div>
+						}}
+					></div>
 				</div>
 			</div>
 		);
@@ -547,7 +697,8 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}>
+				}
+			>
 				{options?.map((option, i) => (
 					<option key={i} value={option.toLowerCase()}>
 						{option}
@@ -558,7 +709,7 @@ function Select({
 	);
 }
 
-function HoveredCanvasText(
+function GetObjectFromPointer(
 	e: any,
 	canvas: HTMLCanvasElement,
 	tray: ObjectProps,
@@ -704,27 +855,40 @@ async function DrawImages(
 	images: ObjectProps[]
 ) {
 	const loadImage = (image: ObjectProps): Promise<void> => {
+		function DrawImage(
+			image: ObjectProps,
+			img: HTMLImageElement,
+			resolve: any
+		) {
+			const { x, y, width, height } = GetObjectDimensions(
+				ctx,
+				tray,
+				image
+			);
+
+			ctx.save();
+			GetRoundedRect(ctx, x, y, width, height, image.radius ?? 0);
+			ctx.clip();
+
+			const { offsetX, offsetY, newWidth, newHeight } =
+				GetCoverImageDimensions(img, x, y, width, height);
+
+			ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+			ctx.restore();
+			resolve();
+		}
+
 		return new Promise((resolve) => {
+			if (image.image) {
+				DrawImage(image, image.image, resolve);
+				return;
+			}
+
 			const img = new Image();
 			img.crossOrigin = "anonymous";
 			img.src = image.content;
 			img.onload = () => {
-				const { x, y, width, height } = GetObjectDimensions(
-					ctx,
-					tray,
-					image
-				);
-
-				ctx.save();
-				GetRoundedRect(ctx, x, y, width, height, image.radius ?? 0);
-				ctx.clip();
-
-				const { offsetX, offsetY, newWidth, newHeight } =
-					GetCoverImageDimensions(img, x, y, width, height);
-
-				ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
-				ctx.restore();
-				resolve();
+				DrawImage(image, img, resolve);
 			};
 			img.onerror = () => {
 				resolve();
