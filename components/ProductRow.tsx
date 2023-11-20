@@ -25,12 +25,12 @@ export default function ProductRow({
 	return (
 		<section
 			className={`flex flex-col ${
-				!left ? "items-center" : ""
+				!left ? "items-center text-center" : ""
 			} space-y-4 w-full`}>
 			{title && <h2 className="text-4xl font-bold">{title}</h2>}
 			{description && <p className="text-muted text-lg">{description}</p>}
 			<br />
-			<div className="w-full grid lg:grid-cols-3 lg:gap-8 grid-cols-2 gap-4">
+			<div className="w-full grid lg:grid-cols-3 lg:gap-8 grid-cols-2 gap-4 text-left">
 				{products
 					?.filter(
 						(product: any) =>
