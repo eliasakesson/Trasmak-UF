@@ -184,11 +184,14 @@ export default function Design({ products }: { products: any }) {
 		let dragObject: ObjectProps | undefined = undefined;
 		let dragObjectOffset: { x: number; y: number } = { x: 0, y: 0 };
 		let dragType: "move" | "resize" | undefined = undefined;
+		let mouseDownPosition: { x: number; y: number } = { x: 0, y: 0 };
 
 		function onMouseDown(e: any) {
-			dragObject = GetObjectFromPointer(e, canvas, tray, currentDesign);
 			const clickX = e.offsetX * (canvas.width / rect.width);
 			const clickY = e.offsetY * (canvas.height / rect.height);
+			mouseDownPosition = { x: clickX, y: clickY };
+
+			dragObject = GetObjectFromPointer(e, canvas, tray, currentDesign);
 
 			if (dragObject && ctx && selectedObjectID !== null) {
 				const { x, y, width, height } = GetObjectDimensions(
@@ -225,28 +228,49 @@ export default function Design({ products }: { products: any }) {
 		}
 
 		function onMouseUp() {
-			setCurrentDesign((current) => ({
-				...current,
-				objects: current.objects.map((obj) =>
-					dragObject && obj.id === dragObject.id ? dragObject : obj
-				),
-			}));
-			dragObject = undefined;
+			if (dragObject) {
+				setCurrentDesign((current) => ({
+					...current,
+					objects: current.objects.map((obj) =>
+						dragObject && obj.id === dragObject.id
+							? dragObject
+							: obj
+					),
+				}));
+				dragObject = undefined;
+			}
 		}
 
 		function onClick(e: any) {
 			const object = GetObjectFromPointer(e, canvas, tray, currentDesign);
+
+			const clickX = e.offsetX * (canvas.width / rect.width);
+			const clickY = e.offsetY * (canvas.height / rect.height);
+
 			if (
 				(!object || object.type !== "text") &&
 				selectedTool === "text" &&
 				selectedObjectID === null
 			) {
-				addObject("text", e.offsetX, e.offsetY);
+				addObject("text", clickX, clickY);
 			} else if (
 				(!object || object.type !== "image") &&
 				selectedTool === "image"
 			) {
-				addObject("image", e.offsetX, e.offsetY);
+				if (
+					Math.abs(clickX - mouseDownPosition.x) > 5 ||
+					Math.abs(clickY - mouseDownPosition.y) > 5
+				) {
+					addObject(
+						"image",
+						mouseDownPosition.x,
+						mouseDownPosition.y,
+						clickX,
+						clickY
+					);
+				} else {
+					addObject("image", clickX, clickY);
+				}
 			} else {
 				setSelectedObjectID(object?.id ?? null);
 			}
@@ -466,18 +490,22 @@ export default function Design({ products }: { products: any }) {
 	function addObject(
 		type: "text" | "image",
 		pointerX: number = 0,
-		pointerY: number = 0
+		pointerY: number = 0,
+		pointerEndX?: number,
+		pointerEndY?: number
 	) {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 		const tray = GetTrayObjFromCanvas(canvas);
-		const rect = canvas.getBoundingClientRect();
 
-		const x =
-			(pointerX * (canvas.width / rect.width) - tray.x) /
-			(tray.width || 1);
-		const y =
-			(pointerY * (canvas.width / rect.width) - tray.y) /
-			(tray.height || 1);
+		const x = (pointerX - tray.x) / (tray.width || 1);
+		const y = (pointerY - tray.y) / (tray.height || 1);
+
+		const width = pointerEndX
+			? (pointerEndX - pointerX) / (tray.width || 1)
+			: 0.2;
+		const height = pointerEndY
+			? (pointerEndY - pointerY) / (tray.height || 1)
+			: 0.2;
 
 		setCurrentDesign({
 			...currentDesign,
@@ -493,11 +521,15 @@ export default function Design({ products }: { products: any }) {
 							: 1,
 					x,
 					y,
+					width,
+					height,
 				},
 			],
 		});
 
-		setSelectedTool("select");
+		if (selectedTool === "image") {
+			setSelectedTool("select");
+		}
 	}
 
 	return (
