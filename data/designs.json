@@ -31,8 +31,8 @@
                 "color": "#000000",
                 "font": "Arial",
                 "size": 48,
-                "align": "center",
-                "baseline": "middle"
+                "align": "left",
+                "baseline": "top"
             }
         ]
     },
@@ -48,8 +48,8 @@
                 "color": "#000000",
                 "font": "Arial",
                 "size": 48,
-                "align": "center",
-                "baseline": "middle"
+                "align": "left",
+                "baseline": "top"
             },
             {
                 "id": 2,
@@ -76,8 +76,8 @@
                 "color": "#000000",
                 "font": "Arial",
                 "size": 64,
-                "align": "center",
-                "baseline": "middle"
+                "align": "left",
+                "baseline": "top"
             },
             {
                 "id": 2,
@@ -99,7 +99,7 @@
                 "color": "#434343",
                 "font": "Arial",
                 "size": 28,
-                "align": "center",
+                "align": "left",
                 "baseline": "top"
             }
         ]
@@ -111,7 +111,7 @@
                 "id": 1,
                 "type": "text",
                 "content": "Hello, world!",
-                "x": 0.12,
+                "x": 0.25,
                 "y": 0.4,
                 "color": "#000000",
                 "font": "Arial",
