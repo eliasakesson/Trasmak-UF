@@ -43,6 +43,7 @@ export interface ObjectProps {
 	height?: number;
 	radius?: number;
 	image?: HTMLImageElement;
+	fit?: string;
 }
 
 export default function Design({ products }: { products: any }) {
@@ -59,6 +60,7 @@ export default function Design({ products }: { products: any }) {
 		{ start: null, end: null }
 	);
 	const [trayObject, setTrayObject] = useState<ObjectProps | null>(null);
+	const designEditorRef = useRef<HTMLDivElement>(null);
 
 	const { cartDetails, addItem } = useShoppingCart();
 
@@ -104,7 +106,6 @@ export default function Design({ products }: { products: any }) {
 		);
 
 		if (!trayObject || !canvas || !ctx || !rect) return;
-		console.log("past");
 
 		let input: HTMLTextAreaElement | null = null;
 
@@ -114,6 +115,21 @@ export default function Design({ products }: { products: any }) {
 		}, 100);
 
 		LoadImages(currentDesign);
+
+		if (selectedObject && designEditorRef.current) {
+			const { x, y, width, height } = GetObjectDimensions(
+				ctx,
+				trayObject,
+				selectedObject
+			);
+
+			designEditorRef.current.style.left = `${
+				x * (rect.width / canvas.width) - 8
+			}px`;
+			designEditorRef.current.style.top = `${
+				(y + height) * (rect.height / canvas.height) + 16
+			}px`;
+		}
 
 		if (
 			selectedObject &&
@@ -136,7 +152,7 @@ export default function Design({ products }: { products: any }) {
 			) as HTMLTextAreaElement;
 		}
 
-		const mouseEvents = SetupMouseEvents(
+		const mouseEventCleanup = SetupMouseEvents(
 			canvas,
 			trayObject,
 			currentDesign,
@@ -145,12 +161,13 @@ export default function Design({ products }: { products: any }) {
 			setSelectedObjectID,
 			selectedTool,
 			setSelectedTool,
+			designEditorRef.current,
 			(design) => Draw(canvas, trayObject, design, selectedObjectID)
 		);
 
 		return () => {
 			clearTimeout(drawTimer);
-			mouseEvents();
+			mouseEventCleanup();
 			if (input) {
 				(canvas.parentNode || document.body).removeChild(input);
 			}
@@ -256,13 +273,49 @@ export default function Design({ products }: { products: any }) {
 			<div className="max-w-7xl mx-auto px-8 py-16 space-y-8">
 				<div className="grid md:grid-cols-4 md:grid-rows-2 gap-8">
 					<div className="col-span-3 space-y-4">
-						<div className="relative overflow-hidden">
+						<div className="relative">
 							<canvas
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
-								height={720}
-							></canvas>
+								height={720}></canvas>
+							<div className="absolute" ref={designEditorRef}>
+								{selectedObjectID && (
+									<DesignEditor
+										object={
+											currentDesign?.objects.find(
+												(obj) =>
+													obj.id === selectedObjectID
+											) ?? null
+										}
+										setObject={(obj: ObjectProps) =>
+											setCurrentDesign((design) => {
+												if (!design) return design;
+												const objects =
+													design.objects.map((o) => {
+														if (o.id === obj.id)
+															return obj;
+														return o;
+													});
+												return { ...design, objects };
+											})
+										}
+										removeObject={() => {
+											setCurrentDesign((design) => {
+												if (!design) return design;
+												const objects =
+													design.objects.filter(
+														(o) =>
+															o.id !==
+															selectedObjectID
+													);
+												return { ...design, objects };
+											});
+											setSelectedObjectID(null);
+										}}
+									/>
+								)}
+							</div>
 						</div>
 						<div className="flex justify-between">
 							<div className="flex gap-2">
@@ -272,8 +325,7 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("select")}
-								>
+									onClick={() => setSelectedTool("select")}>
 									<FaMousePointer />
 								</button>
 								<button
@@ -282,8 +334,7 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("text")}
-								>
+									onClick={() => setSelectedTool("text")}>
 									T
 								</button>
 								<button
@@ -292,8 +343,7 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("image")}
-								>
+									onClick={() => setSelectedTool("image")}>
 									<FaImage />
 								</button>
 								<button
@@ -302,8 +352,9 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("rectangle")}
-								>
+									onClick={() =>
+										setSelectedTool("rectangle")
+									}>
 									<FaSquare />
 								</button>
 							</div>
@@ -327,47 +378,13 @@ export default function Design({ products }: { products: any }) {
 								</button> */}
 								<button
 									onClick={addToCart}
-									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-								>
+									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 									Lägg till i kundvagn
 								</button>
 							</div>
 						</div>
 					</div>
-					<div className="row-span-2">
-						<div className="mb-4 flex gap-4"></div>
-						{selectedObjectID && (
-							<DesignEditor
-								object={
-									currentDesign?.objects.find(
-										(obj) => obj.id === selectedObjectID
-									) ?? null
-								}
-								setObject={(obj: ObjectProps) =>
-									setCurrentDesign((design) => {
-										if (!design) return design;
-										const objects = design.objects.map(
-											(o) => {
-												if (o.id === obj.id) return obj;
-												return o;
-											}
-										);
-										return { ...design, objects };
-									})
-								}
-								removeObject={() => {
-									setCurrentDesign((design) => {
-										if (!design) return design;
-										const objects = design.objects.filter(
-											(o) => o.id !== selectedObjectID
-										);
-										return { ...design, objects };
-									});
-									setSelectedObjectID(null);
-								}}
-							/>
-						)}
-					</div>
+					<div className="row-span-2"></div>
 					<div className="col-span-3">
 						<h2 className="text-xl font-bold border-b pb-2 mb-4">
 							Designs
@@ -426,13 +443,11 @@ function DesignTemplates({
 				<li key={design.id} className="list-none">
 					<button
 						onClick={() => onClick(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl"
-					>
+						className="w-full aspect-video bg-gray-100 rounded-xl">
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
 							width={1280}
-							height={720}
-						></canvas>
+							height={720}></canvas>
 					</button>
 				</li>
 			))}
@@ -453,50 +468,53 @@ function DesignEditor({
 
 	return (
 		<SelectedObjectContext.Provider value={{ object, setObject }}>
-			<div className="absolute flex flex-col gap-4">
-				<h2 className="text-xl font-bold border-b pb-2 flex items-center justify-between">
-					{object?.type === "text" && "Text"}
-					{object?.type === "image" && "Bild"}
-					{object?.type === "rectangle" && "Rektangel"}
-					<FaTrash
+			<div className="absolute flex flex-col gap-2 bg-white border rounded-md p-4">
+				<div className="flex items-center gap-4">
+					{object?.type === "image" ? (
+						<Input label="Bildkälla" objKey="content" type="file" />
+					) : (
+						<TextArea
+							label={
+								object?.type === "text" ? "Text" : "Bildkälla"
+							}
+							objKey="content"
+						/>
+					)}
+					<button
 						className="cursor-pointer"
-						onClick={() => removeObject()}
+						onClick={() => removeObject()}>
+						<FaTrash size={20} />
+					</button>
+				</div>
+				<div className="flex items-stretch gap-2">
+					<Input label="Färg" objKey="color" type="color" />
+					<Input
+						label="Textstorlek (px)"
+						objKey="size"
+						type="number"
 					/>
-				</h2>
-				{object?.type === "image" ? (
-					<Input label="Bildkälla" objKey="content" type="file" />
-				) : (
-					<TextArea
-						label={object?.type === "text" ? "Text" : "Bildkälla"}
-						objKey="content"
+					<Select
+						label="Font"
+						objKey="font"
+						options={[
+							"Cinzel",
+							"Courier New",
+							"Times New Roman",
+							"Arial",
+						]}
 					/>
-				)}
-				<Select
-					label="Font"
-					objKey="font"
-					options={[
-						"Cinzel",
-						"Courier New",
-						"Times New Roman",
-						"Arial",
-					]}
-				/>
-				<div className="flex flex-row md:flex-nowrap flex-wrap gap-2">
+				</div>
+				<div className="flex items-stretch gap-2">
 					<Select
 						label="Textjustering"
 						objKey="align"
 						options={["Left", "Center", "Right"]}
 					/>
-				</div>
-				<Input label="Textstorlek (px)" objKey="size" type="number" />
-				<Input label="Färg" objKey="color" type="color" />
-				<div className="flex flex-row flex-wrap gap-2">
-					<Input label="Vänster (%)" objKey="x" type="number" />
-					<Input label="Topp (%)" objKey="y" type="number" />
-				</div>
-				<div className="flex flex-row flex-wrap gap-2">
-					<Input label="Bredd (%)" objKey="width" type="number" />
-					<Input label="Höjd (%)" objKey="height" type="number" />
+					<Select
+						label="Bildjustering"
+						objKey="fit"
+						options={["Contain", "Cover", "Fill"]}
+					/>
 				</div>
 				<Input label="Rundning (px)" objKey="radius" type="number" />
 			</div>
@@ -511,12 +529,15 @@ function TextArea({ label, objKey }: { label: string; objKey: "content" }) {
 
 	return (
 		<div className="flex flex-col gap-1 grow">
-			<label htmlFor={label}>{label}</label>
+			<label className="sr-only" htmlFor={label}>
+				{label}
+			</label>
 			<textarea
 				name={label}
 				id={label}
 				className="border border-gray-300 rounded-md p-2"
-				rows={5}
+				rows={1}
+				placeholder={label}
 				value={object[objKey]}
 				onChange={(e) =>
 					setObject({
@@ -553,8 +574,10 @@ function Input({
 	if (type === "color")
 		return (
 			<div className="flex flex-col gap-1 grow">
-				<label htmlFor={label}>{label}</label>
-				<div className="relative rounded-md border border-gray-300 py-4">
+				<label className="sr-only" htmlFor={label}>
+					{label}
+				</label>
+				<div className="relative rounded-md border border-gray-300 py-4 aspect-video h-full">
 					<input
 						type="color"
 						name={label}
@@ -572,8 +595,7 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}
-					></div>
+						}}></div>
 				</div>
 			</div>
 		);
@@ -581,7 +603,9 @@ function Input({
 	if (type === "file")
 		return (
 			<div className="flex flex-col gap-1 grow">
-				<label htmlFor={label}>{label}</label>
+				<label className="sr-only" htmlFor={label}>
+					{label}
+				</label>
 				<input
 					type="file"
 					name={label}
@@ -603,12 +627,16 @@ function Input({
 
 	return (
 		<div className="flex flex-col gap-1 grow">
-			<label htmlFor={label}>{label}</label>
+			<label className="sr-only" htmlFor={label}>
+				{label}
+			</label>
 			<input
 				type={type}
 				name={label}
 				id={label}
-				className="border border-gray-300 rounded-md p-2"
+				className={`border border-gray-300 rounded-md p-2 ${
+					type === "number" ? "w-16" : ""
+				}`}
 				value={objKey in object ? object[objKey] : ""}
 				onChange={(e) =>
 					setObject({
@@ -630,7 +658,7 @@ function Select({
 	options,
 }: {
 	label: string;
-	objKey: "font" | "align";
+	objKey: "font" | "align" | "fit";
 	options: string[];
 }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
@@ -639,7 +667,9 @@ function Select({
 
 	return (
 		<div className="flex flex-col gap-1 grow">
-			<label htmlFor={label}>{label}</label>
+			<label className="sr-only" htmlFor={label}>
+				{label}
+			</label>
 			<select
 				name={label}
 				id={label}
@@ -650,8 +680,7 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}
-			>
+				}>
 				{options?.map((option, i) => (
 					<option key={i} value={option.toLowerCase()}>
 						{option}
@@ -826,12 +855,26 @@ async function DrawImage(
 				image.radius ?? 0
 			);
 
-			ctx.save();
-			GetRoundedRect(ctx, x, y, width, height, radius);
-			ctx.clip();
-
 			const { offsetX, offsetY, newWidth, newHeight } =
-				GetCoverImageDimensions(img, x, y, width, height);
+				GetImageDimensions(
+					img,
+					image.fit || "contain",
+					x,
+					y,
+					width,
+					height
+				);
+
+			ctx.save();
+			GetRoundedRect(
+				ctx,
+				Math.max(x, offsetX),
+				Math.max(y, offsetY),
+				Math.min(width, newWidth),
+				Math.min(height, newHeight),
+				radius
+			);
+			ctx.clip();
 
 			ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
 			ctx.restore();
@@ -859,19 +902,25 @@ async function DrawImage(
 	await loadImage(image);
 }
 
-function GetCoverImageDimensions(
+function GetImageDimensions(
 	image: HTMLImageElement,
+	type: string,
 	x: number,
 	y: number,
 	width: number,
 	height: number
 ) {
+	if (type === "fill") {
+		return { offsetX: x, offsetY: y, newWidth: width, newHeight: height };
+	}
+
 	// Calculate scaling factors for width and height
 	const scaleX = width / image.width;
 	const scaleY = height / image.height;
 
 	// Choose the larger scale to cover the target area
-	const scale = Math.max(scaleX, scaleY);
+	const scale =
+		type === "cover" ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY);
 
 	// Calculate the new image dimensions
 	const newWidth = image.width * scale;

@@ -13,7 +13,6 @@
                 "order": 0,
                 "x": 0.2,
                 "y": 0.2,
-                "color": "#00ff00",
                 "width": 0.6,
                 "height": 0.6,
                 "radius": 48
@@ -61,7 +60,6 @@
                 "order": 1,
                 "x": 0.2,
                 "y": 0.2,
-                "color": "#00ff00",
                 "width": 0.6,
                 "height": 0.6,
                 "radius": 48
@@ -91,7 +89,6 @@
                 "order": 1,
                 "x": 0,
                 "y": 0,
-                "color": "#00ff00",
                 "width": 1,
                 "height": 1,
                 "radius": 48
@@ -147,7 +144,6 @@
                 "order": 2,
                 "x": 0.2,
                 "y": 0.2,
-                "color": "#00ff00",
                 "width": 0.6,
                 "height": 0.6,
                 "radius": 48

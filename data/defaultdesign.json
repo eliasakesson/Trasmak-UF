@@ -19,7 +19,8 @@
         "y": 0.25,
         "width": 0.5,
         "height": 0.5,
-        "radius": 0
+        "radius": 0,
+        "fit": "contain"
     },
     "rectangle": {
         "type": "rectangle",
