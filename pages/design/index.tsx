@@ -1,13 +1,12 @@
 import { useEffect, useState, useContext, createContext, useRef } from "react";
 import designs from "../../data/designs.json";
-import defaultDesign from "../../data/defaultdesign.json";
 import { useRouter } from "next/router";
 import {
 	FaDownload,
-	FaPlus,
 	FaTrash,
 	FaMousePointer,
 	FaImage,
+	FaSquare,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useShoppingCart } from "use-shopping-cart";
@@ -15,29 +14,30 @@ import GetProducts from "@/utils/getProducts";
 import { uploadFromCanvas } from "@/utils/firebase";
 import { Product } from "use-shopping-cart/core";
 import Head from "next/head";
+import SetupMouseEvents from "@/utils/design/MouseEvents";
 
 const SelectedObjectContext = createContext({
 	object: null as ObjectProps | null,
 	setObject: (obj: ObjectProps) => {},
 });
 
-interface DesignProps {
+export interface DesignProps {
 	id: string;
 	objects: ObjectProps[];
 }
 
-interface ObjectProps {
+export interface ObjectProps {
 	id: number;
 	type: string;
 	content: string;
 	x: number;
 	y: number;
+	order: number;
 
 	color?: string;
 	font?: string;
 	size?: number;
 	align?: string;
-	baseline?: string;
 
 	width?: number;
 	height?: number;
@@ -53,11 +53,12 @@ export default function Design({ products }: { products: any }) {
 		null
 	);
 	const [selectedTool, setSelectedTool] = useState<
-		"select" | "text" | "image"
+		"select" | "text" | "image" | "rectangle"
 	>("select");
 	const inputSelection = useRef<{ start: number | null; end: number | null }>(
 		{ start: null, end: null }
 	);
+	const [trayObject, setTrayObject] = useState<ObjectProps | null>(null);
 
 	const { cartDetails, addItem } = useShoppingCart();
 
@@ -75,15 +76,15 @@ export default function Design({ products }: { products: any }) {
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-		const ctx = canvas.getContext("2d");
-		const rect = canvas.getBoundingClientRect();
+
 		const size = JSON.parse(
 			products.find(
 				(product: any) =>
 					product.id.substring(6, product.id.length) ===
 					currentDesign.id
-			)?.metadata.size || "{}"
+			)?.metadata?.size || "{}"
 		);
+
 		const tray = GetTrayObjFromCanvas(
 			canvas,
 			0.85,
@@ -91,311 +92,70 @@ export default function Design({ products }: { products: any }) {
 			"15"
 		);
 
-		const timer = setTimeout(() => {
-			Draw(canvas, tray, currentDesign, selectedObjectID);
-			localStorage.setItem("design", JSON.stringify(currentDesign));
-		}, 100);
+		setTrayObject(tray);
+	}, [currentDesign.id]);
 
-		currentDesign.objects.forEach((obj) => {
-			if (
-				obj.type === "image" &&
-				(!obj.image || obj.content !== obj.image.src)
-			) {
-				const img = new Image();
-				img.crossOrigin = "anonymous";
-				img.src = obj.content;
-				img.onload = () => {
-					obj.image = img;
-				};
-			}
-		});
-
-		let input: HTMLInputElement | null = null;
+	useEffect(() => {
+		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+		const ctx = canvas.getContext("2d");
+		const rect = canvas.getBoundingClientRect();
 		const selectedObject = currentDesign.objects.find(
 			(obj) => obj.id === selectedObjectID
 		);
 
+		if (!trayObject || !canvas || !ctx || !rect) return;
+		console.log("past");
+
+		let input: HTMLTextAreaElement | null = null;
+
+		const drawTimer = setTimeout(() => {
+			Draw(canvas, trayObject, currentDesign, selectedObjectID);
+			localStorage.setItem("design", JSON.stringify(currentDesign));
+		}, 100);
+
+		LoadImages(currentDesign);
+
 		if (
-			ctx &&
 			selectedObject &&
 			selectedObject.type === "text" &&
 			selectedTool === "text"
 		) {
-			input = document.createElement("input");
-
-			const { x, y, width, height } = GetObjectDimensions(
-				ctx,
-				tray,
-				selectedObject
-			);
-
-			// Set the initial value of the input to the current text
-			input.value =
-				currentDesign.objects.find((obj) => obj.id === selectedObjectID)
-					?.content || "";
-			input.selectionStart =
-				inputSelection.current.start ?? input.value.length;
-			input.selectionEnd =
-				inputSelection.current.end ?? input.value.length;
-			input.style.position = "absolute";
-			input.style.left = `${x * (rect.width / canvas.width) - 8}px`;
-			input.style.top = `${y * (rect.height / canvas.height) - 8}px`;
-			input.style.width = `${width * (rect.width / canvas.width)}px`;
-			input.style.height = `${height * (rect.height / canvas.height)}px`;
-			input.style.padding = "8px";
-			input.style.boxSizing = "content-box";
-			input.style.fontSize = `${
-				(selectedObject.size ?? 0) * (rect.width / canvas.width)
-			}px`;
-			input.style.fontFamily = selectedObject.font ?? "sans-serif";
-			input.style.textAlign = selectedObject.align ?? "left";
-			input.style.verticalAlign = selectedObject.baseline ?? "top";
-			input.style.outline = "none";
-			input.style.border = "none";
-			input.style.background = "transparent";
-			input.style.webkitTextFillColor = "transparent";
-			// Append the input to the body
-			(canvas.parentNode || document.body).appendChild(input);
-
-			// Focus on the input and select its text
-			input.focus();
-
-			// Event listener to handle the input changes
-			input.addEventListener("input", (e) => {
-				inputSelection.current = {
-					start: input?.selectionStart || null,
-					end: input?.selectionEnd || null,
-				};
-				const target = e.target as HTMLInputElement;
-				setCurrentDesign((current) => ({
-					...current,
-					objects: current.objects.map((obj) =>
-						obj.id === selectedObjectID
-							? {
-									...obj,
-									content: target.value,
-							  }
-							: obj
-					),
-				}));
-			});
-		}
-
-		let dragObject: ObjectProps | undefined = undefined;
-		let dragObjectOffset: { x: number; y: number } = { x: 0, y: 0 };
-		let dragType: "move" | "resize" | undefined = undefined;
-		let mouseDownPosition: { x: number; y: number } = { x: 0, y: 0 };
-
-		function onMouseDown(e: any) {
-			const clickX = e.offsetX * (canvas.width / rect.width);
-			const clickY = e.offsetY * (canvas.height / rect.height);
-			mouseDownPosition = { x: clickX, y: clickY };
-
-			dragObject = GetObjectFromPointer(e, canvas, tray, currentDesign);
-
-			if (dragObject && ctx && selectedObjectID !== null) {
-				const { x, y, width, height } = GetObjectDimensions(
-					ctx,
-					tray,
-					dragObject
-				);
-
-				dragObjectOffset = {
-					x:
-						clickX -
-						x -
-						(dragObject.align === "center" ? width / 2 : 0) -
-						(dragObject.align === "right" ? width : 0),
-					y:
-						clickY -
-						y -
-						(dragObject.baseline === "middle" ? height / 2 : 0) -
-						(dragObject.baseline === "bottom" ? height : 0),
-				};
-
-				if (dragObject.type === "image") {
-					if (clickX >= x + width - 8) {
-						dragType = "resize";
-					} else {
-						dragType = "move";
-					}
-				} else {
-					dragType = "move";
-				}
-			} else {
-				dragType = undefined;
-			}
-		}
-
-		function onMouseUp() {
-			if (dragObject) {
-				setCurrentDesign((current) => ({
-					...current,
-					objects: current.objects.map((obj) =>
-						dragObject && obj.id === dragObject.id
-							? dragObject
-							: obj
-					),
-				}));
-				dragObject = undefined;
-			}
-		}
-
-		function onClick(e: any) {
-			const object = GetObjectFromPointer(e, canvas, tray, currentDesign);
-
-			const clickX = e.offsetX * (canvas.width / rect.width);
-			const clickY = e.offsetY * (canvas.height / rect.height);
-
-			if (
-				(!object || object.type !== "text") &&
-				selectedTool === "text" &&
-				selectedObjectID === null
-			) {
-				addObject("text", clickX, clickY);
-			} else if (
-				(!object || object.type !== "image") &&
-				selectedTool === "image"
-			) {
-				if (
-					Math.abs(clickX - mouseDownPosition.x) > 5 ||
-					Math.abs(clickY - mouseDownPosition.y) > 5
-				) {
-					addObject(
-						"image",
-						mouseDownPosition.x,
-						mouseDownPosition.y,
-						clickX,
-						clickY
-					);
-				} else {
-					addObject("image", clickX, clickY);
-				}
-			} else {
-				setSelectedObjectID(object?.id ?? null);
-			}
-		}
-
-		function onMouseMove(e: any) {
-			const object = GetObjectFromPointer(e, canvas, tray, currentDesign);
-			canvas.style.cursor =
-				selectedTool === "text"
-					? "text"
-					: object
-					? "pointer"
-					: "default";
-
-			// If the mouse is down right corner of an image, show resize cursor
-			if (selectedObject && selectedObject === object && ctx) {
-				const { x, y, width, height } = GetObjectDimensions(
-					ctx,
-					tray,
-					selectedObject
-				);
-
-				if (selectedObject.type === "image") {
-					if (
-						e.offsetX * (canvas.width / rect.width) >=
-						x + width - 8
-					) {
-						canvas.style.cursor = "nwse-resize";
-					}
-				}
-			}
-
-			if (dragObject && ctx) {
-				const rect = canvas.getBoundingClientRect();
-
-				const clickX = e.offsetX * (canvas.width / rect.width);
-				const clickY = e.offsetY * (canvas.height / rect.height);
-
-				if (dragType === "move") {
-					const width =
-						dragObject.width ||
-						GetObjectDimensions(ctx, tray, dragObject).width /
-							(tray.width || 1);
-					const height =
-						dragObject.height ||
-						GetObjectDimensions(ctx, tray, dragObject).height /
-							(tray.height || 1);
-
-					dragObject.x =
-						(clickX - dragObjectOffset.x - tray.x) /
-						(tray.width || 1);
-					dragObject.y =
-						(clickY - dragObjectOffset.y - tray.y) /
-						(tray.height || 1);
-
-					const snapDistance = 0.01;
-
-					if (Math.abs(dragObject.x) < snapDistance) {
-						dragObject.x = 0;
-					}
-					if (Math.abs(dragObject.x + width - 1) < snapDistance) {
-						dragObject.x = 1 - width;
-					}
-					if (Math.abs(dragObject.y) < snapDistance) {
-						dragObject.y = 0;
-					}
-					if (Math.abs(dragObject.y + height - 1) < snapDistance) {
-						dragObject.y = 1 - height;
-					}
-					if (
-						Math.abs(dragObject.x + width / 2 - 0.5) < snapDistance
-					) {
-						dragObject.x = 0.5 - width / 2;
-					}
-					if (
-						Math.abs(dragObject.y + height / 2 - 0.5) < snapDistance
-					) {
-						dragObject.y = 0.5 - height / 2;
-					}
-				} else if (dragType === "resize") {
-					dragObject.width =
-						(clickX - tray.x) / (tray.width || 1) - dragObject.x;
-					dragObject.height =
-						(clickY - tray.y) / (tray.height || 1) - dragObject.y;
-
-					if (dragObject.width < 0) dragObject.width = 0;
-					if (dragObject.height < 0) dragObject.height = 0;
-					if (dragObject.width > 1 - dragObject.x)
-						dragObject.width = 1 - dragObject.x;
-					if (dragObject.height > 1 - dragObject.y)
-						dragObject.height = 1 - dragObject.y;
-				}
-
-				Draw(
-					canvas,
-					tray,
-					{
-						...currentDesign,
-						objects: currentDesign.objects.map((obj) =>
-							dragObject && obj.id === dragObject.id
-								? dragObject
-								: obj
+			input = CanvasTextEditorInput(
+				canvas,
+				trayObject,
+				inputSelection.current,
+				(selection) => (inputSelection.current = selection),
+				selectedObject,
+				(design) =>
+					setCurrentDesign((current) => ({
+						...current,
+						objects: current.objects.map((obj) =>
+							obj.id === selectedObjectID ? design : obj
 						),
-					},
-					selectedObjectID
-				);
-			}
+					}))
+			) as HTMLTextAreaElement;
 		}
 
-		canvas.addEventListener("mousedown", onMouseDown);
-		canvas.addEventListener("mouseup", onMouseUp);
-		canvas.addEventListener("mousemove", onMouseMove);
-		canvas.addEventListener("click", onClick);
+		const mouseEvents = SetupMouseEvents(
+			canvas,
+			trayObject,
+			currentDesign,
+			setCurrentDesign,
+			selectedObjectID,
+			setSelectedObjectID,
+			selectedTool,
+			setSelectedTool,
+			(design) => Draw(canvas, trayObject, design, selectedObjectID)
+		);
 
 		return () => {
-			clearTimeout(timer);
-			canvas.removeEventListener("mousedown", onMouseDown);
-			canvas.removeEventListener("mouseup", onMouseUp);
-			canvas.removeEventListener("mousemove", onMouseMove);
-			canvas.removeEventListener("click", onClick);
+			clearTimeout(drawTimer);
+			mouseEvents();
 			if (input) {
 				(canvas.parentNode || document.body).removeChild(input);
 			}
 		};
-	}, [currentDesign, selectedObjectID, selectedTool]);
+	}, [trayObject, currentDesign, selectedObjectID, selectedTool]);
 
 	useEffect(() => {
 		if (selectedObjectID === null) {
@@ -487,51 +247,6 @@ export default function Design({ products }: { products: any }) {
 		}
 	}
 
-	function addObject(
-		type: "text" | "image",
-		pointerX: number = 0,
-		pointerY: number = 0,
-		pointerEndX?: number,
-		pointerEndY?: number
-	) {
-		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-		const tray = GetTrayObjFromCanvas(canvas);
-
-		const x = (pointerX - tray.x) / (tray.width || 1);
-		const y = (pointerY - tray.y) / (tray.height || 1);
-
-		const width = pointerEndX
-			? (pointerEndX - pointerX) / (tray.width || 1)
-			: 0.2;
-		const height = pointerEndY
-			? (pointerEndY - pointerY) / (tray.height || 1)
-			: 0.2;
-
-		setCurrentDesign({
-			...currentDesign,
-			objects: [
-				...currentDesign.objects,
-				{
-					...defaultDesign[type],
-					id:
-						currentDesign.objects.length > 0
-							? Math.max(
-									...currentDesign.objects.map((o) => o.id)
-							  ) + 1
-							: 1,
-					x,
-					y,
-					width,
-					height,
-				},
-			],
-		});
-
-		if (selectedTool === "image") {
-			setSelectedTool("select");
-		}
-	}
-
 	return (
 		<>
 			<Head>
@@ -541,7 +256,7 @@ export default function Design({ products }: { products: any }) {
 			<div className="max-w-7xl mx-auto px-8 py-16 space-y-8">
 				<div className="grid md:grid-cols-4 md:grid-rows-2 gap-8">
 					<div className="col-span-3 space-y-4">
-						<div className="relative">
+						<div className="relative overflow-hidden">
 							<canvas
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
@@ -580,6 +295,16 @@ export default function Design({ products }: { products: any }) {
 									onClick={() => setSelectedTool("image")}
 								>
 									<FaImage />
+								</button>
+								<button
+									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl ${
+										selectedTool === "rectangle"
+											? "bg-gray-200"
+											: "bg-gray-100"
+									}`}
+									onClick={() => setSelectedTool("rectangle")}
+								>
+									<FaSquare />
 								</button>
 							</div>
 							<div className="flex gap-2">
@@ -728,10 +453,11 @@ function DesignEditor({
 
 	return (
 		<SelectedObjectContext.Provider value={{ object, setObject }}>
-			<div className="flex flex-col gap-4">
+			<div className="absolute flex flex-col gap-4">
 				<h2 className="text-xl font-bold border-b pb-2 flex items-center justify-between">
 					{object?.type === "text" && "Text"}
 					{object?.type === "image" && "Bild"}
+					{object?.type === "rectangle" && "Rektangel"}
 					<FaTrash
 						className="cursor-pointer"
 						onClick={() => removeObject()}
@@ -760,11 +486,6 @@ function DesignEditor({
 						label="Textjustering"
 						objKey="align"
 						options={["Left", "Center", "Right"]}
-					/>
-					<Select
-						label="Textbas"
-						objKey="baseline"
-						options={["Top", "Middle", "Bottom"]}
 					/>
 				</div>
 				<Input label="Textstorlek (px)" objKey="size" type="number" />
@@ -909,7 +630,7 @@ function Select({
 	options,
 }: {
 	label: string;
-	objKey: "font" | "align" | "baseline";
+	objKey: "font" | "align";
 	options: string[];
 }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
@@ -941,64 +662,44 @@ function Select({
 	);
 }
 
-function GetObjectFromPointer(
-	e: any,
-	canvas: HTMLCanvasElement,
-	tray: ObjectProps,
-	currentDesign: DesignProps,
-	padding: number = 8
-) {
-	const ctx = canvas.getContext("2d");
-	if (!ctx) return;
-
-	const rect = canvas.getBoundingClientRect();
-
-	const clickX = e.offsetX * (canvas.width / rect.width);
-	const clickY = e.offsetY * (canvas.height / rect.height);
-
-	return currentDesign.objects
-		.sort((a) => (a.type === "text" ? -1 : 1))
-		.find((obj) => {
-			const { x, y, width, height } = GetObjectDimensions(ctx, tray, obj);
-
-			// If the clicked position is inside the object
-			if (
-				clickX >= x - padding &&
-				clickX <= x + width + padding &&
-				clickY >= y - padding &&
-				clickY <= y + height + padding
-			) {
-				return true;
-			}
-		});
-}
-
 function GetObjectDimensions(
 	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
 	obj: ObjectProps
 ) {
-	function MeasureText(ctx: CanvasRenderingContext2D, text: ObjectProps) {
+	function MeasureTextWidth(
+		ctx: CanvasRenderingContext2D,
+		text: ObjectProps
+	) {
 		ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
-		return ctx.measureText(text.content);
+		const lines = text.content.split("\n");
+		return Math.max(...lines.map((line) => ctx.measureText(line).width));
+	}
+
+	function MeasureTextHeight(
+		ctx: CanvasRenderingContext2D,
+		text: ObjectProps
+	) {
+		ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
+		const lines = text.content.split("\n");
+		return lines.length * (text.size || 0);
 	}
 
 	const width =
-		(obj?.width && obj.width * (tray.width ?? 0)) ||
-		MeasureText(ctx, obj).width;
+		obj.type === "text"
+			? MeasureTextWidth(ctx, obj)
+			: (obj.width || 0) * (tray.width || 0);
 	const height =
-		(obj?.height && obj.height * (tray.height ?? 0)) || obj.size || 0;
+		obj.type === "text"
+			? MeasureTextHeight(ctx, obj)
+			: (obj.height || 0) * (tray.height || 0);
 
 	const x =
 		tray.x +
 		(tray.width ?? 0) * obj.x +
 		(obj.align === "center" ? -width / 2 : 0) +
 		(obj.align === "right" ? -width : 0);
-	const y =
-		tray.y +
-		(tray.height ?? 0) * obj.y +
-		(obj.baseline === "middle" ? -height / 2 : 0) +
-		(obj.baseline === "bottom" ? -height : 0);
+	const y = tray.y + (tray.height ?? 0) * obj.y;
 
 	return { x, y, width, height };
 }
@@ -1017,17 +718,17 @@ export async function Draw(
 
 	DrawTray(ctx, tray);
 
-	await DrawImages(
-		ctx,
-		tray,
-		design.objects.filter((obj) => obj.type === "image")
-	);
+	design.objects.sort((a, b) => a.order - b.order);
 
-	DrawTexts(
-		ctx,
-		tray,
-		design.objects.filter((obj) => obj.type === "text")
-	);
+	design.objects.forEach(async (obj) => {
+		if (obj.type === "text") {
+			DrawText(ctx, tray, obj);
+		} else if (obj.type === "rectangle") {
+			DrawRectangle(ctx, tray, obj);
+		} else if (obj.type === "image") {
+			await DrawImage(ctx, tray, obj);
+		}
+	});
 
 	HighlightSelectedObject(ctx, tray, design.objects, selectedObjectID);
 
@@ -1050,46 +751,62 @@ async function DrawRender(canvas: HTMLCanvasElement, design: DesignProps) {
 
 	const tray = GetTrayObjFromCanvas(canvas, 1);
 
-	await DrawImages(
-		ctx,
-		tray,
-		design.objects.filter((obj) => obj.type === "image")
-	);
+	// await DrawImages(
+	// 	ctx,
+	// 	tray,
+	// 	design.objects.filter((obj) => obj.type === "image")
+	// );
 
-	DrawTexts(
-		ctx,
-		tray,
-		design.objects.filter((obj) => obj.type === "text")
-	);
+	// DrawTexts(
+	// 	ctx,
+	// 	tray,
+	// 	design.objects.filter((obj) => obj.type === "text")
+	// );
 }
 
-function DrawTexts(
+function DrawText(
 	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
-	texts: ObjectProps[]
+	text: ObjectProps
 ) {
-	texts.forEach((text) => {
-		ctx.fillStyle = text.color ?? "#000";
-		ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
-		ctx.textAlign = text.align as CanvasTextAlign;
-		ctx.textBaseline = text.baseline as CanvasTextBaseline;
-		const lines = text.content.split("\n");
-		lines.forEach((line, i) => {
-			ctx.fillText(
-				line,
-				(tray.x ?? 0) + (tray.width ?? 0) * text.x,
-				(tray.y ?? 0) +
-					(tray.height ?? 0) * text.y +
-					(text.size ?? 0) * (i - (lines.length - 1) / 2)
-			);
-		});
+	ctx.fillStyle = text.color ?? "#000";
+	ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
+	ctx.textAlign = text.align as CanvasTextAlign;
+	ctx.textBaseline = "top";
+	const lines = text.content.split("\n");
+
+	lines.forEach((line, i) => {
+		const x = (tray.x ?? 0) + (tray.width ?? 0) * text.x;
+		const y =
+			(tray.y ?? 0) + (tray.height ?? 0) * text.y + (text.size ?? 0) * i;
+
+		ctx.fillText(line, x, y);
 	});
 }
 
-async function DrawImages(
+function DrawRectangle(
 	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
-	images: ObjectProps[]
+	rectangle: ObjectProps
+) {
+	const { x, y, width, height } = GetObjectDimensions(ctx, tray, rectangle);
+
+	// Make sure radius is not larger than half the width or height
+	const radius = Math.min(Math.min(width, height) / 2, rectangle.radius ?? 0);
+
+	ctx.save();
+	GetRoundedRect(ctx, x, y, width, height, radius);
+	ctx.clip();
+
+	ctx.fillStyle = rectangle.color ?? "#000";
+	ctx.fillRect(x, y, width, height);
+	ctx.restore();
+}
+
+async function DrawImage(
+	ctx: CanvasRenderingContext2D,
+	tray: ObjectProps,
+	image: ObjectProps
 ) {
 	const loadImage = (image: ObjectProps): Promise<void> => {
 		function DrawImage(
@@ -1139,16 +856,7 @@ async function DrawImages(
 		});
 	};
 
-	const loadingPromises: Promise<void>[] = images.map((image) =>
-		loadImage(image)
-	);
-
-	try {
-		await Promise.all(loadingPromises);
-		console.log("Done");
-	} catch (error) {
-		console.error(error);
-	}
+	await loadImage(image);
 }
 
 function GetCoverImageDimensions(
@@ -1289,7 +997,94 @@ export function GetTrayObjFromCanvas(
 			typeof radius === "string"
 				? (Number(radius) / 100) * width
 				: radius,
+		order: 0,
 	};
+}
+
+function LoadImages(design: DesignProps) {
+	design.objects.forEach((obj) => {
+		if (
+			obj.type === "image" &&
+			(!obj.image || obj.content !== obj.image.src)
+		) {
+			const img = new Image();
+			img.crossOrigin = "anonymous";
+			img.src = obj.content;
+			img.onload = () => {
+				obj.image = img;
+			};
+		}
+	});
+}
+
+interface SelectionProps {
+	start: number | null;
+	end: number | null;
+}
+
+function CanvasTextEditorInput(
+	canvas: HTMLCanvasElement,
+	trayObject: ObjectProps,
+	selection: SelectionProps,
+	setSelection: (obj: SelectionProps) => void,
+	object: ObjectProps,
+	setObject: (obj: ObjectProps) => void
+) {
+	const input = document.createElement("textarea");
+	const ctx = canvas.getContext("2d");
+	const rect = canvas.getBoundingClientRect();
+	if (!ctx || !rect) return;
+
+	const { x, y, width, height } = GetObjectDimensions(
+		ctx,
+		trayObject,
+		object
+	);
+
+	// Set the initial value of the input to the current text
+	input.value = object.content ?? "";
+	input.selectionStart = selection.start ?? input.value.length;
+	input.selectionEnd = selection.end ?? input.value.length;
+	input.style.position = "absolute";
+	input.style.left = `${x * (rect.width / canvas.width) - 8}px`;
+	input.style.top = `${y * (rect.height / canvas.height) - 16}px`;
+	input.style.width = `${width * (rect.width / canvas.width)}px`;
+	input.style.height = `${height * (rect.height / canvas.height)}px`;
+	input.style.padding = "8px";
+	input.style.boxSizing = "content-box";
+	input.style.fontSize = `${
+		(object.size ?? 0) * (rect.width / canvas.width)
+	}px`;
+	input.style.fontFamily = object.font ?? "sans-serif";
+	input.style.textAlign = object.align ?? "left";
+	input.style.verticalAlign = "top";
+	input.style.outline = "none";
+	input.style.border = "none";
+	input.style.background = "transparent";
+	input.style.webkitTextFillColor = "transparent";
+	input.style.resize = "none";
+	input.style.overflow = "hidden";
+	// Append the input to the body
+	(canvas.parentNode || document.body).appendChild(input);
+
+	// Focus on the input and select its text
+	input.focus();
+
+	// Event listener to handle the input changes
+	input.addEventListener("input", (e) => {
+		setSelection({
+			start: input?.selectionStart || null,
+			end: input?.selectionEnd || null,
+		});
+
+		const target = e.target as HTMLTextAreaElement;
+		setObject({
+			...object,
+			content: target.value,
+		});
+	});
+
+	return input;
 }
 
 export async function getStaticProps() {
