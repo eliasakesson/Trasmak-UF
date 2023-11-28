@@ -73,25 +73,29 @@ export default function Design({ products }: { products: any }) {
 		if (router.query.d) {
 			const rtDesign = designs.find((d) => d.id === router.query.d);
 			if (rtDesign) setCurrentDesign(rtDesign);
+			else
+				setCurrentDesign({
+					...designs[0],
+					id: router.query.d as string,
+				});
 		}
 	}, [router.query.d]);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
-		const size = JSON.parse(
-			products.find(
-				(product: any) =>
-					product.id.substring(6, product.id.length) ===
-					currentDesign.id
-			)?.metadata?.size || "{}"
-		);
+		const metadata = products.find(
+			(product: any) =>
+				product.id.substring(6, product.id.length) === currentDesign.id
+		)?.metadata;
 
 		const tray = GetTrayObjFromCanvas(
 			canvas,
 			0.85,
-			size?.width ? size.width / size.height : 4 / 3,
-			"15"
+			metadata?.width && metadata?.height
+				? metadata.width / metadata.height
+				: 4 / 3,
+			metadata?.radius ? `${metadata.radius}` : "10"
 		);
 
 		setTrayObject(tray);
@@ -114,7 +118,7 @@ export default function Design({ products }: { products: any }) {
 			localStorage.setItem("design", JSON.stringify(currentDesign));
 		}, 100);
 
-		LoadImages(currentDesign);
+		LoadImages(currentDesign, (design) => Draw(canvas, trayObject, design));
 
 		if (selectedObject && designEditorRef.current) {
 			const { x, y, width, height } = GetObjectDimensions(
@@ -278,7 +282,8 @@ export default function Design({ products }: { products: any }) {
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
-								height={720}></canvas>
+								height={720}
+							></canvas>
 							<div className="absolute" ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
@@ -325,7 +330,8 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("select")}>
+									onClick={() => setSelectedTool("select")}
+								>
 									<FaMousePointer />
 								</button>
 								<button
@@ -334,7 +340,8 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("text")}>
+									onClick={() => setSelectedTool("text")}
+								>
 									T
 								</button>
 								<button
@@ -343,7 +350,8 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("image")}>
+									onClick={() => setSelectedTool("image")}
+								>
 									<FaImage />
 								</button>
 								<button
@@ -352,9 +360,8 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() =>
-										setSelectedTool("rectangle")
-									}>
+									onClick={() => setSelectedTool("rectangle")}
+								>
 									<FaSquare />
 								</button>
 							</div>
@@ -378,7 +385,8 @@ export default function Design({ products }: { products: any }) {
 								</button> */}
 								<button
 									onClick={addToCart}
-									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
+								>
 									Lägg till i kundvagn
 								</button>
 							</div>
@@ -443,11 +451,13 @@ function DesignTemplates({
 				<li key={design.id} className="list-none">
 					<button
 						onClick={() => onClick(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl">
+						className="w-full aspect-video bg-gray-100 rounded-xl"
+					>
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
 							width={1280}
-							height={720}></canvas>
+							height={720}
+						></canvas>
 					</button>
 				</li>
 			))}
@@ -482,7 +492,8 @@ function DesignEditor({
 					)}
 					<button
 						className="cursor-pointer"
-						onClick={() => removeObject()}>
+						onClick={() => removeObject()}
+					>
 						<FaTrash size={20} />
 					</button>
 				</div>
@@ -595,7 +606,8 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}></div>
+						}}
+					></div>
 				</div>
 			</div>
 		);
@@ -680,7 +692,8 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}>
+				}
+			>
 				{options?.map((option, i) => (
 					<option key={i} value={option.toLowerCase()}>
 						{option}
@@ -1012,15 +1025,26 @@ function GetRoundedRect(
 	radius: number
 ) {
 	ctx.beginPath();
-	ctx.moveTo(x, y + radius);
-	ctx.lineTo(x, y + height - radius);
-	ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
-	ctx.lineTo(x + width - radius, y + height);
-	ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
-	ctx.lineTo(x + width, y + radius);
-	ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
-	ctx.lineTo(x + radius, y);
-	ctx.quadraticCurveTo(x, y, x, y + radius);
+
+	if (width > height ? radius == height / 2 : radius == width / 2) {
+		ctx.arc(x + radius, y + radius, radius, 0, Math.PI * 2);
+	} else {
+		ctx.moveTo(x, y + radius);
+		ctx.lineTo(x, y + height - radius);
+		ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
+		ctx.lineTo(x + width - radius, y + height);
+		ctx.quadraticCurveTo(
+			x + width,
+			y + height,
+			x + width,
+			y + height - radius
+		);
+		ctx.lineTo(x + width, y + radius);
+		ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
+		ctx.lineTo(x + radius, y);
+		ctx.quadraticCurveTo(x, y, x, y + radius);
+	}
+
 	ctx.closePath();
 }
 
@@ -1044,13 +1068,13 @@ export function GetTrayObjFromCanvas(
 		height,
 		radius:
 			typeof radius === "string"
-				? (Number(radius) / 100) * width
+				? (Number(radius) / 100) * (width > height ? height : width)
 				: radius,
 		order: 0,
 	};
 }
 
-function LoadImages(design: DesignProps) {
+function LoadImages(design: DesignProps, Draw: (design: DesignProps) => void) {
 	design.objects.forEach((obj) => {
 		if (
 			obj.type === "image" &&
@@ -1061,6 +1085,7 @@ function LoadImages(design: DesignProps) {
 			img.src = obj.content;
 			img.onload = () => {
 				obj.image = img;
+				Draw(design);
 			};
 		}
 	});
@@ -1141,9 +1166,7 @@ export async function getStaticProps() {
 
 	return {
 		props: {
-			products: products.filter(
-				(product) => product.metadata.type === "template"
-			),
+			products,
 		},
 		revalidate: 3600,
 	};

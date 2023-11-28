@@ -5,7 +5,7 @@ export default async function GetProducts(randomize = false) {
 		expand: ["data.product"],
 	});
 
-	const products = inventory.data.map((product) => ({
+	const products = inventory.data.filter((product) => product.product.active).map((product) => ({
 		id: product.id,
 		price: product.unit_amount,
 		currency: product.currency,
@@ -28,6 +28,10 @@ export async function GetProduct(id) {
 	const product = await stripe.prices.retrieve(id, {
 		expand: ["product"],
 	});
+
+	if (!product || !product?.product?.active) {
+		return null;
+	}
 
 	return {
 		id: product.id,

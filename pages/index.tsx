@@ -22,8 +22,6 @@ export default function Home({ products }: { products: any }) {
 						description="Detta är de brickor som säljs som bäst. Passa på innan de tar
 						slut!"
 						products={products}
-						metadata="best_seller"
-						type="common"
 					/>
 					<PersonalSection />
 					<ProductRow

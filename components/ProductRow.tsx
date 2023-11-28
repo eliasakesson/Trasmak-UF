@@ -84,7 +84,7 @@ export function ProductCard({
 	return (
 		<Link
 			href={
-				type === "template"
+				/* type === "template" */ true
 					? `/design?d=${id.substring(6, id.length)}`
 					: `/products/${id.substring(6, id.length)}`
 			}
@@ -112,7 +112,7 @@ export function ProductCard({
 								})}
 							</p>
 						</div>
-						{type !== "template" && (
+						{/* {type !== "template" && (
 							<button
 								className="bg-primary text-white sm:p-4 px-4 py-2 sm:rounded-lg rounded-md flex items-center justify-center gap-2"
 								onClick={(e) => {
@@ -134,7 +134,7 @@ export function ProductCard({
 								</span>
 								<FaPlus />
 							</button>
-						)}
+						)} */}
 					</div>
 				</div>
 			</div>
