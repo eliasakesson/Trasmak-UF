@@ -7,6 +7,8 @@ import {
 	FaMousePointer,
 	FaImage,
 	FaSquare,
+	FaChevronUp,
+	FaChevronDown,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useShoppingCart } from "use-shopping-cart";
@@ -70,7 +72,7 @@ export default function Design({ products }: { products: any }) {
 		// 		JSON.parse(localStorage.getItem("design") as string)
 		// 	);
 		// } else
-		if (router.query.d) {
+		if (router.query.d && currentDesign.id !== router.query.d) {
 			const rtDesign = designs.find((d) => d.id === router.query.d);
 			if (rtDesign) setCurrentDesign(rtDesign);
 			else
@@ -78,8 +80,13 @@ export default function Design({ products }: { products: any }) {
 					...designs[0],
 					id: router.query.d as string,
 				});
+		} else if (products[0]) {
+			setCurrentDesign({
+				...designs[0],
+				id: products[0].id.substring(6, products[0].id.length),
+			});
 		}
-	}, [router.query.d]);
+	}, [router.query.d, products]);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -193,7 +200,12 @@ export default function Design({ products }: { products: any }) {
 
 		const toastID = toast.loading("Laddar upp bilder...");
 
-		await DrawRender(newCanvas, currentDesign);
+		if (!trayObject) {
+			toast.error("Något gick fel", { id: toastID });
+			console.error("Tray object is null");
+			return;
+		}
+		await DrawRender(newCanvas, trayObject, currentDesign);
 
 		try {
 			const coverImage = uploadFromCanvas(canvas);
@@ -216,6 +228,7 @@ export default function Design({ products }: { products: any }) {
 					);
 				} else {
 					toast.error("Något gick fel", { id: toastID });
+					console.error("Product is null");
 				}
 			});
 		} catch (error) {
@@ -241,8 +254,15 @@ export default function Design({ products }: { products: any }) {
 						count: 1,
 						product_metadata: {
 							...newProduct.metadata,
-							image: images.image,
-							cover: images.cover,
+							products: [
+								...product.metadata.products,
+								{
+									id: newProduct.id,
+									count: 1,
+									image: images.image,
+									cover: images.cover,
+								},
+							],
 						},
 					}
 				);
@@ -268,6 +288,46 @@ export default function Design({ products }: { products: any }) {
 		}
 	}
 
+	function changeOrder(order: number) {
+		const maxOrder = Math.max(...currentDesign.objects.map((o) => o.order));
+		const minOrder = Math.min(...currentDesign.objects.map((o) => o.order));
+
+		const selectedObject = currentDesign.objects.find(
+			(obj) => obj.id === selectedObjectID
+		);
+		if (!selectedObject) return;
+
+		console.log(selectedObject.order, maxOrder, minOrder);
+
+		if (order > 0 && selectedObject.order === maxOrder) return;
+		if (order < 0 && selectedObject.order === minOrder) return;
+
+		setCurrentDesign((design) => {
+			if (!design) return design;
+			const objects = design.objects.map((obj: ObjectProps) => {
+				if (order > 0) {
+					if (obj.id === selectedObjectID) {
+						return { ...obj, order: obj.order + 1 };
+					}
+					if (obj.order === selectedObject.order + 1) {
+						return { ...obj, order: obj.order - 1 };
+					}
+				} else {
+					if (obj.id === selectedObjectID) {
+						return { ...obj, order: obj.order - 1 };
+					}
+					if (obj.order === selectedObject.order - 1) {
+						return { ...obj, order: obj.order + 1 };
+					}
+				}
+
+				return obj;
+			});
+			console.log(objects);
+			return { ...design, objects };
+		});
+	}
+
 	return (
 		<>
 			<Head>
@@ -282,8 +342,7 @@ export default function Design({ products }: { products: any }) {
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
-								height={720}
-							></canvas>
+								height={720}></canvas>
 							<div className="absolute" ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
@@ -318,6 +377,7 @@ export default function Design({ products }: { products: any }) {
 											});
 											setSelectedObjectID(null);
 										}}
+										changeOrder={changeOrder}
 									/>
 								)}
 							</div>
@@ -330,8 +390,7 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("select")}
-								>
+									onClick={() => setSelectedTool("select")}>
 									<FaMousePointer />
 								</button>
 								<button
@@ -340,8 +399,7 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("text")}
-								>
+									onClick={() => setSelectedTool("text")}>
 									T
 								</button>
 								<button
@@ -350,8 +408,7 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("image")}
-								>
+									onClick={() => setSelectedTool("image")}>
 									<FaImage />
 								</button>
 								<button
@@ -360,8 +417,9 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("rectangle")}
-								>
+									onClick={() =>
+										setSelectedTool("rectangle")
+									}>
 									<FaSquare />
 								</button>
 							</div>
@@ -385,8 +443,7 @@ export default function Design({ products }: { products: any }) {
 								</button> */}
 								<button
 									onClick={addToCart}
-									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-								>
+									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 									Lägg till i kundvagn
 								</button>
 							</div>
@@ -451,13 +508,11 @@ function DesignTemplates({
 				<li key={design.id} className="list-none">
 					<button
 						onClick={() => onClick(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl"
-					>
+						className="w-full aspect-video bg-gray-100 rounded-xl">
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
 							width={1280}
-							height={720}
-						></canvas>
+							height={720}></canvas>
 					</button>
 				</li>
 			))}
@@ -469,10 +524,12 @@ function DesignEditor({
 	object,
 	setObject,
 	removeObject,
+	changeOrder,
 }: {
 	object: ObjectProps | null;
 	setObject: (obj: ObjectProps) => void;
 	removeObject: () => void;
+	changeOrder: (order: number) => void;
 }) {
 	if (!object) return null;
 
@@ -490,10 +547,13 @@ function DesignEditor({
 							objKey="content"
 						/>
 					)}
-					<button
-						className="cursor-pointer"
-						onClick={() => removeObject()}
-					>
+					<button onClick={() => changeOrder(1)}>
+						<FaChevronUp />
+					</button>
+					<button onClick={() => changeOrder(-1)}>
+						<FaChevronDown />
+					</button>
+					<button onClick={() => removeObject()}>
 						<FaTrash size={20} />
 					</button>
 				</div>
@@ -606,8 +666,7 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}
-					></div>
+						}}></div>
 				</div>
 			</div>
 		);
@@ -692,8 +751,7 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}
-			>
+				}>
 				{options?.map((option, i) => (
 					<option key={i} value={option.toLowerCase()}>
 						{option}
@@ -762,7 +820,8 @@ export async function Draw(
 
 	design.objects.sort((a, b) => a.order - b.order);
 
-	design.objects.forEach(async (obj) => {
+	for (let i = 0; i < design.objects.length; i++) {
+		const obj = design.objects[i];
 		if (obj.type === "text") {
 			DrawText(ctx, tray, obj);
 		} else if (obj.type === "rectangle") {
@@ -770,7 +829,7 @@ export async function Draw(
 		} else if (obj.type === "image") {
 			await DrawImage(ctx, tray, obj);
 		}
-	});
+	}
 
 	HighlightSelectedObject(ctx, tray, design.objects, selectedObjectID);
 
@@ -785,25 +844,31 @@ export async function Draw(
 	});
 }
 
-async function DrawRender(canvas: HTMLCanvasElement, design: DesignProps) {
+async function DrawRender(
+	canvas: HTMLCanvasElement,
+	tray: ObjectProps,
+	design: DesignProps
+) {
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
 
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.reset();
+	ctx.save();
 
-	const tray = GetTrayObjFromCanvas(canvas, 1);
+	DrawTray(ctx, tray, false);
 
-	// await DrawImages(
-	// 	ctx,
-	// 	tray,
-	// 	design.objects.filter((obj) => obj.type === "image")
-	// );
+	design.objects.sort((a, b) => a.order - b.order);
 
-	// DrawTexts(
-	// 	ctx,
-	// 	tray,
-	// 	design.objects.filter((obj) => obj.type === "text")
-	// );
+	for (let i = 0; i < design.objects.length; i++) {
+		const obj = design.objects[i];
+		if (obj.type === "text") {
+			DrawText(ctx, tray, obj);
+		} else if (obj.type === "rectangle") {
+			DrawRectangle(ctx, tray, obj);
+		} else if (obj.type === "image") {
+			await DrawImage(ctx, tray, obj);
+		}
+	}
 }
 
 function DrawText(
@@ -980,10 +1045,16 @@ function HighlightSelectedObject(
 	ctx.restore();
 }
 
-function DrawTray(ctx: any, { x, y, width, height, radius }: ObjectProps) {
-	ctx.fillStyle = "#ddd";
+function DrawTray(
+	ctx: any,
+	{ x, y, width, height, radius }: ObjectProps,
+	fill: boolean = true
+) {
 	GetRoundedRect(ctx, x, y, width ?? 0, height ?? 0, radius ?? 0);
-	ctx.fill();
+	if (fill) {
+		ctx.fillStyle = "#ddd";
+		ctx.fill();
+	}
 	ctx.clip();
 }
 

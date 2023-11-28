@@ -12,9 +12,9 @@ export default function Hero() {
 		const canvas4 = document.getElementById("hero4") as HTMLCanvasElement;
 
 		const tray1 = GetTrayObjFromCanvas(canvas1, 1, 43 / 33);
-		const tray2 = GetTrayObjFromCanvas(canvas2, 1, 43 / 33);
-		const tray3 = GetTrayObjFromCanvas(canvas2, 1, 43 / 33);
-		const tray4 = GetTrayObjFromCanvas(canvas2, 1, 43 / 33);
+		const tray2 = GetTrayObjFromCanvas(canvas2, 1, 1, "50");
+		const tray3 = GetTrayObjFromCanvas(canvas2, 1, 1, "50");
+		const tray4 = GetTrayObjFromCanvas(canvas2, 1, 36 / 28);
 
 		Draw(canvas1, tray1, designs[0]);
 		Draw(canvas2, tray2, designs[1]);
@@ -40,8 +40,7 @@ export default function Hero() {
 				<div className="flex justify-center flex-1 w-full">
 					<Link
 						href="/design"
-						className="bg-primary text-white lg:w-fit w-full lg:px-16 px-8 py-4 font-semibold rounded-md hover:bg-primary_light transition-colors"
-					>
+						className="bg-primary text-white lg:w-fit w-full lg:px-16 px-8 py-4 font-semibold rounded-md hover:bg-primary_light transition-colors">
 						Designa din bricka
 					</Link>
 				</div>
@@ -52,8 +51,7 @@ export default function Hero() {
 						id="hero1"
 						className="h-full max-lg:hidden"
 						width={1000}
-						height={720}
-					></canvas>
+						height={720}></canvas>
 					<Image
 						src="/images/hero1.png"
 						className="lg:hidden object-contain"
@@ -67,8 +65,7 @@ export default function Hero() {
 						id="hero2"
 						className="h-full max-lg:hidden"
 						width={1000}
-						height={720}
-					></canvas>
+						height={720}></canvas>
 					<Image
 						src="/images/hero2.png"
 						className="lg:hidden object-contain"

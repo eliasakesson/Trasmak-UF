@@ -49,7 +49,10 @@ export default function SetupMouseEvents(
 				y: clickY - y,
 			};
 
-			if (dragObject.type === "image") {
+			if (
+				dragObject.type === "image" ||
+				dragObject.type === "rectangle"
+			) {
 				if (clickX >= x + width - 8) {
 					dragType = "resize";
 				} else {
@@ -156,7 +159,10 @@ export default function SetupMouseEvents(
 				selectedObject
 			);
 
-			if (selectedObject.type === "image") {
+			if (
+				selectedObject.type === "image" ||
+				selectedObject.type === "rectangle"
+			) {
 				if (e.offsetX * (canvas.width / rect.width) >= x + width - 8) {
 					canvas.style.cursor = "nwse-resize";
 				}
@@ -271,7 +277,8 @@ export default function SetupMouseEvents(
 					height,
 					order:
 						Math.max(
-							...currentDesign.objects.map((obj) => obj.order)
+							...currentDesign.objects.map((obj) => obj.order),
+							0
 						) + 1,
 				},
 			],
