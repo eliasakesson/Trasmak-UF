@@ -33,6 +33,9 @@ export async function uploadFromCanvas(canvas) {
 }
 
 export function shortenDownloadURL(url) {
+	if (!url) {
+		return "";
+	}
 	const match = url.match(/%2F(.*?)\?/);
 
 	if (match) {

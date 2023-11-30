@@ -49,13 +49,21 @@ export default async function handler(req, res) {
 					0
 				) >= data.freeShippingThreshold;
 
+			console.log(JSON.stringify(cartDetails))
+
 			const metadata = {
-				images: JSON.stringify(
-					Object.values(cartDetails).map((item) => {
-						return shortenDownloadURL(item.product_data.image);
-					})
-				),
-			};
+				products: JSON.stringify(Object.values(cartDetails).map((product) => 
+					product.product_data.products.map((p) => 
+						({
+							name: p.name,
+							count: p.count,
+							image: shortenDownloadURL(p.image),
+						})
+					)
+				).flat())
+			}
+
+			console.log(metadata);
 
 			const session = await stripe.checkout.sessions.create({
 				mode: "payment",

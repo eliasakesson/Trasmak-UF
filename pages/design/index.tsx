@@ -65,13 +65,12 @@ export default function Design({ products }: { products: any }) {
 	const designEditorRef = useRef<HTMLDivElement>(null);
 
 	const { cartDetails, addItem } = useShoppingCart();
+	const isAddingToCart = useRef(false);
+	const lastAddedImageURL = useRef<string | null>(null);
+
+	console.log(cartDetails);
 
 	useEffect(() => {
-		// if (localStorage.getItem("design")) {
-		// 	setCurrentDesign(
-		// 		JSON.parse(localStorage.getItem("design") as string)
-		// 	);
-		// } else
 		if (router.query.d && currentDesign.id !== router.query.d) {
 			const rtDesign = designs.find((d) => d.id === router.query.d);
 			if (rtDesign) setCurrentDesign(rtDesign);
@@ -87,6 +86,10 @@ export default function Design({ products }: { products: any }) {
 			});
 		}
 	}, [router.query.d, products]);
+
+	useEffect(() => {
+		lastAddedImageURL.current = null;
+	}, [selectedObjectID]);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -205,35 +208,52 @@ export default function Design({ products }: { products: any }) {
 			console.error("Tray object is null");
 			return;
 		}
-		await DrawRender(newCanvas, trayObject, currentDesign);
+
+		if (isAddingToCart.current === true) {
+			toast.error("Var god vänta...", { id: toastID });
+			return;
+		}
+
+		isAddingToCart.current = true;
 
 		try {
+			const product = products.find(
+				(product: any) => product.id == "price_" + currentDesign.id
+			);
+
+			if (!product) {
+				throw new Error("Product is null");
+			}
+
+			if (lastAddedImageURL.current) {
+				incrementProduct(product, toastID);
+				isAddingToCart.current = false;
+				return;
+			}
+
+			await DrawRender(newCanvas, trayObject, currentDesign);
+
 			const coverImage = uploadFromCanvas(canvas);
 			const renderImage = uploadFromCanvas(newCanvas);
 
-			Promise.all([renderImage, coverImage]).then((values) => {
-				toast.loading("Lägger till i kundvagnen...", { id: toastID });
-				const product = products.find(
-					(product: any) => product.id == "price_" + currentDesign.id
-				);
+			Promise.all([renderImage, coverImage])
+				.then((values) => {
+					toast.loading("Lägger till i kundvagnen...", {
+						id: toastID,
+					});
 
-				if (product) {
-					addProduct(
-						product,
-						{
-							image: values[0],
-							cover: values[1],
-						},
-						toastID
-					);
-				} else {
-					toast.error("Något gick fel", { id: toastID });
-					console.error("Product is null");
-				}
-			});
+					addProductToCart(product, toastID, {
+						image: values[0],
+						cover: values[1],
+					});
+				})
+				.finally(() => {
+					isAddingToCart.current = false;
+				});
 		} catch (error) {
 			toast.error("Något gick fel", { id: toastID });
 			console.error(error);
+			isAddingToCart.current = false;
 		}
 	}
 
@@ -286,6 +306,57 @@ export default function Design({ products }: { products: any }) {
 			);
 			toast.success("Produkten lades till i kundvagnen", { id: toastID });
 		}
+	}
+
+	function incrementProduct(product: any, toastID: string) {
+		const products = (cartDetails?.[product.id]?.product_data as any)
+			?.products;
+
+		addItem(product, {
+			count: 1,
+			product_metadata: {
+				products: products.map((p: any) => {
+					if (p.image === lastAddedImageURL.current) {
+						return { ...p, count: p.count + 1 };
+					}
+					return p;
+				}),
+			},
+		});
+
+		toast.success("Produkten inkrementerades", { id: toastID });
+	}
+
+	function addProductToCart(
+		product: any,
+		toastID: string,
+		{ image, cover }: { image: string; cover: string }
+	) {
+		const products =
+			(cartDetails?.[product.id]?.product_data as any)?.products ?? [];
+
+		const metadata = {
+			products: [
+				...products,
+				{
+					name: product.name,
+					count: 1,
+					image,
+					cover,
+				},
+			],
+		};
+
+		addItem(product, {
+			count: 1,
+			product_metadata: metadata,
+		});
+
+		lastAddedImageURL.current = image;
+
+		toast.success("Produkten lades till i kundvagnen", {
+			id: toastID,
+		});
 	}
 
 	function changeOrder(order: number) {
@@ -342,7 +413,8 @@ export default function Design({ products }: { products: any }) {
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
-								height={720}></canvas>
+								height={720}
+							></canvas>
 							<div className="absolute" ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
@@ -390,7 +462,8 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("select")}>
+									onClick={() => setSelectedTool("select")}
+								>
 									<FaMousePointer />
 								</button>
 								<button
@@ -399,7 +472,8 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("text")}>
+									onClick={() => setSelectedTool("text")}
+								>
 									T
 								</button>
 								<button
@@ -408,7 +482,8 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("image")}>
+									onClick={() => setSelectedTool("image")}
+								>
 									<FaImage />
 								</button>
 								<button
@@ -417,9 +492,8 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() =>
-										setSelectedTool("rectangle")
-									}>
+									onClick={() => setSelectedTool("rectangle")}
+								>
 									<FaSquare />
 								</button>
 							</div>
@@ -443,7 +517,8 @@ export default function Design({ products }: { products: any }) {
 								</button> */}
 								<button
 									onClick={addToCart}
-									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
+								>
 									Lägg till i kundvagn
 								</button>
 							</div>
@@ -508,11 +583,13 @@ function DesignTemplates({
 				<li key={design.id} className="list-none">
 					<button
 						onClick={() => onClick(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl">
+						className="w-full aspect-video bg-gray-100 rounded-xl"
+					>
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
 							width={1280}
-							height={720}></canvas>
+							height={720}
+						></canvas>
 					</button>
 				</li>
 			))}
@@ -666,7 +743,8 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}></div>
+						}}
+					></div>
 				</div>
 			</div>
 		);
@@ -751,7 +829,8 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}>
+				}
+			>
 				{options?.map((option, i) => (
 					<option key={i} value={option.toLowerCase()}>
 						{option}
