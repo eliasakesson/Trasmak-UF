@@ -413,8 +413,7 @@ export default function Design({ products }: { products: any }) {
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
-								height={720}
-							></canvas>
+								height={720}></canvas>
 							<div className="absolute" ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
@@ -462,8 +461,7 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("select")}
-								>
+									onClick={() => setSelectedTool("select")}>
 									<FaMousePointer />
 								</button>
 								<button
@@ -472,8 +470,7 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("text")}
-								>
+									onClick={() => setSelectedTool("text")}>
 									T
 								</button>
 								<button
@@ -482,8 +479,7 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("image")}
-								>
+									onClick={() => setSelectedTool("image")}>
 									<FaImage />
 								</button>
 								<button
@@ -492,8 +488,9 @@ export default function Design({ products }: { products: any }) {
 											? "bg-gray-200"
 											: "bg-gray-100"
 									}`}
-									onClick={() => setSelectedTool("rectangle")}
-								>
+									onClick={() =>
+										setSelectedTool("rectangle")
+									}>
 									<FaSquare />
 								</button>
 							</div>
@@ -517,8 +514,7 @@ export default function Design({ products }: { products: any }) {
 								</button> */}
 								<button
 									onClick={addToCart}
-									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-								>
+									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 									Lägg till i kundvagn
 								</button>
 							</div>
@@ -583,13 +579,11 @@ function DesignTemplates({
 				<li key={design.id} className="list-none">
 					<button
 						onClick={() => onClick(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl"
-					>
+						className="w-full aspect-video bg-gray-100 rounded-xl">
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
 							width={1280}
-							height={720}
-						></canvas>
+							height={720}></canvas>
 					</button>
 				</li>
 			))}
@@ -743,8 +737,7 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}
-					></div>
+						}}></div>
 				</div>
 			</div>
 		);
@@ -829,8 +822,7 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}
-			>
+				}>
 				{options?.map((option, i) => (
 					<option key={i} value={option.toLowerCase()}>
 						{option}

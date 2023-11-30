@@ -63,65 +63,78 @@ function CartItem({
 	removeItem: any;
 }) {
 	return (
-		<li className="flex md:gap-8 gap-4 py-4 border-b">
-			<div className="-z-10 bg-gray-100 rounded-lg border">
-				<Image
-					className="mix-blend-multiply object-contain aspect-square"
-					src={cartItem.image}
-					alt=""
-					width={64}
-					height={64}
-				/>
-			</div>
-
-			<div className="flex items-center md:flex-row flex-col flex-1">
-				<div className="flex-1">
-					<Link
-						href={`products/${cartItem.id.substring(
-							6,
-							cartItem.id.length
-						)}`}
-						className="text-xl font-semibold">
-						{cartItem.name}
-					</Link>
-					<p className="text-gray-500">
-						{cartItem.quantity} x{" "}
-						{formatCurrencyString({
-							value: cartItem.price,
-							currency: cartItem.currency,
-						})}
-					</p>
+		<li className="border-b py-4">
+			<div className="flex md:gap-8 gap-4">
+				<div className="-z-10 bg-gray-100 rounded-lg border">
+					<Image
+						className="mix-blend-multiply object-contain aspect-square"
+						src={cartItem.image}
+						alt=""
+						width={64}
+						height={64}
+					/>
 				</div>
-				<div className="flex items-center md:gap-8 gap-2">
-					<p className="font-semibold text-xl md:flex-grow-0 flex-grow">
-						{formatCurrencyString({
-							value: cartItem.price,
-							currency: cartItem.currency,
-						})}
-					</p>
-					<div className="px-2 flex gap-4 items-center border rounded-lg font-mono">
-						<button
-							className="md:p-2 p-1 font-semibold md:text-xl"
-							onClick={() => decrementItem(cartItem.id)}>
-							-
-						</button>
-						<span className="font-semibold">
-							{cartItem.quantity}
-						</span>
-						<button
-							className="md:p-2 p-1 font-semibold md:text-xl"
-							onClick={() => incrementItem(cartItem.id)}>
-							+
-						</button>
+				<div className="flex items-center md:flex-row flex-col flex-1">
+					<div className="flex-1">
+						<h2 className="text-xl font-semibold">
+							{cartItem.name}
+						</h2>
+						<p className="text-gray-500">
+							{cartItem.quantity} x{" "}
+							{formatCurrencyString({
+								value: cartItem.price,
+								currency: cartItem.currency,
+							})}
+						</p>
 					</div>
-					<button
-						type="button"
-						className="p-2 text-muted"
-						onClick={() => removeItem(cartItem.id)}>
-						<FaTrash />
-					</button>
+					<div className="flex items-center md:gap-8 gap-2">
+						<p className="font-semibold text-xl md:flex-grow-0 flex-grow">
+							{formatCurrencyString({
+								value: cartItem.price * cartItem.quantity,
+								currency: cartItem.currency,
+							})}
+						</p>
+					</div>
 				</div>
 			</div>
+			<ul className="space-y-4 pt-4">
+				{cartItem?.product_data?.products?.map(
+					(product: any, i: number) => (
+						<li
+							key={product.id}
+							className="flex items-center gap-4 ml-4">
+							<div className="-z-10 bg-gray-100 rounded-lg border mr-auto">
+								<Image
+									className="mix-blend-multiply object-contain aspect-square"
+									src={product.cover}
+									alt=""
+									width={48}
+									height={48}
+								/>
+							</div>
+							<div className="flex-1">
+								<h2 className="text-xl font-semibold">
+									Design {i + 1}
+								</h2>
+							</div>
+							<div className="px-2 flex gap-4 items-center border rounded-lg font-mono">
+								<button className="md:p-2 p-1 font-semibold md:text-xl">
+									-
+								</button>
+								<span className="font-semibold">
+									{product.count}
+								</span>
+								<button className="md:p-2 p-1 font-semibold md:text-xl">
+									+
+								</button>
+							</div>
+							<button type="button" className="p-2 text-muted">
+								<FaTrash />
+							</button>
+						</li>
+					)
+				)}
+			</ul>
 		</li>
 	);
 }
