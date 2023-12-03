@@ -11,7 +11,7 @@ import {
 	FaChevronDown,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
-import { useShoppingCart } from "use-shopping-cart";
+import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
 import GetProducts from "@/utils/getProducts";
 import { uploadFromCanvas } from "@/utils/firebase";
 import { Product } from "use-shopping-cart/core";
@@ -46,6 +46,9 @@ export interface ObjectProps {
 	radius?: number;
 	image?: HTMLImageElement;
 	fit?: string;
+
+	bleed?: number;
+	edge?: number;
 }
 
 export default function Design({ products }: { products: any }) {
@@ -62,13 +65,12 @@ export default function Design({ products }: { products: any }) {
 		{ start: null, end: null }
 	);
 	const [trayObject, setTrayObject] = useState<ObjectProps | null>(null);
+	const [showCanvasSupport, setShowCanvasSupport] = useState(false);
 	const designEditorRef = useRef<HTMLDivElement>(null);
 
 	const { cartDetails, addItem } = useShoppingCart();
 	const isAddingToCart = useRef(false);
 	const lastAddedImageURL = useRef<string | null>(null);
-
-	console.log(cartDetails);
 
 	useEffect(() => {
 		if (router.query.d && currentDesign.id !== router.query.d) {
@@ -89,7 +91,7 @@ export default function Design({ products }: { products: any }) {
 
 	useEffect(() => {
 		lastAddedImageURL.current = null;
-	}, [selectedObjectID]);
+	}, [selectedObjectID, currentDesign.id]);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -102,10 +104,11 @@ export default function Design({ products }: { products: any }) {
 		const tray = GetTrayObjFromCanvas(
 			canvas,
 			0.85,
-			metadata?.width && metadata?.height
-				? metadata.width / metadata.height
-				: 4 / 3,
-			metadata?.radius ? `${metadata.radius}` : "10"
+			metadata?.width,
+			metadata?.height,
+			metadata?.radius,
+			metadata?.bleed,
+			metadata?.edge
 		);
 
 		setTrayObject(tray);
@@ -124,7 +127,13 @@ export default function Design({ products }: { products: any }) {
 		let input: HTMLTextAreaElement | null = null;
 
 		const drawTimer = setTimeout(() => {
-			Draw(canvas, trayObject, currentDesign, selectedObjectID);
+			Draw(
+				canvas,
+				trayObject,
+				currentDesign,
+				selectedObjectID,
+				showCanvasSupport
+			);
 			localStorage.setItem("design", JSON.stringify(currentDesign));
 		}, 100);
 
@@ -186,7 +195,13 @@ export default function Design({ products }: { products: any }) {
 				(canvas.parentNode || document.body).removeChild(input);
 			}
 		};
-	}, [trayObject, currentDesign, selectedObjectID, selectedTool]);
+	}, [
+		trayObject,
+		currentDesign,
+		selectedObjectID,
+		selectedTool,
+		showCanvasSupport,
+	]);
 
 	useEffect(() => {
 		if (selectedObjectID === null) {
@@ -198,7 +213,7 @@ export default function Design({ products }: { products: any }) {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 		const newCanvas = document.createElement("canvas");
-		newCanvas.width = 960;
+		newCanvas.width = 1280;
 		newCanvas.height = 720;
 
 		const toastID = toast.loading("Laddar upp bilder...");
@@ -231,7 +246,16 @@ export default function Design({ products }: { products: any }) {
 				return;
 			}
 
-			await DrawRender(newCanvas, trayObject, currentDesign);
+			const renderTray = GetTrayObjFromCanvas(
+				newCanvas,
+				1,
+				trayObject.width,
+				trayObject.height,
+				trayObject.radius,
+				trayObject.bleed
+			);
+
+			await DrawRender(newCanvas, renderTray, currentDesign);
 
 			const coverImage = uploadFromCanvas(canvas);
 			const renderImage = uploadFromCanvas(newCanvas);
@@ -254,57 +278,6 @@ export default function Design({ products }: { products: any }) {
 			toast.error("Något gick fel", { id: toastID });
 			console.error(error);
 			isAddingToCart.current = false;
-		}
-	}
-
-	function addProduct(
-		product: any,
-		images: { image: string; cover: string },
-		toastID: string
-	) {
-		if (cartDetails?.[product.id]) {
-			// Find a product that isn't in the cart yet
-			const newProduct = products.find((p: any) => !cartDetails?.[p.id]);
-
-			// If there is one, add it to the cart
-			if (newProduct) {
-				addItem(
-					{ ...newProduct, image: images.cover, name: product.name },
-					{
-						count: 1,
-						product_metadata: {
-							...newProduct.metadata,
-							products: [
-								...product.metadata.products,
-								{
-									id: newProduct.id,
-									count: 1,
-									image: images.image,
-									cover: images.cover,
-								},
-							],
-						},
-					}
-				);
-				toast.success("Produkten lades till i kundvagnen", {
-					id: toastID,
-				});
-			} else {
-				toast.error("Kundvagnen är full", { id: toastID });
-			}
-		} else {
-			addItem(
-				{ ...product, image: images.cover },
-				{
-					count: 1,
-					product_metadata: {
-						...product.metadata,
-						image: images.image,
-						cover: images.cover,
-					},
-				}
-			);
-			toast.success("Produkten lades till i kundvagnen", { id: toastID });
 		}
 	}
 
@@ -406,7 +379,7 @@ export default function Design({ products }: { products: any }) {
 				<meta name="description" content="Designa din egen träbricka" />
 			</Head>
 			<div className="max-w-7xl mx-auto px-8 py-16 space-y-8">
-				<div className="grid md:grid-cols-4 md:grid-rows-2 gap-8">
+				<div className="grid lg:grid-cols-4 lg:grid-rows-2 gap-8">
 					<div className="col-span-3 space-y-4">
 						<div className="relative">
 							<canvas
@@ -453,10 +426,10 @@ export default function Design({ products }: { products: any }) {
 								)}
 							</div>
 						</div>
-						<div className="flex justify-between">
-							<div className="flex gap-2">
+						<div className="flex justify-between max-sm:flex-col gap-4">
+							<div className="flex gap-2 h-12">
 								<button
-									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl ${
+									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
 										selectedTool === "select"
 											? "bg-gray-200"
 											: "bg-gray-100"
@@ -465,7 +438,7 @@ export default function Design({ products }: { products: any }) {
 									<FaMousePointer />
 								</button>
 								<button
-									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl ${
+									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
 										selectedTool === "text"
 											? "bg-gray-200"
 											: "bg-gray-100"
@@ -474,7 +447,7 @@ export default function Design({ products }: { products: any }) {
 									T
 								</button>
 								<button
-									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl ${
+									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
 										selectedTool === "image"
 											? "bg-gray-200"
 											: "bg-gray-100"
@@ -483,7 +456,7 @@ export default function Design({ products }: { products: any }) {
 									<FaImage />
 								</button>
 								<button
-									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl ${
+									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
 										selectedTool === "rectangle"
 											? "bg-gray-200"
 											: "bg-gray-100"
@@ -492,6 +465,34 @@ export default function Design({ products }: { products: any }) {
 										setSelectedTool("rectangle")
 									}>
 									<FaSquare />
+								</button>
+							</div>
+							<div className="flex gap-2 h-12">
+								<div className="relative rounded-md border aspect-square h-full">
+									<input
+										type="color"
+										className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+										value={trayObject?.color ?? "#000"}
+										onChange={(e) =>
+											setTrayObject((tray) => ({
+												...(tray as ObjectProps),
+												color: e.target.value,
+											}))
+										}
+									/>
+									<div
+										className="absolute inset-0 pointer-events-none rounded-[4px]"
+										style={{
+											backgroundColor:
+												trayObject?.color ?? "",
+										}}></div>
+								</div>
+								<button
+									onClick={() =>
+										setShowCanvasSupport((s) => !s)
+									}
+									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}>
+									{showCanvasSupport ? "Dölj" : "Visa"} stöd
 								</button>
 							</div>
 							<div className="flex gap-2">
@@ -520,7 +521,57 @@ export default function Design({ products }: { products: any }) {
 							</div>
 						</div>
 					</div>
-					<div className="row-span-2"></div>
+					<div className="row-span-2 max-lg:col-span-3">
+						<h2 className="text-xl font-bold border-b pb-2 mb-4">
+							Produkter
+						</h2>
+						<ul className="lg:flex flex-col grid grid-cols-2 gap-2">
+							{products.map((product: Product) => (
+								<li
+									key={product.id}
+									className={`border rounded-md px-2 ${
+										currentDesign.id ===
+										product.id.substring(
+											6,
+											product.id.length
+										)
+											? "border-muted"
+											: ""
+									}`}>
+									<button
+										onClick={() =>
+											setCurrentDesign((design) => ({
+												...design,
+												id: product.id.substring(
+													6,
+													product.id.length
+												),
+											}))
+										}
+										className="w-full flex items-center max-sm:flex-col sm:text-left max-sm:pb-2">
+										<div className="flex-shrink-0">
+											<img
+												src={product.image}
+												alt={product.name}
+												className="w-24 h-24 rounded-md object-contain"
+											/>
+										</div>
+										<div className="flex-grow">
+											<h3 className="font-bold">
+												{product.name}
+											</h3>
+											<p className="text-gray-500">
+												{formatCurrencyString({
+													value: product.price,
+													currency: product.currency,
+												})}
+											</p>
+										</div>
+									</button>
+								</li>
+							))}
+						</ul>
+					</div>
 					<div className="col-span-3">
 						<h2 className="text-xl font-bold border-b pb-2 mb-4">
 							Designs
@@ -606,7 +657,7 @@ function DesignEditor({
 
 	return (
 		<SelectedObjectContext.Provider value={{ object, setObject }}>
-			<div className="absolute flex flex-col gap-2 bg-white border rounded-md p-4">
+			<div className="absolute flex flex-col gap-2 bg-white border rounded-md p-4 z-50">
 				<div className="flex items-center gap-4">
 					{object?.type === "image" ? (
 						<Input label="Bildkälla" objKey="content" type="file" />
@@ -879,7 +930,8 @@ export async function Draw(
 	canvas: HTMLCanvasElement,
 	tray: ObjectProps,
 	design: DesignProps,
-	selectedObjectID?: number | null
+	selectedObjectID?: number | null,
+	showSupport: boolean = false
 ) {
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
@@ -902,17 +954,15 @@ export async function Draw(
 		}
 	}
 
+	if (showSupport) {
+		DrawTraySupport(ctx, tray);
+		DrawTrayShadow(ctx, tray);
+	}
+
+	DrawTrayBorder(ctx, tray);
+	DrawTrayShadowOld(ctx, tray);
+
 	HighlightSelectedObject(ctx, tray, design.objects, selectedObjectID);
-
-	const borderWidth = 32;
-
-	DrawTrayShadow(ctx, {
-		x: tray.x + borderWidth,
-		y: tray.y + borderWidth,
-		width: (tray.width ?? 0) - borderWidth * 2,
-		height: (tray.height ?? 0) - borderWidth * 2,
-		radius: (tray.radius ?? 0) - borderWidth,
-	});
 }
 
 async function DrawRender(
@@ -1118,20 +1168,69 @@ function HighlightSelectedObject(
 
 function DrawTray(
 	ctx: any,
-	{ x, y, width, height, radius }: ObjectProps,
+	{ x, y, width, height, radius, color }: ObjectProps,
 	fill: boolean = true
 ) {
 	GetRoundedRect(ctx, x, y, width ?? 0, height ?? 0, radius ?? 0);
 	if (fill) {
-		ctx.fillStyle = "#ddd";
+		ctx.fillStyle = color ?? "#ddd";
 		ctx.fill();
 	}
 	ctx.clip();
 }
 
-function DrawTrayShadow(ctx: any, { x, y, width, height, radius }: any) {
+function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
+	// Draw a stroke inside the tray with a width of half the bleed
 	ctx.save();
-	const lineWidth = 12;
+	ctx.strokeStyle = "#ff676caa";
+	ctx.lineWidth = tray.bleed ?? 0;
+	GetRoundedRect(
+		ctx,
+		tray.x + (tray.bleed ?? 0) / 2,
+		tray.y + (tray.bleed ?? 0) / 2,
+		(tray.width ?? 0) - (tray.bleed ?? 0),
+		(tray.height ?? 0) - (tray.bleed ?? 0),
+		(tray.radius ?? 0) - (tray.bleed ?? 0) / 2
+	);
+	ctx.stroke();
+	ctx.restore();
+}
+
+function DrawTrayShadow(ctx: any, tray: ObjectProps) {
+	ctx.save();
+	ctx.strokeStyle = "#ffffff99";
+	ctx.lineWidth = tray.edge ?? 0;
+	GetRoundedRect(
+		ctx,
+		tray.x + (tray.bleed ?? 0) + (tray.edge ?? 0) / 2,
+		tray.y + (tray.bleed ?? 0) + (tray.edge ?? 0) / 2,
+		(tray.width ?? 0) - (tray.bleed ?? 0) * 2 - (tray.edge ?? 0),
+		(tray.height ?? 0) - (tray.bleed ?? 0) * 2 - (tray.edge ?? 0),
+		(tray.radius ?? 0) - (tray.bleed ?? 0) - (tray.edge ?? 0) / 2
+	);
+	ctx.stroke();
+	ctx.restore();
+}
+
+function DrawTrayBorder(ctx: any, tray: ObjectProps) {
+	ctx.save();
+	ctx.strokeStyle = "#777";
+	ctx.lineWidth = 1;
+	GetRoundedRect(
+		ctx,
+		tray.x,
+		tray.y,
+		tray.width ?? 0,
+		tray.height ?? 0,
+		tray.radius ?? 0
+	);
+	ctx.stroke();
+	ctx.restore();
+}
+
+function DrawTrayShadowOld(ctx: any, { x, y, width, height, radius }: any) {
+	ctx.save();
+	let lineWidth = 12;
 	ctx.lineWidth = lineWidth;
 	ctx.strokeStyle = "#00000044";
 	GetRoundedRect(ctx, x, y, width ?? 0, height ?? 0, radius ?? 0);
@@ -1139,13 +1238,14 @@ function DrawTrayShadow(ctx: any, { x, y, width, height, radius }: any) {
 	ctx.strokeStyle = "#00000022";
 	GetRoundedRect(
 		ctx,
-		x - lineWidth,
-		y - lineWidth,
-		width + lineWidth * 2,
-		height + lineWidth * 2,
-		radius + lineWidth
+		x + lineWidth,
+		y + lineWidth,
+		width - lineWidth * 2,
+		height - lineWidth * 2,
+		radius - lineWidth
 	);
 	ctx.stroke();
+	lineWidth = 24;
 	GetRoundedRect(
 		ctx,
 		x + lineWidth,
@@ -1193,26 +1293,33 @@ function GetRoundedRect(
 export function GetTrayObjFromCanvas(
 	canvas: HTMLCanvasElement,
 	heightProcentage: number = 0.85,
-	aspectRatio: number = 4 / 3,
-	radius: number | string = 128
+	width: number = 43,
+	height: number = 33,
+	radius: number = 20,
+	bleed: number = 10,
+	edge: number = 20
 ): ObjectProps {
-	const width = canvas.height * heightProcentage * aspectRatio;
-	const height = canvas.height * heightProcentage;
+	const aspectRatio = (width + bleed / 20) / (height + bleed / 20);
+	const newWidth = canvas.height * heightProcentage * aspectRatio;
+	const newHeight = canvas.height * heightProcentage;
+	const newRadius =
+		(radius / 100) * (newWidth > newHeight ? newHeight : newWidth);
+	const newBleed = (bleed / 20) * (newWidth / width);
+	const newEdge = (edge / 20) * (newWidth / width);
 
 	return {
 		id: 0,
 		type: "tray",
 		content: "",
-		color: "",
-		x: (canvas.width - width) / 2,
-		y: (canvas.height - height) / 2,
-		width,
-		height,
-		radius:
-			typeof radius === "string"
-				? (Number(radius) / 100) * (width > height ? height : width)
-				: radius,
+		color: "#eee",
+		x: (canvas.width - newWidth) / 2,
+		y: (canvas.height - newHeight) / 2,
+		width: newWidth,
+		height: newHeight,
+		radius: newRadius,
 		order: 0,
+		bleed: newBleed,
+		edge: newEdge,
 	};
 }
 

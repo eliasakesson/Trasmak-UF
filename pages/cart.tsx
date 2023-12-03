@@ -6,26 +6,21 @@ import { FaTrash } from "react-icons/fa";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
 import { ref, get } from "firebase/database";
 import { db } from "../firebase";
+import GetProducts from "@/utils/getProducts";
 
-export default function Cart({ config }: any) {
+export default function Cart({ products, config }: any) {
 	return (
 		<div className="max-w-7xl mx-auto px-8 py-16 space-y-8 min-h-[calc(100vh-108px)]">
 			<div className="grid lg:grid-cols-3 grid-cols-1 lg:gap-x-16 gap-x-0 gap-y-16">
-				<CartItems />
+				<CartItems products={products} />
 				<CartSummary config={config} />
 			</div>
 		</div>
 	);
 }
 
-function CartItems() {
-	const {
-		cartDetails,
-		incrementItem,
-		decrementItem,
-		removeItem,
-		cartCount,
-	}: any = useShoppingCart();
+function CartItems({ products }: { products: any }) {
+	const { cartDetails, cartCount }: any = useShoppingCart();
 
 	return (
 		<div className="col-span-2">
@@ -41,9 +36,7 @@ function CartItems() {
 					<CartItem
 						key={index}
 						cartItem={cartDetails[item]}
-						incrementItem={incrementItem}
-						decrementItem={decrementItem}
-						removeItem={removeItem}
+						products={products}
 					/>
 				))}
 			</ul>
@@ -51,17 +44,32 @@ function CartItems() {
 	);
 }
 
-function CartItem({
-	cartItem,
-	incrementItem,
-	decrementItem,
-	removeItem,
-}: {
-	cartItem: any;
-	incrementItem: any;
-	decrementItem: any;
-	removeItem: any;
-}) {
+function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
+	const { incrementItem, decrementItem, removeItem, addItem } =
+		useShoppingCart();
+
+	function changeDesignCount(design: any, increment: boolean) {
+		const product = products.find((p: any) => p.id === cartItem.id);
+		if (!product) return;
+
+		if (design.count === 1 && !increment) {
+			removeItem(product.id);
+			return;
+		}
+
+		addItem(product, {
+			count: 1,
+			product_metadata: {
+				products: [
+					...cartItem.product_data.products.filter(
+						(d: any) => d.image !== design.image
+					),
+					{ ...design, count: design.count + increment ? 1 : -1 },
+				],
+			},
+		});
+	}
+
 	return (
 		<li className="border-b py-4">
 			<div className="flex md:gap-8 gap-4">
@@ -99,14 +107,12 @@ function CartItem({
 			</div>
 			<ul className="space-y-4 pt-4">
 				{cartItem?.product_data?.products?.map(
-					(product: any, i: number) => (
-						<li
-							key={product.id}
-							className="flex items-center gap-4 ml-4">
+					(design: any, i: number) => (
+						<li key={i} className="flex items-center gap-4 ml-4">
 							<div className="-z-10 bg-gray-100 rounded-lg border mr-auto">
 								<Image
 									className="mix-blend-multiply object-contain aspect-square"
-									src={product.cover}
+									src={design.cover}
 									alt=""
 									width={48}
 									height={48}
@@ -118,13 +124,21 @@ function CartItem({
 								</h2>
 							</div>
 							<div className="px-2 flex gap-4 items-center border rounded-lg font-mono">
-								<button className="md:p-2 p-1 font-semibold md:text-xl">
+								<button
+									onClick={() =>
+										changeDesignCount(design, false)
+									}
+									className="md:p-2 p-1 font-semibold md:text-xl">
 									-
 								</button>
 								<span className="font-semibold">
-									{product.count}
+									{design.count}
 								</span>
-								<button className="md:p-2 p-1 font-semibold md:text-xl">
+								<button
+									onClick={() =>
+										changeDesignCount(design, true)
+									}
+									className="md:p-2 p-1 font-semibold md:text-xl">
 									+
 								</button>
 							</div>
@@ -174,7 +188,7 @@ function CartSummary({ config }: { config: any }) {
 	}
 
 	return (
-		<div className="p-8 bg-gray-100 space-y-8">
+		<div className="p-8 bg-gray-100 space-y-8 h-fit">
 			<div>
 				<div className="flex items-center justify-between py-4 border-b border-border_dark">
 					<p className="font-semibold text-xl">Delsumma</p>
@@ -232,6 +246,8 @@ function CartSummary({ config }: { config: any }) {
 }
 
 export async function getStaticProps() {
+	const products = await GetProducts();
+
 	const configRef = ref(db, "config");
 
 	const configSnap = await get(configRef);
@@ -239,7 +255,8 @@ export async function getStaticProps() {
 
 	return {
 		props: {
-			config: config,
+			products,
+			config,
 		},
 	};
 }

@@ -9,6 +9,7 @@ export default function ProductRow({
 	title,
 	description,
 	products,
+	rows = 1,
 	left,
 	metadata,
 	type,
@@ -17,6 +18,7 @@ export default function ProductRow({
 	title: string;
 	description: string;
 	products: any;
+	rows?: number;
 	left?: boolean;
 	metadata?: string;
 	type?: string;
@@ -26,12 +28,11 @@ export default function ProductRow({
 		<section
 			className={`flex flex-col ${
 				!left ? "items-center text-center" : ""
-			} space-y-4 w-full`}
-		>
+			} space-y-4 w-full`}>
 			{title && <h2 className="text-4xl font-bold">{title}</h2>}
 			{description && <p className="text-muted text-lg">{description}</p>}
 			<br />
-			<div className="w-full grid lg:grid-cols-3 lg:gap-8 md:grid-cols-2 gap-4 text-left">
+			<div className="w-full grid lg:grid-cols-3 lg:gap-8 grid-cols-2 gap-4 text-left">
 				{products
 					?.filter(
 						(product: any) =>
@@ -42,11 +43,7 @@ export default function ProductRow({
 					)
 					.slice(
 						0,
-						document.body.clientWidth < 768
-							? 1
-							: document.body.clientWidth < 1024
-							? 2
-							: 3
+						document.body.clientWidth < 1024 ? rows * 2 : rows * 3
 					)
 					.map((product: any) => (
 						<ProductCard
@@ -87,9 +84,8 @@ export function ProductCard({
 				/* type === "template" */ true
 					? `/design?d=${id.substring(6, id.length)}`
 					: `/products/${id.substring(6, id.length)}`
-			}
-		>
-			<div className="bg-white rounded-xl overflow-hidden border border-gray-100">
+			}>
+			<div className="bg-white rounded-xl overflow-hidden border border-gray-100 h-full">
 				<div className="relative overflow-hidden bg-gray-100 aspect-[4/3] p-4">
 					<div className="w-full h-full">
 						<Image

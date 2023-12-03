@@ -22,10 +22,10 @@ export default function Products({ products }: { products: any }) {
 					</span>
 				) : (
 					<p className="max-w-prose text-muted">
-						Lorem ipsum, dolor sit amet consectetur adipisicing
-						elit. Non ab eligendi suscipit ipsa rerum. Impedit sequi
-						libero a illum odio reprehenderit aliquid nulla fugit
-						expedita.
+						Här hittar du våra produkter. Du kan välja en mall att
+						utgå från eller designa din egen bricka från grunden. Du
+						kan enkelt sortera och filtrera produkterna för att
+						hitta det du söker.
 					</p>
 				)}
 			</div>
@@ -42,7 +42,9 @@ function ProductsAndFilterGrid({ products }: { products: any }) {
 		<div className="w-full">
 			<div className="flex justify-between w-full border-b py-4">
 				<span>4 Resultat</span>
-				<select onChange={(e) => setSortVal(e.target.value)}>
+				<select
+					onChange={(e) => setSortVal(e.target.value)}
+					className="px-2 py-1 border rounded-lg">
 					<option value="1">Sortera efter</option>
 					<option value="2">Popularitet</option>
 					<option value="3">Betyg</option>
@@ -98,7 +100,7 @@ function Filters({ setFilters }: { setFilters: any }) {
 							value="common"
 							onChange={(e) => onFilterChange(e, "type")}
 						/>
-						<label>Färdiga</label>
+						<label>Storlekar</label>
 					</li>
 					<li className="flex items-center gap-2">
 						<input

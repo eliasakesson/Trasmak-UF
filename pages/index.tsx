@@ -1,8 +1,10 @@
 import ProductRow from "@/components/ProductRow";
 import Hero from "@/components/Hero";
 import GetProducts from "@/utils/getProducts";
-import PersonalSection from "@/components/PersonalSection";
+import Section1 from "@/components/Section1";
+import Section2 from "@/components/Section2";
 import Head from "next/head";
+import Inspiration from "@/components/Inspiration";
 
 export default function Home({ products }: { products: any }) {
 	return (
@@ -14,22 +16,29 @@ export default function Home({ products }: { products: any }) {
 					content="Skapa en personlig bricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
 				/>
 			</Head>
-			<main className="relative px-8 py-8 pb-16">
-				<div className="max-w-7xl mx-auto sm:space-y-32 space-y-8">
+			<main className="relative pb-16">
+				<div className="flex flex-col gap-32">
 					<Hero />
-					<ProductRow
-						title="Bästsäljare"
-						description="Detta är de brickor som säljs som bäst. Passa på innan de tar
-						slut!"
-						products={products}
-					/>
-					<PersonalSection />
+					<div className="max-w-7xl mx-auto px-8">
+						<ProductRow
+							title="Bästsäljare"
+							description="Detta är de brickor som säljs som bäst. Passa på innan de tar
+							slut!"
+							products={products}
+							rows={2}
+						/>
+					</div>
+					<Section1 />
 					<ProductRow
 						title="Våra favoritmallar"
 						description="Skapa personliga brickor baserat på våra bästa mallar!"
 						products={products}
 						type="template"
 					/>
+					<Section2 />
+					<div className="max-w-7xl mx-auto px-8">
+						<Inspiration />
+					</div>
 				</div>
 			</main>
 		</>
