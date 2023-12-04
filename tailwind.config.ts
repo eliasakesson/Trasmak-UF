@@ -21,6 +21,12 @@ const config: Config = {
 				primary_dark: "#151C48",
 				secondary: "#FFDE59",
 			},
+			screens: {
+				'h-sm': {'raw': '(height: 640px)'},
+				'h-md': {'raw': '(height: 768px)'},
+				'h-lg': {'raw': '(height: 1024px)'},
+				'h-xl': {'raw': '(height: 1280px)'},
+			}
 		},
 	},
 	plugins: [],

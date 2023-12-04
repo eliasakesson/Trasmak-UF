@@ -17,9 +17,9 @@ export default function Home({ products }: { products: any }) {
 				/>
 			</Head>
 			<main className="relative pb-16">
-				<div className="flex flex-col gap-32">
+				<div className="flex flex-col lg:gap-32 gap-16">
 					<Hero />
-					<div className="max-w-7xl mx-auto px-8">
+					<div className="max-w-7xl mx-auto px-4">
 						<ProductRow
 							title="Bästsäljare"
 							description="Detta är de brickor som säljs som bäst. Passa på innan de tar
@@ -36,7 +36,7 @@ export default function Home({ products }: { products: any }) {
 						type="template"
 					/>
 					<Section2 />
-					<div className="max-w-7xl mx-auto px-8">
+					<div className="max-w-7xl mx-auto px-4">
 						<Inspiration />
 					</div>
 				</div>

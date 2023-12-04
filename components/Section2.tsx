@@ -1,18 +1,17 @@
-import { Draw, GetTrayObjFromCanvas } from "@/pages/design";
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
-import { LuRecycle } from "react-icons/lu";
-import { PiForkKnifeFill } from "react-icons/pi";
 
 export default function Section2() {
 	return (
 		<div>
-			<section className="flex max-lg:flex-col max-lg:gap-8">
+			<section className="flex lg:flex-row flex-col max-lg:gap-8">
 				<div className="flex-1 flex">
 					<div className="flex-1 bg-primary lg:rounded-tr-[10vh] lg:p-24 p-8">
-						<img
+						<Image
 							src="/images/designer.png"
 							alt=""
+							width={800}
+							height={600}
 							className="lg:rounded-2xl rounded-xl"
 						/>
 					</div>
@@ -30,7 +29,8 @@ export default function Section2() {
 						</p>
 						<Link
 							href="/design"
-							className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
+							className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors"
+						>
 							Designa din bricka
 						</Link>
 					</div>
