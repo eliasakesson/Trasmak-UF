@@ -22,11 +22,11 @@ const config: Config = {
 				secondary: "#FFDE59",
 			},
 			screens: {
-				'h-sm': {'raw': '(height: 640px)'},
-				'h-md': {'raw': '(height: 768px)'},
-				'h-lg': {'raw': '(height: 1024px)'},
-				'h-xl': {'raw': '(height: 1280px)'},
-			}
+				"h-sm": { raw: "(min-height: 640px)" },
+				"h-md": { raw: "(min-height: 768px)" },
+				"h-lg": { raw: "(min-height: 1024px)" },
+				"h-xl": { raw: "(min-height: 1280px)" },
+			},
 		},
 	},
 	plugins: [],

@@ -21,7 +21,7 @@ export default function Hero() {
 	return (
 		<section className="lg:min-h-[calc(100vh-153px)] min-h-[calc(100vh-111px)] flex lg:flex-row flex-col-reverse max-lg:gap-8">
 			<div className="lg:flex-1 flex max-lg:h-1/2">
-				<div className="lg:pl-[10vw] lg:pr-[5vw] px-8 lg:h-lg:pb-[153px] py-8 flex flex-col justify-center gap-8 h-full">
+				<div className="lg:pl-[10vw] lg:pr-[5vw] px-8 lg:h-md:pb-[153px] py-8 flex flex-col justify-center gap-8 h-full">
 					<h1 className="xl:text-7xl lg:text-6xl text-4xl font-bold leading-tight text-gray-900">
 						<span className="text-primary">Personlig</span> design
 						<br />
@@ -36,14 +36,12 @@ export default function Hero() {
 					<div className="flex gap-4 max-lg:flex-col md:pt-4">
 						<Link
 							href="/design"
-							className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors"
-						>
+							className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
 							Designa din bricka
 						</Link>
 						<Link
 							href="/products"
-							className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors"
-						>
+							className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
 							Se våra mallar
 						</Link>
 					</div>
@@ -52,8 +50,7 @@ export default function Hero() {
 			<div className="flex-1 flex max-lg:h-1/2">
 				<div
 					className="flex-1 bg-primary relative overflow-hidden"
-					style={{ borderBottomLeftRadius: scrollY }}
-				>
+					style={{ borderBottomLeftRadius: scrollY }}>
 					<Image
 						src="/images/hero.jpg"
 						layout="fill"

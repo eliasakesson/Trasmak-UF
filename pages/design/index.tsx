@@ -91,7 +91,7 @@ export default function Design({ products }: { products: any }) {
 
 	useEffect(() => {
 		lastAddedImageURL.current = null;
-	}, [selectedObjectID, currentDesign.id]);
+	}, [selectedObjectID, currentDesign.id, trayObject?.color]);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;

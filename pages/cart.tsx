@@ -22,6 +22,8 @@ export default function Cart({ products, config }: any) {
 function CartItems({ products }: { products: any }) {
 	const { cartDetails, cartCount }: any = useShoppingCart();
 
+	console.log(cartDetails);
+
 	return (
 		<div className="col-span-2">
 			<div className="flex justify-between items-center py-4 pb-8">
@@ -52,20 +54,25 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 		const product = products.find((p: any) => p.id === cartItem.id);
 		if (!product) return;
 
-		if (design.count === 1 && !increment) {
+		if (cartItem.quantity === 1 && !increment) {
 			removeItem(product.id);
 			return;
 		}
 
+		const inc = increment ? 1 : -1;
+
 		addItem(product, {
-			count: 1,
+			count: inc,
 			product_metadata: {
-				products: [
-					...cartItem.product_data.products.filter(
-						(d: any) => d.image !== design.image
-					),
-					{ ...design, count: design.count + increment ? 1 : -1 },
-				],
+				products: cartItem.product_data.products
+					.map((d: any) =>
+						d.image !== design.image
+							? d
+							: d.count + inc > 0
+							? { ...d, count: d.count + inc }
+							: null
+					)
+					.filter((d: any) => d),
 			},
 		});
 	}
