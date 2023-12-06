@@ -53,8 +53,8 @@ function ProductsAndFilterGrid({ products }: { products: any }) {
 				</select>
 			</div>
 			<div className="grid md:grid-cols-4 gap-4 py-4">
-				<Filters setFilters={setFilters} />
-				<div className="col-span-3 grid grid-cols-2 gap-4">
+				{/* <Filters setFilters={setFilters} /> */}
+				<div className="col-span-4 grid lg:grid-cols-3 grid-cols-2 gap-4">
 					<ProductGrid
 						products={products}
 						sortVal={sortVal}
@@ -113,7 +113,7 @@ function Filters({ setFilters }: { setFilters: any }) {
 					</li>
 				</ul>
 			</div>
-			<div>
+			{/* <div>
 				<h4 className="border-b py-1">Motiv</h4>
 				<ul className="mt-2 flex md:flex-col gap-2">
 					<li className="flex items-center gap-2">
@@ -144,7 +144,7 @@ function Filters({ setFilters }: { setFilters: any }) {
 						<label>Djur</label>
 					</li>
 				</ul>
-			</div>
+			</div> */}
 		</div>
 	);
 }

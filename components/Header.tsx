@@ -16,6 +16,7 @@ import { motion, useAnimationControls } from "framer-motion";
 import { useShoppingCart } from "use-shopping-cart";
 import GetProducts from "@/utils/getProducts";
 import { useRouter } from "next/router";
+import { FaX } from "react-icons/fa6";
 
 const Header = () => {
 	return (
@@ -43,12 +44,10 @@ function Announcement() {
 
 function Navbar() {
 	return (
-		<div className="bg-white z-20">
+		<div className="bg-white z-20 border-b">
 			<div className="max-w-7xl mx-auto flex justify-between items-center py-4 px-8">
 				<div className="flex gap-4 md:hidden flex-1">
-					<button className="text-gray-700 hover:text-gray-900 focus:outline-none">
-						<FaBars className="h-6 w-6" />
-					</button>
+					<HamburgerMenu />
 				</div>
 				<div className="md:flex-1 flex-[2]">
 					<Link
@@ -73,6 +72,59 @@ function Navbar() {
 	);
 }
 
+function HamburgerMenu() {
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+	const controls = useAnimationControls();
+
+	useEffect(() => {
+		if (isMenuOpen) {
+			controls.start({ translateX: 0, opacity: 1 });
+		} else {
+			controls.start({ translateX: "-100%", opacity: 0 });
+		}
+	}, [isMenuOpen]);
+
+	return (
+		<>
+			<button
+				onClick={() => setIsMenuOpen((open) => !open)}
+				className="text-gray-700 hover:text-gray-900 focus:outline-none">
+				{isMenuOpen ? (
+					<FaX className="h-6 w-6" />
+				) : (
+					<FaBars className="h-6 w-6" />
+				)}
+			</button>
+			<motion.div
+				animate={controls}
+				className="absolute z-50 top-[73px] h-[calc(100vh-108px)] left-0 bg-white w-80 px-4 py-4">
+				<div className="flex flex-col space-y-4">
+					<Search />
+				</div>
+				<ul className="flex flex-col gap-2 py-8 px-2">
+					<li>
+						<Link
+							href="/design"
+							className="text-xl flex gap-4 items-center py-2">
+							<FaPencilRuler className="text-xl" />
+							Designa din bricka
+						</Link>
+					</li>
+					<li>
+						<Link
+							href="/products"
+							className="text-xl flex gap-4 items-center py-2">
+							<FaCrown className="text-xl" />
+							Våra produkter
+						</Link>
+					</li>
+				</ul>
+			</motion.div>
+		</>
+	);
+}
+
 function Search() {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const [searchInput, setSearchInput] = useState("");
@@ -85,7 +137,7 @@ function Search() {
 	}, []);
 
 	return (
-		<div className="relative w-96">
+		<div className="relative w-96 max-w-full">
 			<form
 				onSubmit={(e) => {
 					e.preventDefault();
@@ -248,12 +300,9 @@ function CartButton() {
 						<Link
 							href="/cart"
 							onClick={() => setIsCartOpen(false)}
-							className="whitespace-nowrap border-2 px-8 py-2 rounded-lg font-semibold">
-							Varukorg
+							className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+							Gå till varukorgen
 						</Link>
-						<button className="whitespace-nowrap bg-primary text-white px-8 py-2 rounded-lg font-semibold">
-							Köp nu
-						</button>
 					</div>
 				</motion.div>
 			</motion.div>

@@ -467,34 +467,6 @@ export default function Design({ products }: { products: any }) {
 									<FaSquare />
 								</button>
 							</div>
-							<div className="flex gap-2 h-12">
-								<div className="relative rounded-md border aspect-square h-full">
-									<input
-										type="color"
-										className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-										value={trayObject?.color ?? "#000"}
-										onChange={(e) =>
-											setTrayObject((tray) => ({
-												...(tray as ObjectProps),
-												color: e.target.value,
-											}))
-										}
-									/>
-									<div
-										className="absolute inset-0 pointer-events-none rounded-[4px]"
-										style={{
-											backgroundColor:
-												trayObject?.color ?? "",
-										}}></div>
-								</div>
-								<button
-									onClick={() =>
-										setShowCanvasSupport((s) => !s)
-									}
-									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}>
-									{showCanvasSupport ? "Dölj" : "Visa"} stöd
-								</button>
-							</div>
 							<div className="flex gap-2">
 								{/* <button
 									onClick={() => {
@@ -518,6 +490,47 @@ export default function Design({ products }: { products: any }) {
 									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 									Lägg till i kundvagn
 								</button>
+							</div>
+						</div>
+						<div className="flex gap-2 h-12">
+							<div className="relative rounded-md border aspect-square h-full">
+								<input
+									type="color"
+									className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+									value={trayObject?.color ?? "#000"}
+									onChange={(e) =>
+										setTrayObject((tray) => ({
+											...(tray as ObjectProps),
+											color: e.target.value,
+										}))
+									}
+								/>
+								<div
+									className="absolute inset-0 pointer-events-none rounded-[4px]"
+									style={{
+										backgroundColor:
+											trayObject?.color ?? "",
+									}}></div>
+							</div>
+							<button
+								onClick={() => setShowCanvasSupport((s) => !s)}
+								className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}>
+								{showCanvasSupport ? "Dölj" : "Visa"} stöd
+							</button>
+							<div className="grid grid-rows-2 gap-1">
+								<div className="h-full flex gap-2">
+									<div className="bg-red-300 border aspect-square h-full rounded"></div>
+									<p>Säkerhetsmarginal</p>
+								</div>
+								<div className="h-full flex gap-2">
+									<div
+										className={`${
+											trayObject?.color === "#ffffff"
+												? "bg-gray-300"
+												: "bg-white"
+										} border aspect-square h-full rounded`}></div>
+									<p>Kanter</p>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -690,26 +703,40 @@ function DesignEditor({
 						label="Font"
 						objKey="font"
 						options={[
-							"Cinzel",
-							"Courier New",
-							"Times New Roman",
-							"Arial",
+							{ value: "cinzel", text: "Cinzel" },
+							{ value: "courier new", text: "Courier New" },
+							{
+								value: "times new roman",
+								text: "Times New Roman",
+							},
+							{ value: "arial", text: "Arial" },
 						]}
-					/>
-				</div>
-				<div className="flex items-stretch gap-2">
-					<Select
-						label="Textjustering"
-						objKey="align"
-						options={["Left", "Center", "Right"]}
 					/>
 					<Select
 						label="Bildjustering"
 						objKey="fit"
-						options={["Contain", "Cover", "Fill"]}
+						options={[
+							{ value: "contain", text: "Rymm" },
+							{ value: "cover", text: "Täck" },
+							{ value: "fill", text: "Fyll" },
+						]}
+					/>
+					<Input
+						label="Rundning (px)"
+						objKey="radius"
+						type="number"
+					/>
+					<Select
+						label="Textjustering"
+						objKey="align"
+						options={[
+							{ value: "left", text: "Vänster" },
+							{ value: "center", text: "Mitten" },
+							{ value: "right", text: "Höger" },
+						]}
 					/>
 				</div>
-				<Input label="Rundning (px)" objKey="radius" type="number" />
+				<div className="flex items-stretch gap-2"></div>
 			</div>
 		</SelectedObjectContext.Provider>
 	);
@@ -766,7 +793,7 @@ function Input({
 
 	if (type === "color")
 		return (
-			<div className="flex flex-col gap-1 grow">
+			<div className="flex flex-col gap-1 w-full">
 				<label className="sr-only" htmlFor={label}>
 					{label}
 				</label>
@@ -852,7 +879,7 @@ function Select({
 }: {
 	label: string;
 	objKey: "font" | "align" | "fit";
-	options: string[];
+	options: { value: string; text: string }[];
 }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
 
@@ -875,8 +902,8 @@ function Select({
 					})
 				}>
 				{options?.map((option, i) => (
-					<option key={i} value={option.toLowerCase()}>
-						{option}
+					<option key={i} value={option.value}>
+						{option.text}
 					</option>
 				))}
 			</select>
@@ -956,11 +983,12 @@ export async function Draw(
 
 	if (showSupport) {
 		DrawTraySupport(ctx, tray);
-		DrawTrayShadow(ctx, tray);
+	} else {
+		// DrawTrayShadowOld(ctx, tray);
 	}
 
+	DrawTrayShadow(ctx, tray);
 	DrawTrayBorder(ctx, tray);
-	DrawTrayShadowOld(ctx, tray);
 
 	HighlightSelectedObject(ctx, tray, design.objects, selectedObjectID);
 }
@@ -1198,7 +1226,7 @@ function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
 
 function DrawTrayShadow(ctx: any, tray: ObjectProps) {
 	ctx.save();
-	ctx.strokeStyle = "#ffffff99";
+	ctx.strokeStyle = tray.color === "#ffffff" ? "#00000011" : "#ffffff99";
 	ctx.lineWidth = tray.edge ?? 0;
 	GetRoundedRect(
 		ctx,

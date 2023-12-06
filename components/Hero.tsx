@@ -33,7 +33,7 @@ export default function Hero() {
 						design. Välj mellan olika storlekar och få en
 						närproducerad bricka levererad till dörren.
 					</p>
-					<div className="flex gap-4 max-lg:flex-col md:pt-4">
+					<div className="flex gap-4 lg:flex-row flex-col md:pt-4">
 						<Link
 							href="/design"
 							className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
@@ -41,7 +41,7 @@ export default function Hero() {
 						</Link>
 						<Link
 							href="/products"
-							className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
+							className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
 							Se våra mallar
 						</Link>
 					</div>
@@ -54,9 +54,8 @@ export default function Hero() {
 					<Image
 						src="/images/hero.jpg"
 						layout="fill"
-						objectFit="cover"
-						objectPosition="center"
 						alt=""
+						className="object-cover"
 					/>
 				</div>
 			</div>

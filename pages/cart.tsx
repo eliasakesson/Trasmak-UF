@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
-import { ref, get } from "firebase/database";
+import { ref, get, remove } from "firebase/database";
 import { db } from "../firebase";
 import GetProducts from "@/utils/getProducts";
 
@@ -47,8 +47,7 @@ function CartItems({ products }: { products: any }) {
 }
 
 function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
-	const { incrementItem, decrementItem, removeItem, addItem } =
-		useShoppingCart();
+	const { removeItem, addItem } = useShoppingCart();
 
 	function changeDesignCount(design: any, increment: boolean) {
 		const product = products.find((p: any) => p.id === cartItem.id);
@@ -73,6 +72,20 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 							: null
 					)
 					.filter((d: any) => d),
+			},
+		});
+	}
+
+	function removeDesign(design: any) {
+		const product = products.find((p: any) => p.id === cartItem.id);
+		if (!product) return;
+
+		addItem(product, {
+			count: -design.count,
+			product_metadata: {
+				products: cartItem.product_data.products.filter(
+					(d: any) => d.image !== design.image
+				),
 			},
 		});
 	}
@@ -149,7 +162,10 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 									+
 								</button>
 							</div>
-							<button type="button" className="p-2 text-muted">
+							<button
+								onClick={() => removeDesign(design)}
+								type="button"
+								className="p-2 text-muted">
 								<FaTrash />
 							</button>
 						</li>
@@ -238,13 +254,13 @@ function CartSummary({ config }: { config: any }) {
 					disabled={isRedirecting}
 					onClick={onCheckout}
 					type="button"
-					className="py-4 px-8 bg-primary text-white rounded-lg font-semibold">
+					className="py-4 px-8 bg-primary text-white hover:bg-primary_light transition-colors rounded-lg font-semibold">
 					Gå till kassan
 				</button>
 
 				<Link
 					href="/products"
-					className="py-4 px-8 border-2 rounded-lg font-semibold text-center">
+					className="py-4 px-8 border-2 rounded-lg font-semibold text-center hover:bg-white transition-colors">
 					Fortsätt handla
 				</Link>
 			</div>

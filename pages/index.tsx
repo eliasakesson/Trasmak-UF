@@ -36,7 +36,7 @@ export default function Home({ products }: { products: any }) {
 						type="template"
 					/>
 					<Section2 />
-					<div className="max-w-7xl mx-auto px-4">
+					<div className="max-w-7xl mx-auto px-4 w-full">
 						<Inspiration />
 					</div>
 				</div>

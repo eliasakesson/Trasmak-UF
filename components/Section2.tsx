@@ -6,13 +6,12 @@ export default function Section2() {
 		<div>
 			<section className="flex lg:flex-row flex-col max-lg:gap-8">
 				<div className="flex-1 flex">
-					<div className="flex-1 bg-primary lg:rounded-tr-[10vh] lg:p-24 p-8">
+					<div className="relative flex-1 flex justify-center bg-primary lg:rounded-tr-[10vh] aspect-video">
 						<Image
 							src="/images/designer.png"
 							alt=""
-							width={800}
-							height={600}
-							className="lg:rounded-2xl rounded-xl"
+							layout="fill"
+							className="lg:rounded-2xl rounded-xl lg:p-24 sm:p-8 p-4 object-contain"
 						/>
 					</div>
 				</div>
@@ -29,8 +28,7 @@ export default function Section2() {
 						</p>
 						<Link
 							href="/design"
-							className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors"
-						>
+							className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
 							Designa din bricka
 						</Link>
 					</div>

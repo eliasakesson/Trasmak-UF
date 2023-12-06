@@ -8,13 +8,12 @@ export default function Section1() {
 		<div>
 			<section className="flex lg:flex-row flex-col">
 				<div className="flex-1 flex">
-					<div className="lg:h-[60vh] h-[40vh] flex-1 bg-primary lg:rounded-tr-[10vh] overflow-hidden p-2">
+					<div className="relative lg:h-[60vh] h-[40vh] flex-1 bg-primary lg:rounded-tr-[10vh]">
 						<Image
 							src="/images/section1.jpg"
 							alt=""
-							className="h-full w-full object-cover lg:rounded-tr-[calc(10vh-8px)]"
-							width={800}
-							height={600}
+							className="h-full w-full object-cover lg:rounded-tr-[10vh] p-2"
+							layout="fill"
 						/>
 					</div>
 				</div>

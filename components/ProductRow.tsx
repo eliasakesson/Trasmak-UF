@@ -30,7 +30,11 @@ export default function ProductRow({
 				!left ? "items-center text-center" : ""
 			} space-y-4 w-full`}>
 			{title && <h2 className="text-4xl font-bold">{title}</h2>}
-			{description && <p className="text-muted text-lg">{description}</p>}
+			{description && (
+				<p className="text-muted text-lg max-w-[calc(100%-16px)]">
+					{description}
+				</p>
+			)}
 			<br />
 			<div className="w-full grid lg:grid-cols-3 lg:gap-8 grid-cols-2 gap-4 text-left">
 				{products

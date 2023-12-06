@@ -224,13 +224,6 @@ export default function SetupMouseEvents(
 				dragObject.height =
 					(clickY - trayObject.y) / (trayObject.height || 1) -
 					dragObject.y;
-
-				if (dragObject.width < 0) dragObject.width = 0;
-				if (dragObject.height < 0) dragObject.height = 0;
-				if (dragObject.width > 1 - dragObject.x)
-					dragObject.width = 1 - dragObject.x;
-				if (dragObject.height > 1 - dragObject.y)
-					dragObject.height = 1 - dragObject.y;
 			}
 
 			Draw({
