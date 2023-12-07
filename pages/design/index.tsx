@@ -386,7 +386,8 @@ export default function Design({ products }: { products: any }) {
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
-								height={720}></canvas>
+								height={720}
+							></canvas>
 							<div className="absolute" ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
@@ -426,110 +427,133 @@ export default function Design({ products }: { products: any }) {
 								)}
 							</div>
 						</div>
-						<div className="flex justify-between max-sm:flex-col gap-4">
-							<div className="flex gap-2 h-12">
-								<button
-									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
-										selectedTool === "select"
-											? "bg-gray-200"
-											: "bg-gray-100"
-									}`}
-									onClick={() => setSelectedTool("select")}>
-									<FaMousePointer />
-								</button>
-								<button
-									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
-										selectedTool === "text"
-											? "bg-gray-200"
-											: "bg-gray-100"
-									}`}
-									onClick={() => setSelectedTool("text")}>
-									T
-								</button>
-								<button
-									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
-										selectedTool === "image"
-											? "bg-gray-200"
-											: "bg-gray-100"
-									}`}
-									onClick={() => setSelectedTool("image")}>
-									<FaImage />
-								</button>
-								<button
-									className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
-										selectedTool === "rectangle"
-											? "bg-gray-200"
-											: "bg-gray-100"
-									}`}
-									onClick={() =>
-										setSelectedTool("rectangle")
-									}>
-									<FaSquare />
-								</button>
-							</div>
-							<div className="flex gap-2">
-								{/* <button
-									onClick={() => {
-										const canvas = document.getElementById(
-											"canvas"
-										) as HTMLCanvasElement;
+						<div className="flex flex-col gap-2">
+							<h3 className="font-semibold">Verktyg</h3>
+							<div className="flex justify-between max-sm:flex-col gap-4">
+								<div className="flex gap-2 h-12">
+									<button
+										className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
+											selectedTool === "select"
+												? "bg-gray-200"
+												: "bg-gray-100"
+										}`}
+										onClick={() =>
+											setSelectedTool("select")
+										}
+									>
+										<FaMousePointer />
+									</button>
+									<button
+										className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
+											selectedTool === "text"
+												? "bg-gray-200"
+												: "bg-gray-100"
+										}`}
+										onClick={() => setSelectedTool("text")}
+									>
+										T
+									</button>
+									<button
+										className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
+											selectedTool === "image"
+												? "bg-gray-200"
+												: "bg-gray-100"
+										}`}
+										onClick={() => setSelectedTool("image")}
+									>
+										<FaImage />
+									</button>
+									<button
+										className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
+											selectedTool === "rectangle"
+												? "bg-gray-200"
+												: "bg-gray-100"
+										}`}
+										onClick={() =>
+											setSelectedTool("rectangle")
+										}
+									>
+										<FaSquare />
+									</button>
+								</div>
+								<div className="flex gap-2">
+									{/* <button
+										onClick={() => {
+											const canvas = document.getElementById(
+												"canvas"
+											) as HTMLCanvasElement;
 
-										const image =
-											canvas.toDataURL("image/png");
-										const link =
-											document.createElement("a");
-										link.download = "design.png";
-										link.href = image;
-										link.click();
-									}}
-									className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
-									<FaDownload /> Ladda ner
-								</button> */}
-								<button
-									onClick={addToCart}
-									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
-									Lägg till i kundvagn
-								</button>
+											const image =
+												canvas.toDataURL("image/png");
+											const link =
+												document.createElement("a");
+											link.download = "design.png";
+											link.href = image;
+											link.click();
+										}}
+										className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+										<FaDownload /> Ladda ner
+									</button> */}
+									<button
+										onClick={addToCart}
+										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
+									>
+										Lägg till i kundvagn
+									</button>
+								</div>
 							</div>
 						</div>
-						<div className="flex gap-2 h-12">
-							<div className="relative rounded-md border aspect-square h-full">
-								<input
-									type="color"
-									className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-									value={trayObject?.color ?? "#000"}
-									onChange={(e) =>
-										setTrayObject((tray) => ({
-											...(tray as ObjectProps),
-											color: e.target.value,
-										}))
-									}
-								/>
-								<div
-									className="absolute inset-0 pointer-events-none rounded-[4px]"
-									style={{
-										backgroundColor:
-											trayObject?.color ?? "",
-									}}></div>
-							</div>
-							<button
-								onClick={() => setShowCanvasSupport((s) => !s)}
-								className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}>
-								{showCanvasSupport ? "Dölj" : "Visa"} stöd
-							</button>
-							<div className="grid grid-rows-2 gap-1">
-								<div className="h-full flex gap-2">
-									<div className="bg-red-300 border aspect-square h-full rounded"></div>
-									<p>Säkerhetsmarginal</p>
-								</div>
-								<div className="h-full flex gap-2">
+						<div className="flex flex-col gap-2">
+							<h3 className="font-semibold">
+								Bakgrundsfärg och stödlinjer
+							</h3>
+							<div className="flex gap-2 h-12">
+								<div className="relative rounded-md border aspect-square h-full">
+									<input
+										type="color"
+										className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+										value={trayObject?.color ?? "#000"}
+										onChange={(e) =>
+											setTrayObject((tray) => ({
+												...(tray as ObjectProps),
+												color: e.target.value,
+											}))
+										}
+									/>
 									<div
-										className={`${
-											trayObject?.color === "#ffffff"
-												? "bg-gray-300"
-												: "bg-white"
-										} border aspect-square h-full rounded`}></div>
-									<p>Kanter</p>
+										className="absolute inset-0 pointer-events-none rounded-[4px]"
+										style={{
+											backgroundColor:
+												trayObject?.color ?? "",
+										}}
+									></div>
+								</div>
+								<br />
+								<br />
+								<button
+									onClick={() =>
+										setShowCanvasSupport((s) => !s)
+									}
+									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}
+								>
+									{showCanvasSupport ? "Dölj" : "Visa"}{" "}
+									stödlinjer
+								</button>
+								<div className="grid grid-rows-2 gap-1">
+									<div className="h-full flex gap-2">
+										<div className="bg-red-300 border aspect-square h-full rounded"></div>
+										<p>Säkerhetsmarginal</p>
+									</div>
+									<div className="h-full flex gap-2">
+										<div
+											className={`${
+												trayObject?.color === "#ffffff"
+													? "bg-gray-300"
+													: "bg-white"
+											} border aspect-square h-full rounded`}
+										></div>
+										<p>Kanter</p>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -550,7 +574,8 @@ export default function Design({ products }: { products: any }) {
 										)
 											? "border-muted"
 											: ""
-									}`}>
+									}`}
+								>
 									<button
 										onClick={() =>
 											setCurrentDesign((design) => ({
@@ -561,7 +586,8 @@ export default function Design({ products }: { products: any }) {
 												),
 											}))
 										}
-										className="w-full flex items-center max-sm:flex-col sm:text-left max-sm:pb-2">
+										className="w-full flex items-center max-sm:flex-col sm:text-left max-sm:pb-2"
+									>
 										<div className="flex-shrink-0">
 											<img
 												src={product.image}
@@ -587,7 +613,7 @@ export default function Design({ products }: { products: any }) {
 					</div>
 					<div className="col-span-3">
 						<h2 className="text-xl font-bold border-b pb-2 mb-4">
-							Designs
+							Mallar
 						</h2>
 						<DesignTemplates
 							designs={designs.filter((design) =>
@@ -643,11 +669,13 @@ function DesignTemplates({
 				<li key={design.id} className="list-none">
 					<button
 						onClick={() => onClick(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl">
+						className="w-full aspect-video bg-gray-100 rounded-xl"
+					>
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
 							width={1280}
-							height={720}></canvas>
+							height={720}
+						></canvas>
 					</button>
 				</li>
 			))}
@@ -815,7 +843,8 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}></div>
+						}}
+					></div>
 				</div>
 			</div>
 		);
@@ -900,7 +929,8 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}>
+				}
+			>
 				{options?.map((option, i) => (
 					<option key={i} value={option.value}>
 						{option.text}
@@ -983,12 +1013,13 @@ export async function Draw(
 
 	if (showSupport) {
 		DrawTraySupport(ctx, tray);
-	} else {
-		// DrawTrayShadowOld(ctx, tray);
+		DrawTrayShadow(ctx, tray);
 	}
 
 	DrawTrayShadow(ctx, tray);
 	DrawTrayBorder(ctx, tray);
+
+	ctx.restore();
 
 	HighlightSelectedObject(ctx, tray, design.objects, selectedObjectID);
 }
@@ -1226,7 +1257,7 @@ function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
 
 function DrawTrayShadow(ctx: any, tray: ObjectProps) {
 	ctx.save();
-	ctx.strokeStyle = tray.color === "#ffffff" ? "#00000011" : "#ffffff99";
+	ctx.strokeStyle = tray.color === "#ffffff" ? "#00000011" : "#ffffff55";
 	ctx.lineWidth = tray.edge ?? 0;
 	GetRoundedRect(
 		ctx,

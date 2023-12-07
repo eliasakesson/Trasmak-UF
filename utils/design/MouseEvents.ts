@@ -24,6 +24,7 @@ export default function SetupMouseEvents(
 	let dragObject: ObjectProps | undefined = undefined;
 	let dragObjectOffset: { x: number; y: number } = { x: 0, y: 0 };
 	let dragType: "move" | "resize" | undefined = undefined;
+	let resizeDirection: "top" | "bottom" | "left" | "right" | "top-left" | "top-right" | "bottom-left" | "bottom-right" | undefined = undefined;
 	let mouseDownPosition: { x: number; y: number } = { x: 0, y: 0 };
 
 	function onMouseDown(e: any) {
@@ -53,8 +54,30 @@ export default function SetupMouseEvents(
 				dragObject.type === "image" ||
 				dragObject.type === "rectangle"
 			) {
-				if (clickX >= x + width - 8) {
+				if (clickX >= x + width - 8 && clickY >= y + height - 8) {
 					dragType = "resize";
+					resizeDirection = "bottom-right";
+				} else if (clickX >= x + width - 8 && clickY <= y + 8) {
+					dragType = "resize";
+					resizeDirection = "top-right";
+				} else if (clickX <= x + 8 && clickY >= y + height - 8) {
+					dragType = "resize";
+					resizeDirection = "bottom-left";
+				} else if (clickX <= x + 8 && clickY <= y + 8) {
+					dragType = "resize";
+					resizeDirection = "top-left";
+				} else if (clickX >= x + width - 8) {
+					dragType = "resize";
+					resizeDirection = "right";
+				} else if (clickX <= x + 8) {
+					dragType = "resize";
+					resizeDirection = "left";
+				} else if (clickY >= y + height - 8) {
+					dragType = "resize";
+					resizeDirection = "bottom";
+				} else if (clickY <= y + 8) {
+					dragType = "resize";
+					resizeDirection = "top";
 				} else {
 					dragType = "move";
 				}
@@ -159,12 +182,31 @@ export default function SetupMouseEvents(
 				selectedObject
 			);
 
+			const mouseX = e.offsetX * (canvas.width / rect.width);
+			const mouseY = e.offsetY * (canvas.height / rect.height);
+
 			if (
 				selectedObject.type === "image" ||
 				selectedObject.type === "rectangle"
 			) {
-				if (e.offsetX * (canvas.width / rect.width) >= x + width - 8) {
+				if (mouseX >= x + width - 8 && mouseY >= y + height - 8) {
 					canvas.style.cursor = "nwse-resize";
+				} else if (mouseX >= x + width - 8 && mouseY <= y + 8) {
+					canvas.style.cursor = "nesw-resize";
+				} else if (mouseX <= x + 8 && mouseY >= y + height - 8) {
+					canvas.style.cursor = "nesw-resize";
+				} else if (mouseX <= x + 8 && mouseY <= y + 8) {
+					canvas.style.cursor = "nwse-resize";
+				} else if (mouseX >= x + width - 8) {
+					canvas.style.cursor = "ew-resize";
+				} else if (mouseX <= x + 8) {
+					canvas.style.cursor = "ew-resize";
+				} else if (mouseY >= y + height - 8) {
+					canvas.style.cursor = "ns-resize";
+				} else if (mouseY <= y + 8) {
+					canvas.style.cursor = "ns-resize";
+				} else {
+					canvas.style.cursor = "move";
 				}
 			}
 		}
@@ -197,33 +239,27 @@ export default function SetupMouseEvents(
 					(clickY - dragObjectOffset.y - trayObject.y) /
 					(trayObject.height || 1);
 
-				const snapDistance = 0.01;
-
-				if (Math.abs(dragObject.x) < snapDistance) {
-					dragObject.x = 0;
-				}
-				if (Math.abs(dragObject.x + width - 1) < snapDistance) {
-					dragObject.x = 1 - width;
-				}
-				if (Math.abs(dragObject.y) < snapDistance) {
-					dragObject.y = 0;
-				}
-				if (Math.abs(dragObject.y + height - 1) < snapDistance) {
-					dragObject.y = 1 - height;
-				}
-				if (Math.abs(dragObject.x + width / 2 - 0.5) < snapDistance) {
-					dragObject.x = 0.5 - width / 2;
-				}
-				if (Math.abs(dragObject.y + height / 2 - 0.5) < snapDistance) {
-					dragObject.y = 0.5 - height / 2;
-				}
+				SnapObject(dragObject);
 			} else if (dragType === "resize") {
-				dragObject.width =
-					(clickX - trayObject.x) / (trayObject.width || 1) -
-					dragObject.x;
-				dragObject.height =
-					(clickY - trayObject.y) / (trayObject.height || 1) -
-					dragObject.y;
+				if (resizeDirection === "top-right" || resizeDirection === "right" || resizeDirection === "bottom-right") {
+					dragObject.width =
+						Math.max(0, (clickX - trayObject.x) / (trayObject.width || 1) -
+						dragObject.x);
+				} else if (resizeDirection === "top-left" || resizeDirection === "left" || resizeDirection === "bottom-left") {
+					const oldX = dragObject.x ?? 0;
+					dragObject.x = (clickX - trayObject.x) / (trayObject.width || 1);
+					dragObject.width = Math.max(0, oldX - dragObject.x + (dragObject.width ?? 0));
+				}
+
+				if (resizeDirection === "top-left" || resizeDirection === "top" || resizeDirection === "top-right") {
+					const oldY = dragObject.y ?? 0;
+					dragObject.y = (clickY - trayObject.y) / (trayObject.height || 1);
+					dragObject.height = Math.max(0, oldY - dragObject.y + (dragObject.height ?? 0));
+				} else if (resizeDirection === "bottom-left" || resizeDirection === "bottom" || resizeDirection === "bottom-right") {
+					dragObject.height =
+						Math.max((clickY - trayObject.y) / (trayObject.height || 1) -
+						dragObject.y);
+				}
 			}
 
 			Draw({
@@ -295,6 +331,32 @@ export default function SetupMouseEvents(
 		canvas.removeEventListener("mousemove", onMouseMove);
 		canvas.removeEventListener("click", onClick);
 	};
+}
+
+function SnapObject(object: ObjectProps) {
+	const snapDistance = 0.01;
+
+	const width = object.width || 0;
+	const height = object.height || 0;
+
+	if (Math.abs(object.x) < snapDistance) {
+		object.x = 0;
+	}
+	if (Math.abs(object.x + width - 1) < snapDistance) {
+		object.x = 1 - width;
+	}
+	if (Math.abs(object.y) < snapDistance) {
+		object.y = 0;
+	}
+	if (Math.abs(object.y + height - 1) < snapDistance) {
+		object.y = 1 - height;
+	}
+	if (Math.abs(object.x + width / 2 - 0.5) < snapDistance) {
+		object.x = 0.5 - width / 2;
+	}
+	if (Math.abs(object.y + height / 2 - 0.5) < snapDistance) {
+		object.y = 0.5 - height / 2;
+	}
 }
 
 function GetObjectFromPointer(
