@@ -250,7 +250,7 @@ function CartSummary({ config }: { config: any }) {
 					</p>
 				</div>
 			</div>
-			<div className="flex gap-4">
+			{/* <div className="flex gap-4">
 				<input
 					type="checkbox"
 					name="gdpr"
@@ -262,7 +262,7 @@ function CartSummary({ config }: { config: any }) {
 					Jag har läst och godkänner GDPR's integritetspolicy samt
 					villkor.
 				</p>
-			</div>
+			</div> */}
 			<div className="flex flex-col items-stretch gap-4">
 				<button
 					disabled={
