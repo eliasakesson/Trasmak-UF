@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Footer() {
 	return (
-		<footer className="bg-gray-100 mt-16">
+		<footer className="bg-gray-100">
 			<div className="max-w-7xl mx-auto px-8 ">
 				<div className="grid lg:grid-cols-4 sm:grid-cols-2 md:gap-16 gap-8 py-16">
 					<div className="sm:col-span-2 space-y-8">
@@ -64,7 +64,7 @@ export default function Footer() {
 					<p className="text-gray-500">
 						© 2023 Träsmak UF. All rights reserved.
 					</p>
-					<p className="text-gray-500">
+					{/* <p className="text-gray-500">
 						Created by{" "}
 						<a
 							href="https://eliasakesson.me"
@@ -73,7 +73,7 @@ export default function Footer() {
 							target="_blank">
 							Elias Åkesson
 						</a>
-					</p>
+					</p> */}
 				</div>
 			</div>
 		</footer>

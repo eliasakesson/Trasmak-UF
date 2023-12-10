@@ -181,6 +181,7 @@ function CartSummary({ config }: { config: any }) {
 		useShoppingCart();
 
 	const [isRedirecting, setIsRedirecting] = useState(false);
+	const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
 
 	const currency =
 		cartDetails[Object.keys(cartDetails)[0]] &&
@@ -249,15 +250,29 @@ function CartSummary({ config }: { config: any }) {
 					</p>
 				</div>
 			</div>
+			<div className="flex gap-4">
+				<input
+					type="checkbox"
+					name="gdpr"
+					id="gdpr"
+					className="w-8"
+					onChange={(e) => setHasAcceptedTerms(e.target.checked)}
+				/>
+				<p>
+					Jag har läst och godkänner GDPR's integritetspolicy samt
+					villkor.
+				</p>
+			</div>
 			<div className="flex flex-col items-stretch gap-4">
 				<button
-					disabled={isRedirecting}
+					disabled={
+						true //isRedirecting || cartCount <= 0 || !hasAcceptedTerms
+					}
 					onClick={onCheckout}
 					type="button"
-					className="py-4 px-8 bg-primary text-white hover:bg-primary_light transition-colors rounded-lg font-semibold">
+					className="py-4 px-8 bg-primary text-white hover:bg-primary_light transition-colors rounded-lg font-semibold disabled:bg-primary_dark">
 					Gå till kassan
 				</button>
-
 				<Link
 					href="/products"
 					className="py-4 px-8 border-2 rounded-lg font-semibold text-center hover:bg-white transition-colors">

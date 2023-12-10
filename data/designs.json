@@ -1,10 +1,10 @@
 [
     {
-        "id": "0",
+        "id": "1OF0i9BwTscfW232Uh9fquPJ",
         "objects": []
     },
     {
-        "id": "1O7d9KBwTscfW232N3qoTc3Q",
+        "id": "1OF0i9BwTscfW232Uh9fquPJ",
         "objects": [
             {
                 "id": 1,
@@ -20,15 +20,15 @@
         ]
     },
     {
-        "id": "2",
+        "id": "1OF0i9BwTscfW232Uh9fquPJ",
         "objects": [
             {
                 "id": 1,
                 "type": "text",
                 "content": "Hello, world!",
                 "order": 0,
-                "x": 0.5,
-                "y": 0.5,
+                "x": 0.33,
+                "y": 0.45,
                 "color": "#000000",
                 "font": "Arial",
                 "size": 48,
@@ -38,7 +38,7 @@
         ]
     },
     {
-        "id": "3",
+        "id": "1OF0i9BwTscfW232Uh9fquPJ",
         "objects": [
             {
                 "id": 1,

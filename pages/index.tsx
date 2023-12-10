@@ -25,7 +25,7 @@ export default function Home({ products }: { products: any }) {
 							description="Detta är de brickor som säljs som bäst. Passa på innan de tar
 							slut!"
 							products={products}
-							rows={2}
+							rows={3}
 						/>
 					</div>
 					<Section1 />

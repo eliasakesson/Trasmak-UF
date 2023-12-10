@@ -22,10 +22,9 @@ export default function Products({ products }: { products: any }) {
 					</span>
 				) : (
 					<p className="max-w-prose text-muted">
-						Här hittar du våra produkter. Du kan välja en mall att
-						utgå från eller designa din egen bricka från grunden. Du
-						kan enkelt sortera och filtrera produkterna för att
-						hitta det du söker.
+						Här hittar du våra produkter. Mallar hittar du efter du
+						valt storlek. Välj en produkt för att komma till
+						designern.
 					</p>
 				)}
 			</div>
@@ -41,7 +40,7 @@ function ProductsAndFilterGrid({ products }: { products: any }) {
 	return (
 		<div className="w-full">
 			<div className="flex justify-between w-full border-b py-4">
-				<span>4 Resultat</span>
+				<span>{products.length} Resultat</span>
 				<select
 					onChange={(e) => setSortVal(e.target.value)}
 					className="px-2 py-1 border rounded-lg">

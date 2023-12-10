@@ -32,10 +32,10 @@ const Header = () => {
 
 function Announcement() {
 	return (
-		<div className="bg-primary text-white py-2">
+		<div className="bg-red-500 text-white py-2">
 			<div className="container mx-auto flex justify-center items-center">
 				<p className="text-sm font-semibold">
-					FRI FRAKT VID KÖP ÖVER 500 KR
+					HEMSIDAN ÄR UNDER UPPBYGGNAD, DET GÅR INTE ATT BESTÄLLA ÄN!
 				</p>
 			</div>
 		</div>
@@ -180,17 +180,10 @@ function Search() {
 						.map((product: any) => (
 							<li key={product.id}>
 								<Link
-									href={
-										product.metadata.type === "template"
-											? `/design?d=${product.id.substring(
-													6,
-													product.id.length
-											  )}`
-											: `/products/${product.id.substring(
-													6,
-													product.id.length
-											  )}`
-									}
+									href={`/design?d=${product.id.substring(
+										6,
+										product.id.length
+									)}`}
 									onClick={() => {
 										setIsSearchOpen(false);
 									}}>
@@ -412,34 +405,6 @@ function ProductsNav() {
 						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
 						<FaExclamation className="text-4xl" />
 						<span className="text-lg">Nya</span>
-					</Link>
-				</li>
-			</ul>
-			<div className="mx-8 w-px self-stretch bg-muted_light"></div>
-			<ul className="space-y-4">
-				<li>
-					<Link href="/products" className="text-lg text-muted">
-						Visa alla
-					</Link>
-				</li>
-				<li>
-					<Link href="/products" className="text-lg text-muted">
-						Mallar
-					</Link>
-				</li>
-				<li>
-					<Link href="/products" className="text-lg text-muted">
-						Städer
-					</Link>
-				</li>
-				<li>
-					<Link href="/products" className="text-lg text-muted">
-						Familj
-					</Link>
-				</li>
-				<li>
-					<Link href="/products" className="text-lg text-muted">
-						Djur
 					</Link>
 				</li>
 			</ul>

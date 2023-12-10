@@ -24,7 +24,16 @@ export default function SetupMouseEvents(
 	let dragObject: ObjectProps | undefined = undefined;
 	let dragObjectOffset: { x: number; y: number } = { x: 0, y: 0 };
 	let dragType: "move" | "resize" | undefined = undefined;
-	let resizeDirection: "top" | "bottom" | "left" | "right" | "top-left" | "top-right" | "bottom-left" | "bottom-right" | undefined = undefined;
+	let resizeDirection:
+		| "top"
+		| "bottom"
+		| "left"
+		| "right"
+		| "top-left"
+		| "top-right"
+		| "bottom-left"
+		| "bottom-right"
+		| undefined = undefined;
 	let mouseDownPosition: { x: number; y: number } = { x: 0, y: 0 };
 
 	function onMouseDown(e: any) {
@@ -117,6 +126,9 @@ export default function SetupMouseEvents(
 		const clickX = e.offsetX * (canvas.width / rect.width);
 		const clickY = e.offsetY * (canvas.height / rect.height);
 
+		const distanceX = clickX - mouseDownPosition.x;
+		const distanceY = clickY - mouseDownPosition.y;
+
 		if (
 			(!object || object.type !== "text") &&
 			selectedTool === "text" &&
@@ -127,16 +139,13 @@ export default function SetupMouseEvents(
 			(!object || object.type !== "image") &&
 			selectedTool === "image"
 		) {
-			if (
-				Math.abs(clickX - mouseDownPosition.x) > 5 ||
-				Math.abs(clickY - mouseDownPosition.y) > 5
-			) {
+			if (Math.abs(distanceX) > 5 || Math.abs(distanceY) > 5) {
 				addObject(
 					"image",
-					mouseDownPosition.x,
-					mouseDownPosition.y,
-					clickX,
-					clickY
+					distanceX > 0 ? mouseDownPosition.x : clickX,
+					distanceY > 0 ? mouseDownPosition.y : clickY,
+					distanceX > 0 ? clickX : mouseDownPosition.x,
+					distanceY > 0 ? clickY : mouseDownPosition.y
 				);
 			} else {
 				addObject("image", clickX, clickY);
@@ -145,16 +154,13 @@ export default function SetupMouseEvents(
 			(!object || object.type !== "rectangle") &&
 			selectedTool === "rectangle"
 		) {
-			if (
-				Math.abs(clickX - mouseDownPosition.x) > 5 ||
-				Math.abs(clickY - mouseDownPosition.y) > 5
-			) {
+			if (Math.abs(distanceX) > 5 || Math.abs(distanceY) > 5) {
 				addObject(
 					"rectangle",
-					mouseDownPosition.x,
-					mouseDownPosition.y,
-					clickX,
-					clickY
+					distanceX > 0 ? mouseDownPosition.x : clickX,
+					distanceY > 0 ? mouseDownPosition.y : clickY,
+					distanceX > 0 ? clickX : mouseDownPosition.x,
+					distanceY > 0 ? clickY : mouseDownPosition.y
 				);
 			} else {
 				addObject("rectangle", clickX, clickY);
@@ -241,24 +247,51 @@ export default function SetupMouseEvents(
 
 				SnapObject(dragObject);
 			} else if (dragType === "resize") {
-				if (resizeDirection === "top-right" || resizeDirection === "right" || resizeDirection === "bottom-right") {
-					dragObject.width =
-						Math.max(0, (clickX - trayObject.x) / (trayObject.width || 1) -
-						dragObject.x);
-				} else if (resizeDirection === "top-left" || resizeDirection === "left" || resizeDirection === "bottom-left") {
+				if (
+					resizeDirection === "top-right" ||
+					resizeDirection === "right" ||
+					resizeDirection === "bottom-right"
+				) {
+					dragObject.width = Math.max(
+						0,
+						(clickX - trayObject.x) / (trayObject.width || 1) -
+							dragObject.x
+					);
+				} else if (
+					resizeDirection === "top-left" ||
+					resizeDirection === "left" ||
+					resizeDirection === "bottom-left"
+				) {
 					const oldX = dragObject.x ?? 0;
-					dragObject.x = (clickX - trayObject.x) / (trayObject.width || 1);
-					dragObject.width = Math.max(0, oldX - dragObject.x + (dragObject.width ?? 0));
+					dragObject.x =
+						(clickX - trayObject.x) / (trayObject.width || 1);
+					dragObject.width = Math.max(
+						0,
+						oldX - dragObject.x + (dragObject.width ?? 0)
+					);
 				}
 
-				if (resizeDirection === "top-left" || resizeDirection === "top" || resizeDirection === "top-right") {
+				if (
+					resizeDirection === "top-left" ||
+					resizeDirection === "top" ||
+					resizeDirection === "top-right"
+				) {
 					const oldY = dragObject.y ?? 0;
-					dragObject.y = (clickY - trayObject.y) / (trayObject.height || 1);
-					dragObject.height = Math.max(0, oldY - dragObject.y + (dragObject.height ?? 0));
-				} else if (resizeDirection === "bottom-left" || resizeDirection === "bottom" || resizeDirection === "bottom-right") {
-					dragObject.height =
-						Math.max((clickY - trayObject.y) / (trayObject.height || 1) -
-						dragObject.y);
+					dragObject.y =
+						(clickY - trayObject.y) / (trayObject.height || 1);
+					dragObject.height = Math.max(
+						0,
+						oldY - dragObject.y + (dragObject.height ?? 0)
+					);
+				} else if (
+					resizeDirection === "bottom-left" ||
+					resizeDirection === "bottom" ||
+					resizeDirection === "bottom-right"
+				) {
+					dragObject.height = Math.max(
+						(clickY - trayObject.y) / (trayObject.height || 1) -
+							dragObject.y
+					);
 				}
 			}
 
