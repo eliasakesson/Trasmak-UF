@@ -18,6 +18,7 @@ import { uploadFromCanvas } from "@/utils/firebase";
 import { Product } from "use-shopping-cart/core";
 import Head from "next/head";
 import SetupMouseEvents from "@/utils/design/MouseEvents";
+import { useWindowSize } from "@/utils/hooks";
 
 const SelectedObjectContext = createContext({
 	object: null as ObjectProps | null,
@@ -54,6 +55,8 @@ export interface ObjectProps {
 
 export default function Design({ products }: { products: any }) {
 	const router = useRouter();
+
+	const windowSize = useWindowSize();
 
 	const [currentDesign, setCurrentDesign] = useState<DesignProps>(designs[0]);
 	const [selectedObjectID, setSelectedObjectID] = useState<number | null>(
@@ -373,13 +376,34 @@ export default function Design({ products }: { products: any }) {
 		});
 	}
 
+	if (windowSize.width < 768) {
+		return (
+			<>
+				<Head>
+					<title>Designer - Träsmak</title>
+					<meta
+						name="description"
+						content="Designa din egen träbricka"
+					/>
+				</Head>
+				<main className="min-h-[80vh] flex flex-col gap-4 items-center justify-center">
+					<FaInfo size={48} className="text-gray-400" />
+					<p className="text-center">
+						Designern är inte tillgänglig på mindre skärmar. Var god
+						använd en enhet med större skärm.
+					</p>
+				</main>
+			</>
+		);
+	}
+
 	return (
 		<>
 			<Head>
 				<title>Designer - Träsmak</title>
 				<meta name="description" content="Designa din egen träbricka" />
 			</Head>
-			<div className="max-w-7xl mx-auto px-8 py-16 space-y-8">
+			<main className="max-w-7xl mx-auto px-8 py-16 space-y-8">
 				<div className="grid lg:grid-cols-4 lg:grid-rows-2 gap-8">
 					<div className="col-span-3 space-y-4">
 						<div className="relative">
@@ -618,7 +642,7 @@ export default function Design({ products }: { products: any }) {
 						/> */}
 					</div>
 				</div>
-			</div>
+			</main>
 		</>
 	);
 }
