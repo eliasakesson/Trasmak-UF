@@ -256,10 +256,7 @@ function CartSummary({ config }: { config: any }) {
 					className="w-8"
 					onChange={(e) => setHasAcceptedTerms(e.target.checked)}
 				/>
-				<p>
-					Jag har läst och godkänner GDPR's integritetspolicy samt
-					villkor.
-				</p>
+				<p>Jag har läst och godkänner GDPR&apos;s köpvillkor.</p>
 			</div>
 			<div className="flex flex-col items-stretch gap-4">
 				<button
