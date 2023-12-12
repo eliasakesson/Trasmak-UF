@@ -22,8 +22,6 @@ export default function Cart({ products, config }: any) {
 function CartItems({ products }: { products: any }) {
 	const { cartDetails, cartCount }: any = useShoppingCart();
 
-	console.log(cartDetails);
-
 	return (
 		<div className="col-span-2">
 			<div className="flex justify-between items-center py-4 pb-8">
@@ -250,7 +248,7 @@ function CartSummary({ config }: { config: any }) {
 					</p>
 				</div>
 			</div>
-			{/* <div className="flex gap-4">
+			<div className="flex gap-4">
 				<input
 					type="checkbox"
 					name="gdpr"
@@ -262,11 +260,11 @@ function CartSummary({ config }: { config: any }) {
 					Jag har läst och godkänner GDPR's integritetspolicy samt
 					villkor.
 				</p>
-			</div> */}
+			</div>
 			<div className="flex flex-col items-stretch gap-4">
 				<button
 					disabled={
-						true //isRedirecting || cartCount <= 0 || !hasAcceptedTerms
+						isRedirecting || cartCount <= 0 || !hasAcceptedTerms
 					}
 					onClick={onCheckout}
 					type="button"

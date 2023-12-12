@@ -1,152 +1,112 @@
 [
     {
         "id": "1OF0i9BwTscfW232Uh9fquPJ",
-        "objects": []
-    },
-    {
-        "id": "1OF0i9BwTscfW232Uh9fquPJ",
         "objects": [
             {
                 "id": 1,
                 "type": "image",
-                "content": "https://images.unsplash.com/photo-1500964757637-c85e8a162699?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29sb3IlMjBsYW5kc2NhcGV8ZW58MHx8MHx8fDA%3D",
+                "content": "https://blog.hootsuite.com/wp-content/uploads/2021/07/free-stock-photos-12.jpeg",
                 "order": 0,
                 "x": 0.2,
                 "y": 0.2,
                 "width": 0.6,
                 "height": 0.6,
-                "radius": 48
+                "radius": 48,
+                "fit": "cover"
             }
         ]
     },
     {
-        "id": "1OF0i9BwTscfW232Uh9fquPJ",
+        "id":"1OF0i9BwTscfW232Uh9fquPJ",
         "objects": [
             {
-                "id": 1,
-                "type": "text",
-                "content": "Hello, world!",
-                "order": 0,
-                "x": 0.33,
-                "y": 0.45,
-                "color": "#000000",
-                "font": "Arial",
-                "size": 48,
-                "align": "left",
-                "baseline": "top"
+                "id":1,
+                "type":"text",
+                "content":"EXEMPEL TEXT",
+                "order":2,
+                "x":0.21201235356480153,
+                "y":0.20015616866215513,
+                "color":"#000000",
+                "font":"cinzel",
+                "size":64
+            },
+            {
+                "id":2,
+                "type":"image",
+                "content":"https://blog.hootsuite.com/wp-content/uploads/2021/07/free-stock-photos-12.jpeg",
+                "order":1,
+                "x":0,
+                "y":0,
+                "width":1,
+                "height":1,
+                "radius":48,
+                "fit":"cover"
+            },{
+                "id":3,
+                "type":"text",
+                "content":"Lorem ipsum dolar",
+                "order":0,
+                "x":0.5,
+                "y":0.55,
+                "color":"#434343",
+                "font":"Arial",
+                "size":28
             }
         ]
     },
     {
-        "id": "1OF0i9BwTscfW232Uh9fquPJ",
-        "objects": [
-            {
-                "id": 1,
-                "type": "text",
-                "content": "Hello, world!",
-                "order": 0,
-                "x": 0.5,
-                "y": 0.5,
-                "color": "#000000",
-                "font": "Arial",
-                "size": 48,
-                "align": "left",
-                "baseline": "top"
-            },
-            {
-                "id": 2,
-                "type": "image",
-                "content": "https://images.unsplash.com/photo-1500964757637-c85e8a162699?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29sb3IlMjBsYW5kc2NhcGV8ZW58MHx8MHx8fDA%3D",
-                "order": 1,
-                "x": 0.2,
-                "y": 0.2,
-                "width": 0.6,
-                "height": 0.6,
-                "radius": 48
-            }
+        "id":"1OF0i9BwTscfW232Uh9fquPJ",
+        "objects":[
+           {
+              "id":1,
+              "type":"text",
+              "content":"EXEMPEL TEXT",
+              "order":2,
+              "x":0.25,
+              "y":0.4,
+              "color":"#000000",
+              "font":"comfortaa",
+              "size":48
+           },
+           {
+              "id":2,
+              "type":"text",
+              "content":"EXEMPEL",
+              "order":1,
+              "x":0.25,
+              "y":0.5,
+              "color":"#ffffff",
+              "font":"whisper",
+              "size":28
+           },
+           {
+              "id":3,
+              "type":"image",
+              "content":"https://blog.hootsuite.com/wp-content/uploads/2021/07/free-stock-photos-12.jpeg",
+              "order":0,
+              "x":0.2,
+              "y":0.2,
+              "width":0.6,
+              "height":0.6,
+              "radius":48,
+              "fit":"cover"
+           }
         ]
     },
     {
-        "id": "1O3iMPBwTscfW232wipYDmfH",
-        "objects": [
+        "id":"1OIpxcBwTscfW2328HMphHsn",
+        "objects":[
             {
-                "id": 1,
-                "type": "text",
-                "content": "Hello, world!",
-                "order": 0,
-                "x": 0.5,
-                "y": 0.45,
-                "color": "#000000",
-                "font": "Arial",
-                "size": 64,
-                "align": "left",
-                "baseline": "top"
-            },
-            {
-                "id": 2,
-                "type": "image",
-                "content": "https://images.unsplash.com/photo-1500964757637-c85e8a162699?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29sb3IlMjBsYW5kc2NhcGV8ZW58MHx8MHx8fDA%3D",
-                "order": 1,
-                "x": 0,
-                "y": 0,
-                "width": 1,
-                "height": 1,
-                "radius": 48
-            },
-            {
-                "id": 3,
-                "type": "text",
-                "content": "Lorem ipsum dolar",
-                "order": 2,
-                "x": 0.5,
-                "y": 0.55,
-                "color": "#434343",
-                "font": "Arial",
-                "size": 28,
-                "align": "left",
-                "baseline": "top"
-            }
-        ]
-    },
-    {
-        "id": "1O7cfqBwTscfW232XpFdevga",
-        "objects": [
-            {
-                "id": 1,
-                "type": "text",
-                "content": "Hello, world!",
-                "order": 0,
-                "x": 0.25,
-                "y": 0.4,
-                "color": "#000000",
-                "font": "Arial",
-                "size": 48,
-                "align": "left",
-                "baseline": "top"
-            },
-            {
-                "id": 2,
-                "type": "text",
-                "content": "Lorem ipsum dolar",
-                "order": 1,
-                "x": 0.25,
-                "y": 0.5,
-                "color": "#434343",
-                "font": "Arial",
-                "size": 28,
-                "align": "left",
-                "baseline": "top"
-            },
-            {
-                "id": 3,
-                "type": "image",
-                "content": "https://images.unsplash.com/photo-1500964757637-c85e8a162699?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29sb3IlMjBsYW5kc2NhcGV8ZW58MHx8MHx8fDA%3D",
-                "order": 2,
-                "x": 0.2,
-                "y": 0.2,
-                "width": 0.6,
-                "height": 0.6,
-                "radius": 48
+                "id":1,
+                "type":"image",
+                "content":"https://blog.hootsuite.com/wp-content/uploads/2021/07/free-stock-photos-12.jpeg",
+                "order":0,
+                "x":0,
+                "y":0,
+                "width":1,
+                "height":1,
+                "radius":0,
+                "fit":"cover"
             }
         ]
     }

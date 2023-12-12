@@ -51,11 +51,7 @@ export default function SetupMouseEvents(
 			);
 
 			dragObjectOffset = {
-				x:
-					clickX -
-					x -
-					(dragObject.align === "center" ? width / 2 : 0) -
-					(dragObject.align === "right" ? width : 0),
+				x: clickX - x,
 				y: clickY - y,
 			};
 
@@ -245,7 +241,7 @@ export default function SetupMouseEvents(
 					(clickY - dragObjectOffset.y - trayObject.y) /
 					(trayObject.height || 1);
 
-				SnapObject(dragObject);
+				SnapObject(dragObject, ctx, trayObject);
 			} else if (dragType === "resize") {
 				if (
 					resizeDirection === "top-right" ||
@@ -366,28 +362,36 @@ export default function SetupMouseEvents(
 	};
 }
 
-function SnapObject(object: ObjectProps) {
+function SnapObject(
+	object: ObjectProps,
+	ctx: CanvasRenderingContext2D,
+	trayObject: ObjectProps
+) {
 	const snapDistance = 0.01;
 
-	const width = object.width || 0;
-	const height = object.height || 0;
+	const { x, y, width, height } = GetObjectDimensions(
+		ctx,
+		trayObject,
+		object,
+		true
+	);
 
-	if (Math.abs(object.x) < snapDistance) {
+	if (Math.abs(x) < snapDistance) {
 		object.x = 0;
 	}
-	if (Math.abs(object.x + width - 1) < snapDistance) {
+	if (Math.abs(x + width - 1) < snapDistance) {
 		object.x = 1 - width;
 	}
-	if (Math.abs(object.y) < snapDistance) {
+	if (Math.abs(y) < snapDistance) {
 		object.y = 0;
 	}
-	if (Math.abs(object.y + height - 1) < snapDistance) {
+	if (Math.abs(y + height - 1) < snapDistance) {
 		object.y = 1 - height;
 	}
-	if (Math.abs(object.x + width / 2 - 0.5) < snapDistance) {
+	if (Math.abs(x + width / 2 - 0.5) < snapDistance) {
 		object.x = 0.5 - width / 2;
 	}
-	if (Math.abs(object.y + height / 2 - 0.5) < snapDistance) {
+	if (Math.abs(y + height / 2 - 0.5) < snapDistance) {
 		object.y = 0.5 - height / 2;
 	}
 }

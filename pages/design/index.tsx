@@ -10,6 +10,7 @@ import {
 	FaChevronDown,
 	FaInfo,
 	FaCopy,
+	FaExpand,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
@@ -19,6 +20,9 @@ import { Product } from "use-shopping-cart/core";
 import Head from "next/head";
 import SetupMouseEvents from "@/utils/design/MouseEvents";
 import { useWindowSize } from "@/utils/hooks";
+import { FaCircleXmark } from "react-icons/fa6";
+import Link from "next/link";
+import { GetObjectDimensions } from "@/utils/design/Helper";
 
 const SelectedObjectContext = createContext({
 	object: null as ObjectProps | null,
@@ -41,7 +45,6 @@ export interface ObjectProps {
 	color?: string;
 	font?: string;
 	size?: number;
-	align?: string;
 
 	width?: number;
 	height?: number;
@@ -99,6 +102,7 @@ export default function Design({ products }: { products: any }) {
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+		if (!canvas) return;
 
 		const metadata = products.find(
 			(product: any) =>
@@ -120,6 +124,7 @@ export default function Design({ products }: { products: any }) {
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+		if (!canvas) return;
 		const ctx = canvas.getContext("2d");
 		const rect = canvas.getBoundingClientRect();
 		const selectedObject = currentDesign.objects.find(
@@ -130,18 +135,23 @@ export default function Design({ products }: { products: any }) {
 
 		let input: HTMLTextAreaElement | null = null;
 
-		const drawTimer = setTimeout(() => {
+		Draw(
+			canvas,
+			trayObject,
+			currentDesign,
+			selectedObjectID,
+			showCanvasSupport
+		);
+
+		LoadImages(currentDesign, (design) =>
 			Draw(
 				canvas,
 				trayObject,
-				currentDesign,
+				design,
 				selectedObjectID,
 				showCanvasSupport
-			);
-			localStorage.setItem("design", JSON.stringify(currentDesign));
-		}, 100);
-
-		LoadImages(currentDesign, (design) => Draw(canvas, trayObject, design));
+			)
+		);
 
 		if (selectedObject && designEditorRef.current) {
 			const { x, y, width, height } = GetObjectDimensions(
@@ -150,12 +160,20 @@ export default function Design({ products }: { products: any }) {
 				selectedObject
 			);
 
-			designEditorRef.current.style.left = `${
-				x * (rect.width / canvas.width) - 8
-			}px`;
-			designEditorRef.current.style.top = `${
-				(y + height) * (rect.height / canvas.height) + 16
-			}px`;
+			const left = x * (rect.width / canvas.width) - 8;
+			const top = (y + height) * (rect.height / canvas.height) + 16;
+
+			if (left > rect.width) {
+				designEditorRef.current.style.left = `${rect.width}px`;
+			} else {
+				designEditorRef.current.style.left = `${left}px`;
+			}
+
+			if (top > rect.height) {
+				designEditorRef.current.style.top = `${rect.height}px`;
+			} else {
+				designEditorRef.current.style.top = `${top}px`;
+			}
 		}
 
 		if (
@@ -189,11 +207,17 @@ export default function Design({ products }: { products: any }) {
 			selectedTool,
 			setSelectedTool,
 			designEditorRef.current,
-			(design) => Draw(canvas, trayObject, design, selectedObjectID)
+			(design) =>
+				Draw(
+					canvas,
+					trayObject,
+					design,
+					selectedObjectID,
+					showCanvasSupport
+				)
 		);
 
 		return () => {
-			clearTimeout(drawTimer);
 			mouseEventCleanup();
 			if (input) {
 				(canvas.parentNode || document.body).removeChild(input);
@@ -345,8 +369,6 @@ export default function Design({ products }: { products: any }) {
 		);
 		if (!selectedObject) return;
 
-		console.log(selectedObject.order, maxOrder, minOrder);
-
 		if (order > 0 && selectedObject.order === maxOrder) return;
 		if (order < 0 && selectedObject.order === minOrder) return;
 
@@ -371,7 +393,7 @@ export default function Design({ products }: { products: any }) {
 
 				return obj;
 			});
-			console.log(objects);
+
 			return { ...design, objects };
 		});
 	}
@@ -386,12 +408,20 @@ export default function Design({ products }: { products: any }) {
 						content="Designa din egen träbricka"
 					/>
 				</Head>
-				<main className="min-h-[80vh] flex flex-col gap-4 items-center justify-center">
-					<FaInfo size={48} className="text-gray-400" />
+				<main className="min-h-[90vh] flex flex-col gap-4 items-center justify-center px-8 pb-32">
+					<FaCircleXmark size={64} className="text-gray-400" />
+					<h1 className="xl:text-7xl lg:text-6xl text-4xl font-bold leading-tight text-gray-900 text-center">
+						För liten skärm
+					</h1>
 					<p className="text-center">
 						Designern är inte tillgänglig på mindre skärmar. Var god
 						använd en enhet med större skärm.
 					</p>
+					<Link
+						href="/"
+						className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+						Gå tillbaka
+					</Link>
 				</main>
 			</>
 		);
@@ -411,8 +441,7 @@ export default function Design({ products }: { products: any }) {
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
-								height={720}
-							></canvas>
+								height={720}></canvas>
 							<div className="absolute" ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
@@ -464,8 +493,7 @@ export default function Design({ products }: { products: any }) {
 										}`}
 										onClick={() =>
 											setSelectedTool("select")
-										}
-									>
+										}>
 										<FaMousePointer />
 									</button>
 									<button
@@ -474,8 +502,7 @@ export default function Design({ products }: { products: any }) {
 												? "bg-gray-200"
 												: "bg-gray-100"
 										}`}
-										onClick={() => setSelectedTool("text")}
-									>
+										onClick={() => setSelectedTool("text")}>
 										T
 									</button>
 									<button
@@ -484,8 +511,9 @@ export default function Design({ products }: { products: any }) {
 												? "bg-gray-200"
 												: "bg-gray-100"
 										}`}
-										onClick={() => setSelectedTool("image")}
-									>
+										onClick={() =>
+											setSelectedTool("image")
+										}>
 										<FaImage />
 									</button>
 									<button
@@ -496,8 +524,7 @@ export default function Design({ products }: { products: any }) {
 										}`}
 										onClick={() =>
 											setSelectedTool("rectangle")
-										}
-									>
+										}>
 										<FaSquare />
 									</button>
 									<br />
@@ -506,17 +533,24 @@ export default function Design({ products }: { products: any }) {
 									<button
 										onClick={() => {
 											navigator.clipboard.writeText(
-												JSON.stringify(currentDesign)
+												JSON.stringify({
+													...currentDesign,
+													objects:
+														currentDesign.objects.map(
+															(obj) => ({
+																...obj,
+																image: undefined,
+															})
+														),
+												})
 											);
 										}}
-										className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-									>
+										className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 										<FaCopy /> Kopiera design
 									</button>
 									<button
 										onClick={addToCart}
-										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-									>
+										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 										Lägg till i kundvagn
 									</button>
 								</div>
@@ -544,8 +578,7 @@ export default function Design({ products }: { products: any }) {
 										style={{
 											backgroundColor:
 												trayObject?.color ?? "",
-										}}
-									></div>
+										}}></div>
 								</div>
 								<br />
 								<br />
@@ -553,8 +586,7 @@ export default function Design({ products }: { products: any }) {
 									onClick={() =>
 										setShowCanvasSupport((s) => !s)
 									}
-									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}
-								>
+									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}>
 									{showCanvasSupport ? "Dölj" : "Visa"}{" "}
 									stödlinjer
 								</button>
@@ -569,15 +601,14 @@ export default function Design({ products }: { products: any }) {
 												trayObject?.color === "#ffffff"
 													? "bg-gray-300"
 													: "bg-white"
-											} border aspect-square h-full rounded`}
-										></div>
+											} border aspect-square h-full rounded`}></div>
 										<p>Kanter</p>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div className="row-span-2 max-lg:col-span-3">
+					<div className="row-span-2 lg:col-span-1 col-span-3">
 						<h2 className="text-xl font-bold border-b pb-2 mb-4">
 							Produkter
 						</h2>
@@ -593,8 +624,7 @@ export default function Design({ products }: { products: any }) {
 										)
 											? "border-muted"
 											: ""
-									}`}
-								>
+									}`}>
 									<button
 										onClick={() =>
 											setCurrentDesign((design) => ({
@@ -605,8 +635,7 @@ export default function Design({ products }: { products: any }) {
 												),
 											}))
 										}
-										className="w-full flex items-center max-sm:flex-col sm:text-left max-sm:pb-2"
-									>
+										className="w-full flex items-center max-sm:flex-col sm:text-left max-sm:pb-2">
 										<div className="flex-shrink-0">
 											<img
 												src={product.image}
@@ -634,12 +663,15 @@ export default function Design({ products }: { products: any }) {
 						<h2 className="text-xl font-bold border-b pb-2 mb-4">
 							Mallar
 						</h2>
-						<p>Kommer snart</p>
-						{/* <DesignTemplates
+						{/* <p>Kommer snart</p> */}
+						<DesignTemplates
 							designs={designs}
 							products={products}
-							onSelect={() => setSelectedObjectID(null)}
-						/> */}
+							onSelect={(design) => {
+								setSelectedObjectID(null);
+								setCurrentDesign(design);
+							}}
+						/>
 					</div>
 				</div>
 			</main>
@@ -654,10 +686,8 @@ function DesignTemplates({
 }: {
 	designs: DesignProps[];
 	products: any[];
-	onSelect?: () => void;
+	onSelect: (design: DesignProps) => void;
 }) {
-	const router = useRouter();
-
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			const canvases = document.querySelectorAll(".minicanvas");
@@ -687,21 +717,17 @@ function DesignTemplates({
 		};
 	}, [designs]);
 
-	function onClick(design: DesignProps) {}
-
 	return (
 		<div className="grid grid-cols-3 gap-4">
-			{designs.map((design) => (
-				<li key={design.id} className="list-none">
+			{designs.map((design, i) => (
+				<li key={i} className="list-none">
 					<button
-						onClick={() => onClick(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl"
-					>
+						onClick={() => onSelect(design)}
+						className="w-full aspect-video bg-gray-100 rounded-xl">
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
 							width={1280}
-							height={720}
-						></canvas>
+							height={720}></canvas>
 					</button>
 				</li>
 			))}
@@ -725,28 +751,41 @@ function DesignEditor({
 	return (
 		<SelectedObjectContext.Provider value={{ object, setObject }}>
 			<div className="absolute flex flex-col gap-2 bg-white border rounded-md p-4 z-50">
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-2 h-12">
 					{object?.type === "image" ? (
 						<Input label="Bildkälla" objKey="content" type="file" />
 					) : (
-						<TextArea
-							label={
-								object?.type === "text" ? "Text" : "Bildkälla"
-							}
-							objKey="content"
-						/>
+						object.type === "text" && (
+							<TextArea label="Text" objKey="content" />
+						)
 					)}
-					<button onClick={() => changeOrder(1)}>
-						<FaChevronUp />
-					</button>
-					<button onClick={() => changeOrder(-1)}>
-						<FaChevronDown />
-					</button>
-					<button onClick={() => removeObject()}>
-						<FaTrash size={20} />
-					</button>
+					<div className="border border-gray-300 rounded-md flex items-center gap-4 h-full px-4">
+						{object?.type !== "text" && (
+							<button
+								onClick={() =>
+									setObject({
+										...object,
+										x: 0,
+										y: 0,
+										width: 1,
+										height: 1,
+									})
+								}>
+								<FaExpand />
+							</button>
+						)}
+						<button onClick={() => changeOrder(1)}>
+							<FaChevronUp />
+						</button>
+						<button onClick={() => changeOrder(-1)}>
+							<FaChevronDown />
+						</button>
+						<button onClick={() => removeObject()}>
+							<FaTrash />
+						</button>
+					</div>
 				</div>
-				<div className="flex items-stretch gap-2">
+				<div className="h-12 flex gap-2">
 					<Input label="Färg" objKey="color" type="color" />
 					<Input
 						label="Textstorlek (px)"
@@ -758,6 +797,14 @@ function DesignEditor({
 						objKey="font"
 						options={[
 							{ value: "cinzel", text: "Cinzel" },
+							{ value: "comfortaa", text: "Comfortaa" },
+							{ value: "gourgette", text: "Gourgette" },
+							{ value: "sono", text: "Sono" },
+							{ value: "whisper", text: "Whisper" },
+							{
+								value: "plus jakarta sans",
+								text: "Plus Jakarta Sans",
+							},
 							{ value: "courier new", text: "Courier New" },
 							{
 								value: "times new roman",
@@ -780,15 +827,6 @@ function DesignEditor({
 						objKey="radius"
 						type="number"
 					/>
-					<Select
-						label="Textjustering"
-						objKey="align"
-						options={[
-							{ value: "left", text: "Vänster" },
-							{ value: "center", text: "Mitten" },
-							{ value: "right", text: "Höger" },
-						]}
-					/>
 				</div>
 				<div className="flex items-stretch gap-2"></div>
 			</div>
@@ -809,7 +847,7 @@ function TextArea({ label, objKey }: { label: string; objKey: "content" }) {
 			<textarea
 				name={label}
 				id={label}
-				className="border border-gray-300 rounded-md p-2"
+				className="border border-gray-300 rounded-md p-2 h-full"
 				rows={1}
 				placeholder={label}
 				value={object[objKey]}
@@ -847,11 +885,11 @@ function Input({
 
 	if (type === "color")
 		return (
-			<div className="flex flex-col gap-1 w-full">
+			<div className="flex flex-col gap-1 h-full aspect-square">
 				<label className="sr-only" htmlFor={label}>
 					{label}
 				</label>
-				<div className="relative rounded-md border border-gray-300 py-4 aspect-video h-full">
+				<div className="relative rounded-md border border-gray-300 h-full w-full">
 					<input
 						type="color"
 						name={label}
@@ -869,8 +907,7 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}
-					></div>
+						}}></div>
 				</div>
 			</div>
 		);
@@ -885,9 +922,9 @@ function Input({
 					type="file"
 					name={label}
 					id={label}
-					className="border border-gray-300 rounded-md p-2"
+					className="border border-gray-300 rounded-md p-2 h-full"
 					onChange={(e) => {
-						if (e.target.files) {
+						if (e.target.files && e.target.files[0]) {
 							setObject({
 								...(object as ObjectProps),
 								[objKey]: URL.createObjectURL(
@@ -896,6 +933,42 @@ function Input({
 							});
 						}
 					}}
+				/>
+			</div>
+		);
+
+	if (type === "number")
+		return (
+			<div className="flex gap-2 grow border border-gray-300 rounded-md px-2">
+				<label className="sr-only" htmlFor={label}>
+					{label}
+				</label>
+				<input
+					type="range"
+					name={label}
+					id={label}
+					min="0"
+					max="150"
+					value={objKey in object ? object[objKey] : ""}
+					onChange={(e) =>
+						setObject({
+							...object,
+							[objKey]: e.target.value,
+						})
+					}
+				/>
+				<input
+					type="number"
+					name={label}
+					id={label}
+					className="py-2 h-full w-10 outline-none"
+					value={objKey in object ? object[objKey] : ""}
+					onChange={(e) =>
+						setObject({
+							...object,
+							[objKey]: e.target.value,
+						})
+					}
 				/>
 			</div>
 		);
@@ -909,17 +982,12 @@ function Input({
 				type={type}
 				name={label}
 				id={label}
-				className={`border border-gray-300 rounded-md p-2 ${
-					type === "number" ? "w-16" : ""
-				}`}
+				className="border border-gray-300 rounded-md p-2 h-full"
 				value={objKey in object ? object[objKey] : ""}
 				onChange={(e) =>
 					setObject({
 						...object,
-						[objKey]:
-							type === "number"
-								? Number(e.target.value)
-								: e.target.value,
+						[objKey]: e.target.value,
 					})
 				}
 			/>
@@ -933,7 +1001,7 @@ function Select({
 	options,
 }: {
 	label: string;
-	objKey: "font" | "align" | "fit";
+	objKey: "font" | "fit";
 	options: { value: string; text: string }[];
 }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
@@ -948,65 +1016,30 @@ function Select({
 			<select
 				name={label}
 				id={label}
-				className="border border-gray-300 rounded-md p-2"
+				className="border border-gray-300 rounded-md p-2 h-full"
+				style={objKey === "font" ? { fontFamily: object[objKey] } : {}}
 				value={object[objKey]}
 				onChange={(e) =>
 					setObject({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}
-			>
+				}>
 				{options?.map((option, i) => (
-					<option key={i} value={option.value}>
+					<option
+						key={i}
+						value={option.value}
+						style={
+							objKey === "font"
+								? { fontFamily: option.value }
+								: {}
+						}>
 						{option.text}
 					</option>
 				))}
 			</select>
 		</div>
 	);
-}
-
-function GetObjectDimensions(
-	ctx: CanvasRenderingContext2D,
-	tray: ObjectProps,
-	obj: ObjectProps
-) {
-	function MeasureTextWidth(
-		ctx: CanvasRenderingContext2D,
-		text: ObjectProps
-	) {
-		ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
-		const lines = text.content.split("\n");
-		return Math.max(...lines.map((line) => ctx.measureText(line).width));
-	}
-
-	function MeasureTextHeight(
-		ctx: CanvasRenderingContext2D,
-		text: ObjectProps
-	) {
-		ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
-		const lines = text.content.split("\n");
-		return lines.length * (text.size || 0);
-	}
-
-	const width =
-		obj.type === "text"
-			? MeasureTextWidth(ctx, obj)
-			: (obj.width || 0) * (tray.width || 0);
-	const height =
-		obj.type === "text"
-			? MeasureTextHeight(ctx, obj)
-			: (obj.height || 0) * (tray.height || 0);
-
-	const x =
-		tray.x +
-		(tray.width ?? 0) * obj.x +
-		(obj.align === "center" ? -width / 2 : 0) +
-		(obj.align === "right" ? -width : 0);
-	const y = tray.y + (tray.height ?? 0) * obj.y;
-
-	return { x, y, width, height };
 }
 
 export async function Draw(
@@ -1084,7 +1117,7 @@ function DrawText(
 ) {
 	ctx.fillStyle = text.color ?? "#000";
 	ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
-	ctx.textAlign = text.align as CanvasTextAlign;
+	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
 	const lines = text.content.split("\n");
 
@@ -1464,7 +1497,6 @@ function CanvasTextEditorInput(
 		(object.size ?? 0) * (rect.width / canvas.width)
 	}px`;
 	input.style.fontFamily = object.font ?? "sans-serif";
-	input.style.textAlign = object.align ?? "left";
 	input.style.verticalAlign = "top";
 	input.style.outline = "none";
 	input.style.border = "none";

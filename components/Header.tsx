@@ -34,7 +34,7 @@ function Announcement() {
 	return (
 		<div className="bg-red-500 text-white py-2">
 			<div className="container mx-auto flex justify-center items-center">
-				<p className="text-sm font-semibold">
+				<p className="text-sm font-semibold text-center">
 					HEMSIDAN ÄR UNDER UPPBYGGNAD, DET GÅR INTE ATT BESTÄLLA ÄN!
 				</p>
 			</div>

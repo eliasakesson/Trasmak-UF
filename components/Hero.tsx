@@ -42,7 +42,7 @@ export default function Hero() {
 						<Link
 							href="/products"
 							className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
-							Se våra mallar
+							Se våra brickor
 						</Link>
 					</div>
 				</div>
