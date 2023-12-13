@@ -11,6 +11,7 @@ import {
 	FaInfo,
 	FaCopy,
 	FaExpand,
+	FaSave,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
@@ -254,8 +255,8 @@ export default function Design({ products }: { products: any }) {
 
 		const newCanvas = document.createElement("canvas");
 		newCanvas.width =
-			720 * ((metadata?.width ?? 1) / (metadata?.height ?? 1));
-		newCanvas.height = 720;
+			1440 * ((metadata?.width ?? 1) / (metadata?.height ?? 1));
+		newCanvas.height = 1440;
 
 		const renderTray = GetTrayObjFromCanvas(
 			newCanvas,
@@ -622,6 +623,43 @@ export default function Design({ products }: { products: any }) {
 										<p>Kanter</p>
 									</div>
 								</div>
+								<button
+									onClick={() => {
+										toast.success("Design sparad");
+										localStorage.setItem(
+											"lastDesign",
+											JSON.stringify({
+												...currentDesign,
+												objects:
+													currentDesign.objects.map(
+														(obj) => ({
+															...obj,
+															image: undefined,
+														})
+													),
+											})
+										);
+									}}
+									className="ml-auto border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+									<FaSave /> Spara design
+								</button>
+								<button
+									onClick={() => {
+										const design =
+											localStorage.getItem("lastDesign");
+										const designObject = JSON.parse(
+											design ?? "null"
+										);
+										if (designObject) {
+											toast.success("Design laddad");
+											setCurrentDesign(designObject);
+										} else {
+											toast.error("Ingen design sparad");
+										}
+									}}
+									className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+									<FaCopy /> Ladda spara design
+								</button>
 							</div>
 						</div>
 					</div>
@@ -814,6 +852,7 @@ function DesignEditor({
 						objKey="font"
 						options={[
 							{ value: "cinzel", text: "Cinzel" },
+							{ value: "dancing script", text: "Dancing Script" },
 							{ value: "comfortaa", text: "Comfortaa" },
 							{ value: "gourgette", text: "Gourgette" },
 							{ value: "sono", text: "Sono" },
