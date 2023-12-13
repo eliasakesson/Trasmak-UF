@@ -458,8 +458,8 @@ export default function Design({ products }: { products: any }) {
 							<canvas
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
-								width={1280}
-								height={720}></canvas>
+								width={2560}
+								height={1440}></canvas>
 							<div className="absolute" ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
@@ -781,8 +781,8 @@ function DesignTemplates({
 						className="w-full aspect-video bg-gray-100 rounded-xl">
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
-							width={1280}
-							height={720}></canvas>
+							width={2560}
+							height={1440}></canvas>
 					</button>
 				</li>
 			))}
