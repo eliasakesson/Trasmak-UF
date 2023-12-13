@@ -95,8 +95,8 @@ export default function Design({ products }: { products: any }) {
 			});
 		} else if (products[0]) {
 			setCurrentDesign({
-				...designs[0],
 				id: products[0].id.substring(6, products[0].id.length),
+				objects: designs[0].objects,
 			});
 		}
 	}, [router.query.d, products]);
@@ -243,17 +243,35 @@ export default function Design({ products }: { products: any }) {
 	}, [selectedObjectID]);
 
 	async function addToCart() {
+		const toastID = toast.loading("Laddar upp bilder...");
+
+		const metadata = products.find(
+			(product: any) =>
+				product.id.substring(6, product.id.length) === currentDesign.id
+		)?.metadata;
+
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 		const newCanvas = document.createElement("canvas");
-		newCanvas.width = 1280;
+		newCanvas.width =
+			720 * ((metadata?.width ?? 1) / (metadata?.height ?? 1));
 		newCanvas.height = 720;
 
-		const toastID = toast.loading("Laddar upp bilder...");
+		const renderTray = GetTrayObjFromCanvas(
+			newCanvas,
+			1,
+			metadata?.width,
+			metadata?.height,
+			metadata?.radius,
+			metadata?.bleed,
+			metadata?.edge
+		);
 
-		if (!trayObject) {
+		renderTray.color = trayObject?.color ?? "#ffffff";
+
+		if (!renderTray) {
 			toast.error("Något gick fel", { id: toastID });
-			console.error("Tray object is null");
+			console.error("Tray is null");
 			return;
 		}
 
@@ -279,16 +297,8 @@ export default function Design({ products }: { products: any }) {
 				return;
 			}
 
-			const renderTray = GetTrayObjFromCanvas(
-				newCanvas,
-				1,
-				trayObject.width,
-				trayObject.height,
-				trayObject.radius,
-				trayObject.bleed
-			);
-
 			await DrawRender(newCanvas, renderTray, currentDesign);
+			console.log("Rendered");
 
 			const coverImage = uploadFromCanvas(canvas);
 			const renderImage = uploadFromCanvas(newCanvas);
@@ -299,7 +309,7 @@ export default function Design({ products }: { products: any }) {
 						id: toastID,
 					});
 
-					console.log(values[0]);
+					console.log(values[0], values[1]);
 
 					addProductToCart(product, toastID, {
 						image: values[0],
@@ -426,8 +436,7 @@ export default function Design({ products }: { products: any }) {
 					</p>
 					<Link
 						href="/"
-						className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors"
-					>
+						className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
 						Gå tillbaka
 					</Link>
 				</main>
@@ -449,8 +458,7 @@ export default function Design({ products }: { products: any }) {
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
-								height={720}
-							></canvas>
+								height={720}></canvas>
 							<div className="absolute" ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
@@ -502,8 +510,7 @@ export default function Design({ products }: { products: any }) {
 										}`}
 										onClick={() =>
 											setSelectedTool("select")
-										}
-									>
+										}>
 										<FaMousePointer />
 									</button>
 									<button
@@ -512,8 +519,7 @@ export default function Design({ products }: { products: any }) {
 												? "bg-gray-200"
 												: "bg-gray-100"
 										}`}
-										onClick={() => setSelectedTool("text")}
-									>
+										onClick={() => setSelectedTool("text")}>
 										T
 									</button>
 									<button
@@ -522,8 +528,9 @@ export default function Design({ products }: { products: any }) {
 												? "bg-gray-200"
 												: "bg-gray-100"
 										}`}
-										onClick={() => setSelectedTool("image")}
-									>
+										onClick={() =>
+											setSelectedTool("image")
+										}>
 										<FaImage />
 									</button>
 									<button
@@ -534,8 +541,7 @@ export default function Design({ products }: { products: any }) {
 										}`}
 										onClick={() =>
 											setSelectedTool("rectangle")
-										}
-									>
+										}>
 										<FaSquare />
 									</button>
 									<br />
@@ -556,14 +562,12 @@ export default function Design({ products }: { products: any }) {
 												})
 											);
 										}}
-										className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-									>
+										className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 										<FaCopy /> Kopiera design
 									</button>
 									<button
 										onClick={addToCart}
-										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-									>
+										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 										Lägg till i kundvagn
 									</button>
 								</div>
@@ -591,8 +595,7 @@ export default function Design({ products }: { products: any }) {
 										style={{
 											backgroundColor:
 												trayObject?.color ?? "",
-										}}
-									></div>
+										}}></div>
 								</div>
 								<br />
 								<br />
@@ -600,8 +603,7 @@ export default function Design({ products }: { products: any }) {
 									onClick={() =>
 										setShowCanvasSupport((s) => !s)
 									}
-									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}
-								>
+									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}>
 									{showCanvasSupport ? "Dölj" : "Visa"}{" "}
 									stödlinjer
 								</button>
@@ -616,8 +618,7 @@ export default function Design({ products }: { products: any }) {
 												trayObject?.color === "#ffffff"
 													? "bg-gray-300"
 													: "bg-white"
-											} border aspect-square h-full rounded`}
-										></div>
+											} border aspect-square h-full rounded`}></div>
 										<p>Kanter</p>
 									</div>
 								</div>
@@ -640,8 +641,7 @@ export default function Design({ products }: { products: any }) {
 										)
 											? "border-muted"
 											: ""
-									}`}
-								>
+									}`}>
 									<button
 										onClick={() =>
 											setCurrentDesign((design) => ({
@@ -652,8 +652,7 @@ export default function Design({ products }: { products: any }) {
 												),
 											}))
 										}
-										className="w-full flex items-center max-sm:flex-col sm:text-left max-sm:pb-2"
-									>
+										className="w-full flex items-center max-sm:flex-col sm:text-left max-sm:pb-2">
 										<div className="flex-shrink-0">
 											<img
 												src={product.image}
@@ -741,13 +740,11 @@ function DesignTemplates({
 				<li key={i} className="list-none">
 					<button
 						onClick={() => onSelect(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl"
-					>
+						className="w-full aspect-video bg-gray-100 rounded-xl">
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
 							width={1280}
-							height={720}
-						></canvas>
+							height={720}></canvas>
 					</button>
 				</li>
 			))}
@@ -790,8 +787,7 @@ function DesignEditor({
 										width: 1,
 										height: 1,
 									})
-								}
-							>
+								}>
 								<FaExpand />
 							</button>
 						)}
@@ -928,8 +924,7 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}
-					></div>
+						}}></div>
 				</div>
 			</div>
 		);
@@ -1046,8 +1041,7 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}
-			>
+				}>
 				{options?.map((option, i) => (
 					<option
 						key={i}
@@ -1056,8 +1050,7 @@ function Select({
 							objKey === "font"
 								? { fontFamily: option.value }
 								: {}
-						}
-					>
+						}>
 						{option.text}
 					</option>
 				))}
@@ -1124,6 +1117,7 @@ async function DrawRender(
 
 	for (let i = 0; i < design.objects.length; i++) {
 		const obj = design.objects[i];
+		console.log(obj);
 		if (obj.type === "text") {
 			DrawText(ctx, tray, obj);
 		} else if (obj.type === "rectangle") {
@@ -1314,7 +1308,7 @@ function DrawTray(
 ) {
 	GetRoundedRect(ctx, x, y, width ?? 0, height ?? 0, radius ?? 0);
 	ctx.fillStyle = color ?? "#eeeeee";
-	// ctx.fill();
+	ctx.fill();
 	ctx.clip();
 }
 
