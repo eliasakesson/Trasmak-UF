@@ -5,6 +5,7 @@ import Section1 from "@/components/Section1";
 import Section2 from "@/components/Section2";
 import Head from "next/head";
 import Inspiration from "@/components/Inspiration";
+import TemplateRow from "@/components/TemplateRow";
 
 export default function Home({ products }: { products: any }) {
 	return (
@@ -29,12 +30,15 @@ export default function Home({ products }: { products: any }) {
 						/>
 					</div>
 					<Section1 />
-					<ProductRow
-						title="Våra favoritmallar"
-						description="Skapa personliga brickor baserat på våra bästa mallar!"
-						products={products}
-						type="template"
-					/>
+					<div className="max-w-7xl mx-auto px-4">
+						<ProductRow
+							title="Våra favoritmallar"
+							description="Skapa personliga brickor baserat på våra bästa mallar!"
+							products={products}
+							type="template"
+						/>
+						<TemplateRow products={products} />
+					</div>
 					<Section2 />
 					<div className="max-w-7xl mx-auto px-4 w-full">
 						<Inspiration />

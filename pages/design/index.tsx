@@ -81,13 +81,18 @@ export default function Design({ products }: { products: any }) {
 
 	useEffect(() => {
 		if (router.query.d && currentDesign.id !== router.query.d) {
-			const rtDesign = designs.find((d) => d.id === router.query.d);
-			if (rtDesign) setCurrentDesign(rtDesign);
-			else
-				setCurrentDesign({
-					...designs[0],
-					id: router.query.d as string,
-				});
+			if (router.query.i) {
+				const rtDesign = designs[parseInt(router.query.i as string)];
+				if (rtDesign) {
+					setCurrentDesign(rtDesign);
+					return;
+				}
+			}
+
+			setCurrentDesign({
+				...designs[0],
+				id: router.query.d as string,
+			});
 		} else if (products[0]) {
 			setCurrentDesign({
 				...designs[0],
@@ -293,6 +298,8 @@ export default function Design({ products }: { products: any }) {
 					toast.loading("Lägger till i kundvagnen...", {
 						id: toastID,
 					});
+
+					console.log(values[0]);
 
 					addProductToCart(product, toastID, {
 						image: values[0],
@@ -1111,7 +1118,7 @@ async function DrawRender(
 	ctx.reset();
 	ctx.save();
 
-	DrawTray(ctx, tray, false);
+	DrawTray(ctx, tray);
 
 	design.objects.sort((a, b) => a.order - b.order);
 
@@ -1303,14 +1310,11 @@ function HighlightSelectedObject(
 
 function DrawTray(
 	ctx: any,
-	{ x, y, width, height, radius, color }: ObjectProps,
-	fill: boolean = true
+	{ x, y, width, height, radius, color }: ObjectProps
 ) {
 	GetRoundedRect(ctx, x, y, width ?? 0, height ?? 0, radius ?? 0);
-	if (fill) {
-		ctx.fillStyle = color ?? "#eeeeee";
-		ctx.fill();
-	}
+	ctx.fillStyle = color ?? "#eeeeee";
+	// ctx.fill();
 	ctx.clip();
 }
 

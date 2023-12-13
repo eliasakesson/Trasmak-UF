@@ -2,8 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaStar } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
-import { useShoppingCart, formatCurrencyString } from "use-shopping-cart";
-import toast from "react-hot-toast";
+import { formatCurrencyString } from "use-shopping-cart";
 
 export default function ProductRow({
 	title,
@@ -28,7 +27,8 @@ export default function ProductRow({
 		<section
 			className={`flex flex-col ${
 				!left ? "items-center text-center" : ""
-			} space-y-4 w-full`}>
+			} space-y-4 w-full`}
+		>
 			{title && <h2 className="text-4xl font-bold">{title}</h2>}
 			{description && (
 				<p className="text-muted text-lg max-w-[calc(100%-16px)]">
@@ -80,15 +80,8 @@ export function ProductCard({
 	currency: string;
 	type: string;
 }) {
-	const { addItem } = useShoppingCart();
-
 	return (
-		<Link
-			href={
-				/* type === "template" */ true
-					? `/design?d=${id.substring(6, id.length)}`
-					: `/products/${id.substring(6, id.length)}`
-			}>
+		<Link href={`/design?d=${id.substring(6, id.length)}`}>
 			<div className="bg-white rounded-xl overflow-hidden border border-gray-100 h-full">
 				<div className="relative overflow-hidden bg-gray-100 aspect-[4/3] p-4">
 					<div className="w-full h-full">
@@ -112,29 +105,6 @@ export function ProductCard({
 								})}
 							</p>
 						</div>
-						{/* {type !== "template" && (
-							<button
-								className="bg-primary text-white sm:p-4 px-4 py-2 sm:rounded-lg rounded-md flex items-center justify-center gap-2"
-								onClick={(e) => {
-									e.preventDefault();
-									addItem({
-										id,
-										name,
-										price,
-										image,
-										currency,
-									});
-									toast.success(
-										`${name} tillagd i varukorgen`
-									);
-								}}
-							>
-								<span className="md:hidden">
-									Lägg i kundvagnen
-								</span>
-								<FaPlus />
-							</button>
-						)} */}
 					</div>
 				</div>
 			</div>
