@@ -22,6 +22,9 @@ export default function Document() {
 					rel="stylesheet"
 					href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Sono&family=Whisper&display=swap"
 				/>
+				<link
+					href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Sono&family=Whisper&display=swap"
+					rel="stylesheet"></link>
 			</Head>
 			<body>
 				<Main />
