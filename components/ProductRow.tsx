@@ -27,8 +27,7 @@ export default function ProductRow({
 		<section
 			className={`flex flex-col ${
 				!left ? "items-center text-center" : ""
-			} space-y-4 w-full`}
-		>
+			} space-y-4 w-full`}>
 			{title && <h2 className="text-4xl font-bold">{title}</h2>}
 			{description && (
 				<p className="text-muted text-lg max-w-[calc(100%-16px)]">
@@ -82,11 +81,11 @@ export function ProductCard({
 }) {
 	return (
 		<Link href={`/design?d=${id.substring(6, id.length)}`}>
-			<div className="bg-white rounded-xl overflow-hidden border border-gray-100 h-full">
-				<div className="relative overflow-hidden bg-gray-100 aspect-[4/3] p-4">
+			<div className="h-full">
+				<div className="relative aspect-square">
 					<div className="w-full h-full">
 						<Image
-							className="mix-blend-multiply object-contain w-full h-full"
+							className="object-contain w-full h-full hue-rotate-[50deg] saturate-150"
 							src={image}
 							alt=""
 							width={500}
@@ -94,7 +93,7 @@ export function ProductCard({
 						/>
 					</div>
 				</div>
-				<div className="p-4 sm:space-y-2 space-y-1">
+				<div className="py-4 sm:space-y-2 space-y-1">
 					<h3 className="font-medium sm:text-xl text-base">{name}</h3>
 					<div className="flex justify-between sm:items-end sm:flex-row flex-col gap-4">
 						<div className="flex items-center gap-2">

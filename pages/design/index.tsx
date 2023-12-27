@@ -142,13 +142,15 @@ export default function Design({ products }: { products: any }) {
 
 		let input: HTMLTextAreaElement | null = null;
 
-		Draw(
-			canvas,
-			trayObject,
-			currentDesign,
-			selectedObjectID,
-			showCanvasSupport
-		);
+		const drawTimer = setTimeout(() => {
+			Draw(
+				canvas,
+				trayObject,
+				currentDesign,
+				selectedObjectID,
+				showCanvasSupport
+			);
+		}, 100);
 
 		LoadImages(currentDesign, (design) =>
 			Draw(
@@ -225,6 +227,7 @@ export default function Design({ products }: { products: any }) {
 		);
 
 		return () => {
+			clearTimeout(drawTimer);
 			mouseEventCleanup();
 			if (input) {
 				(canvas.parentNode || document.body).removeChild(input);
@@ -247,6 +250,13 @@ export default function Design({ products }: { products: any }) {
 	async function addToCart() {
 		const toastID = toast.loading("Laddar upp bilder...");
 
+		if (isAddingToCart.current === true) {
+			toast.error("Var god vänta...", { id: toastID });
+			return;
+		}
+
+		isAddingToCart.current = true;
+
 		const metadata = products.find(
 			(product: any) =>
 				product.id.substring(6, product.id.length) === currentDesign.id
@@ -254,10 +264,13 @@ export default function Design({ products }: { products: any }) {
 
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
+		const height = (metadata?.height ?? 33) * 0.393701 * 300;
+		const upScaleFactor = height / canvas.height;
+
 		const newCanvas = document.createElement("canvas");
 		newCanvas.width =
-			1440 * ((metadata?.width ?? 1) / (metadata?.height ?? 1));
-		newCanvas.height = 1440;
+			height * ((metadata?.width ?? 1) / (metadata?.height ?? 1));
+		newCanvas.height = height;
 
 		const renderTray = GetTrayObjFromCanvas(
 			newCanvas,
@@ -277,13 +290,6 @@ export default function Design({ products }: { products: any }) {
 			return;
 		}
 
-		if (isAddingToCart.current === true) {
-			toast.error("Var god vänta...", { id: toastID });
-			return;
-		}
-
-		isAddingToCart.current = true;
-
 		try {
 			const product = products.find(
 				(product: any) => product.id == "price_" + currentDesign.id
@@ -299,7 +305,12 @@ export default function Design({ products }: { products: any }) {
 				return;
 			}
 
-			await DrawRender(newCanvas, renderTray, currentDesign);
+			await DrawRender(
+				newCanvas,
+				renderTray,
+				currentDesign,
+				upScaleFactor
+			);
 			console.log("Rendered");
 
 			const coverImage = uploadFromCanvas(canvas);
@@ -438,8 +449,7 @@ export default function Design({ products }: { products: any }) {
 					</p>
 					<Link
 						href="/"
-						className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors"
-					>
+						className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
 						Gå tillbaka
 					</Link>
 				</main>
@@ -456,13 +466,12 @@ export default function Design({ products }: { products: any }) {
 			<main className="max-w-7xl mx-auto px-8 py-16 space-y-8">
 				<div className="grid lg:grid-cols-4 lg:grid-rows-2 gap-8">
 					<div className="col-span-3 space-y-4">
-						<div className="relative">
+						<div className="relative" id="canvasparent">
 							<canvas
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
-								width={2560}
-								height={1440}
-							></canvas>
+								width={1280}
+								height={720}></canvas>
 							<div className="absolute" ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
@@ -504,7 +513,9 @@ export default function Design({ products }: { products: any }) {
 						</div>
 						<div className="flex flex-col gap-2">
 							<h3 className="font-semibold">Verktyg</h3>
-							<div className="flex justify-between max-sm:flex-col gap-4">
+							<div
+								className="flex justify-between max-sm:flex-col gap-4"
+								id="tools">
 								<div className="flex items-center gap-2 h-12">
 									<button
 										className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
@@ -515,7 +526,7 @@ export default function Design({ products }: { products: any }) {
 										onClick={() =>
 											setSelectedTool("select")
 										}
-									>
+										id="selecttool">
 										<FaMousePointer />
 									</button>
 									<button
@@ -525,7 +536,7 @@ export default function Design({ products }: { products: any }) {
 												: "bg-gray-100"
 										}`}
 										onClick={() => setSelectedTool("text")}
-									>
+										id="texttool">
 										T
 									</button>
 									<button
@@ -535,7 +546,7 @@ export default function Design({ products }: { products: any }) {
 												: "bg-gray-100"
 										}`}
 										onClick={() => setSelectedTool("image")}
-									>
+										id="imagetool">
 										<FaImage />
 									</button>
 									<button
@@ -547,7 +558,7 @@ export default function Design({ products }: { products: any }) {
 										onClick={() =>
 											setSelectedTool("rectangle")
 										}
-									>
+										id="rectangletool">
 										<FaSquare />
 									</button>
 									<br />
@@ -569,14 +580,12 @@ export default function Design({ products }: { products: any }) {
 												})
 											);
 										}}
-										className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-									>
+										className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 										<FaCopy /> Kopiera design
 									</button>
 									<button
 										onClick={addToCart}
-										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-									>
+										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 										Lägg till i kundvagn
 									</button>
 								</div>
@@ -604,8 +613,7 @@ export default function Design({ products }: { products: any }) {
 										style={{
 											backgroundColor:
 												trayObject?.color ?? "",
-										}}
-									></div>
+										}}></div>
 								</div>
 								<br />
 								<br />
@@ -613,8 +621,7 @@ export default function Design({ products }: { products: any }) {
 									onClick={() =>
 										setShowCanvasSupport((s) => !s)
 									}
-									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}
-								>
+									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}>
 									{showCanvasSupport ? "Dölj" : "Visa"}{" "}
 									stödlinjer
 								</button>
@@ -629,8 +636,7 @@ export default function Design({ products }: { products: any }) {
 												trayObject?.color === "#ffffff"
 													? "bg-gray-300"
 													: "bg-white"
-											} border aspect-square h-full rounded`}
-										></div>
+											} border aspect-square h-full rounded`}></div>
 										<p>Kanter</p>
 									</div>
 								</div>
@@ -651,8 +657,7 @@ export default function Design({ products }: { products: any }) {
 											})
 										);
 									}}
-									className="ml-auto border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-								>
+									className="ml-auto border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 									<FaSave /> Spara design
 								</button>
 								<button
@@ -669,8 +674,7 @@ export default function Design({ products }: { products: any }) {
 											toast.error("Ingen design sparad");
 										}
 									}}
-									className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-								>
+									className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 									<FaCopy /> Ladda spara design
 								</button>
 							</div>
@@ -680,20 +684,21 @@ export default function Design({ products }: { products: any }) {
 						<h2 className="text-xl font-bold border-b pb-2 mb-4">
 							Produkter
 						</h2>
-						<ul className="lg:flex flex-col grid grid-cols-2 gap-2">
+						<ul
+							className="lg:flex flex-col grid grid-cols-2 gap-2"
+							id="products">
 							{products.map((product: Product) => (
 								<li
 									key={product.id}
-									className={`border rounded-md px-2 ${
+									className={`border-2 rounded-lg overflow-hidden ${
 										currentDesign.id ===
 										product.id.substring(
 											6,
 											product.id.length
 										)
-											? "border-muted"
+											? "border-muted_light"
 											: ""
-									}`}
-								>
+									}`}>
 									<button
 										onClick={() =>
 											setCurrentDesign((design) => ({
@@ -704,13 +709,14 @@ export default function Design({ products }: { products: any }) {
 												),
 											}))
 										}
-										className="w-full flex items-center max-sm:flex-col sm:text-left max-sm:pb-2"
-									>
+										className="w-full flex gap-4 items-center max-sm:flex-col sm:text-left max-sm:pb-2">
 										<div className="flex-shrink-0">
 											<img
-												src={product.image}
+												src={product.image ?? ""}
 												alt={product.name}
-												className="w-24 h-24 rounded-md object-contain"
+												className="w-24 h-24 object-contain hue-rotate-[50deg] saturate-150"
+												width={96}
+												height={96}
 											/>
 										</div>
 										<div className="flex-grow">
@@ -788,22 +794,20 @@ function DesignTemplates({
 	}, [designs]);
 
 	return (
-		<div className="grid grid-cols-3 gap-4">
+		<ul className="grid grid-cols-3 gap-4" id="templates">
 			{designs.map((design, i) => (
 				<li key={i} className="list-none">
 					<button
 						onClick={() => onSelect(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl"
-					>
+						className="w-full aspect-video bg-gray-100 rounded-xl">
 						<canvas
 							className="minicanvas bg-gray-100 rounded-xl w-full"
-							width={2560}
-							height={1440}
-						></canvas>
+							width={1280}
+							height={720}></canvas>
 					</button>
 				</li>
 			))}
-		</div>
+		</ul>
 	);
 }
 
@@ -822,7 +826,9 @@ function DesignEditor({
 
 	return (
 		<SelectedObjectContext.Provider value={{ object, setObject }}>
-			<div className="absolute flex flex-col gap-2 bg-white border rounded-md p-4 z-50">
+			<div
+				className="flex flex-col gap-2 bg-white border rounded-md p-4 z-50"
+				id="editor">
 				<div className="flex items-center gap-2 h-12">
 					{object?.type === "image" ? (
 						<Input label="Bildkälla" objKey="content" type="file" />
@@ -842,17 +848,23 @@ function DesignEditor({
 										width: 1,
 										height: 1,
 									})
-								}
-							>
+								}>
 								<FaExpand />
 							</button>
 						)}
-						<button onClick={() => changeOrder(1)}>
-							<FaChevronUp />
-						</button>
-						<button onClick={() => changeOrder(-1)}>
-							<FaChevronDown />
-						</button>
+						<div className="flex flex-col items-center border-x">
+							<span className="text-sm leading-none -mt-6 mb-2 px-2 bg-white border-x">
+								Lager
+							</span>
+							<div className="flex gap-4">
+								<button onClick={() => changeOrder(1)}>
+									<FaChevronUp />
+								</button>
+								<button onClick={() => changeOrder(-1)}>
+									<FaChevronDown />
+								</button>
+							</div>
+						</div>
 						<button onClick={() => removeObject()}>
 							<FaTrash />
 						</button>
@@ -981,8 +993,7 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}
-					></div>
+						}}></div>
 				</div>
 			</div>
 		);
@@ -1099,8 +1110,7 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}
-			>
+				}>
 				{options?.map((option, i) => (
 					<option
 						key={i}
@@ -1109,8 +1119,7 @@ function Select({
 							objKey === "font"
 								? { fontFamily: option.value }
 								: {}
-						}
-					>
+						}>
 						{option.text}
 					</option>
 				))}
@@ -1163,7 +1172,8 @@ export async function Draw(
 async function DrawRender(
 	canvas: HTMLCanvasElement,
 	tray: ObjectProps,
-	design: DesignProps
+	design: DesignProps,
+	scale: number
 ) {
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
@@ -1179,11 +1189,11 @@ async function DrawRender(
 		const obj = design.objects[i];
 		console.log(obj);
 		if (obj.type === "text") {
-			DrawText(ctx, tray, obj);
+			DrawText(ctx, tray, obj, scale);
 		} else if (obj.type === "rectangle") {
-			DrawRectangle(ctx, tray, obj);
+			DrawRectangle(ctx, tray, obj, scale);
 		} else if (obj.type === "image") {
-			await DrawImage(ctx, tray, obj);
+			await DrawImage(ctx, tray, obj, scale);
 		}
 	}
 }
@@ -1191,10 +1201,13 @@ async function DrawRender(
 function DrawText(
 	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
-	text: ObjectProps
+	text: ObjectProps,
+	scale: number = 1
 ) {
 	ctx.fillStyle = text.color ?? "#000";
-	ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
+	ctx.font = `bold ${(text.size ?? 1) * scale}px ${
+		text.font ?? "sans-serif"
+	}`;
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
 	const lines = text.content.split("\n");
@@ -1202,7 +1215,9 @@ function DrawText(
 	lines.forEach((line, i) => {
 		const x = (tray.x ?? 0) + (tray.width ?? 0) * text.x;
 		const y =
-			(tray.y ?? 0) + (tray.height ?? 0) * text.y + (text.size ?? 0) * i;
+			(tray.y ?? 0) +
+			(tray.height ?? 0) * text.y +
+			(text.size ?? 0) * scale * i;
 
 		ctx.fillText(line, x, y);
 	});
@@ -1211,12 +1226,16 @@ function DrawText(
 function DrawRectangle(
 	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
-	rectangle: ObjectProps
+	rectangle: ObjectProps,
+	scale: number = 1
 ) {
 	const { x, y, width, height } = GetObjectDimensions(ctx, tray, rectangle);
 
 	// Make sure radius is not larger than half the width or height
-	const radius = Math.min(Math.min(width, height) / 2, rectangle.radius ?? 0);
+	const radius = Math.max(
+		Math.min(Math.min(width, height) / 2, (rectangle.radius ?? 0) * scale),
+		0
+	);
 
 	ctx.save();
 	GetRoundedRect(ctx, x, y, width, height, radius);
@@ -1230,7 +1249,8 @@ function DrawRectangle(
 async function DrawImage(
 	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
-	image: ObjectProps
+	image: ObjectProps,
+	scale: number = 1
 ) {
 	const loadImage = (image: ObjectProps): Promise<void> => {
 		function DrawImage(
@@ -1245,9 +1265,12 @@ async function DrawImage(
 			);
 
 			// Make sure radius is not larger than half the width or height
-			const radius = Math.min(
-				Math.min(width, height) / 2,
-				image.radius ?? 0
+			const radius = Math.max(
+				Math.min(
+					Math.min(width, height) / 2,
+					(image.radius ?? 0) * scale
+				),
+				0
 			);
 
 			const { offsetX, offsetY, newWidth, newHeight } =
@@ -1461,8 +1484,17 @@ function GetRoundedRect(
 ) {
 	ctx.beginPath();
 
-	if (width > height ? radius == height / 2 : radius == width / 2) {
-		ctx.arc(x + radius, y + radius, radius, 0, Math.PI * 2);
+	if (height >= width && width / 2 <= radius) {
+		ctx.arc(x + radius, y + radius, radius, Math.PI / 2, (Math.PI * 3) / 2);
+		ctx.lineTo(x + width - radius, y);
+		ctx.arc(
+			x + width - radius,
+			y + radius,
+			radius,
+			(Math.PI * 3) / 2,
+			Math.PI / 2
+		);
+		ctx.lineTo(x + radius, y + height);
 	} else {
 		ctx.moveTo(x, y + radius);
 		ctx.lineTo(x, y + height - radius);
@@ -1492,12 +1524,12 @@ export function GetTrayObjFromCanvas(
 	bleed: number = 10,
 	edge: number = 20
 ): ObjectProps {
-	const aspectRatio = (width + bleed / 20) / (height + bleed / 20);
+	const aspectRatio = (width + bleed / 10) / (height + bleed / 10);
 	const newWidth = canvas.height * heightProcentage * aspectRatio;
 	const newHeight = canvas.height * heightProcentage;
 	const newRadius =
 		(radius / 100) * (newWidth > newHeight ? newHeight : newWidth);
-	const newBleed = (bleed / 20) * (newWidth / width);
+	const newBleed = (bleed / 10) * (newWidth / width);
 	const newEdge = (edge / 20) * (newWidth / width);
 
 	return {

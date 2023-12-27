@@ -225,15 +225,6 @@ export default function SetupMouseEvents(
 			}
 
 			if (dragType === "move") {
-				const width =
-					dragObject.width ||
-					GetObjectDimensions(ctx, trayObject, dragObject).width /
-						(trayObject.width || 1);
-				const height =
-					dragObject.height ||
-					GetObjectDimensions(ctx, trayObject, dragObject).height /
-						(trayObject.height || 1);
-
 				dragObject.x =
 					(clickX - dragObjectOffset.x - trayObject.x) /
 					(trayObject.width || 1);
@@ -249,7 +240,7 @@ export default function SetupMouseEvents(
 					resizeDirection === "bottom-right"
 				) {
 					dragObject.width = Math.max(
-						0,
+						0.001,
 						(clickX - trayObject.x) / (trayObject.width || 1) -
 							dragObject.x
 					);
@@ -259,10 +250,13 @@ export default function SetupMouseEvents(
 					resizeDirection === "bottom-left"
 				) {
 					const oldX = dragObject.x ?? 0;
-					dragObject.x =
+					const newX =
 						(clickX - trayObject.x) / (trayObject.width || 1);
+					dragObject.x =
+						newX < newX + (dragObject.width ?? 0) ? newX : oldX;
+
 					dragObject.width = Math.max(
-						0,
+						0.001,
 						oldX - dragObject.x + (dragObject.width ?? 0)
 					);
 				}
@@ -273,10 +267,12 @@ export default function SetupMouseEvents(
 					resizeDirection === "top-right"
 				) {
 					const oldY = dragObject.y ?? 0;
-					dragObject.y =
+					const newY =
 						(clickY - trayObject.y) / (trayObject.height || 1);
+					dragObject.y =
+						newY < newY + (dragObject.height ?? 0) ? newY : oldY;
 					dragObject.height = Math.max(
-						0,
+						0.001,
 						oldY - dragObject.y + (dragObject.height ?? 0)
 					);
 				} else if (
@@ -285,6 +281,7 @@ export default function SetupMouseEvents(
 					resizeDirection === "bottom-right"
 				) {
 					dragObject.height = Math.max(
+						0.001,
 						(clickY - trayObject.y) / (trayObject.height || 1) -
 							dragObject.y
 					);
