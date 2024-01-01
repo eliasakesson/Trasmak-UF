@@ -75,7 +75,7 @@ function Welcome({
 			<h1 className="xl:text-4xl lg:text-3xl text-2xl font-bold leading-tight text-gray-900 text-center">
 				Hej!
 			</h1>
-			<p className="xl:text-xl text-base text-gray-600 max-w-prose">
+			<p className="xl:text-xl text-base text-gray-600 1x-w-prose">
 				Ser ut som att du är ny till designverktyget. Hur vill du
 				fortsätta?
 			</p>
@@ -281,6 +281,7 @@ function Step({
 	return (
 		<div
 			ref={ref}
+			key={title}
 			className="absolute bg-white rounded-xl p-8 flex flex-col gap-4 z-50 shadow-md">
 			<h2 className="xl:text-2xl lg:text-xl text-lg font-semibold leading-tight text-gray-900">
 				{title}
