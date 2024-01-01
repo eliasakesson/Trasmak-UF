@@ -52,17 +52,17 @@ export default function Footer() {
 									trasmakuf@gmail.com
 								</span>
 							</a>
-							{/* <a href="tel:0701234567">
+							<a href="tel:0701234567">
 								<span className="text-blue-500 hover:text-blue-600">
-									070-123 45 67
+									070-344 23 65
 								</span>
-							</a> */}
+							</a>
 						</div>
 					</div>
 				</div>
 				<div className="py-4 border-t flex sm:flex-row flex-col-reverse gap-2 justify-between items-center">
 					<p className="text-gray-500">
-						© 2023 Träsmak UF. All rights reserved.
+						© 2024 Träsmak UF. All rights reserved.
 					</p>
 					{/* <p className="text-gray-500">
 						Created by{" "}

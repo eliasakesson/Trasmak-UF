@@ -309,10 +309,10 @@ export default function SetupMouseEvents(
 
 		const width = pointerEndX
 			? (pointerEndX - pointerX) / (trayObject.width || 1)
-			: 0.2;
+			: 0.5;
 		const height = pointerEndY
 			? (pointerEndY - pointerY) / (trayObject.height || 1)
-			: 0.2;
+			: 0.5;
 
 		const id =
 			currentDesign.objects.length > 0

@@ -11,7 +11,11 @@ import {
 import { LuTextCursor } from "react-icons/lu";
 import { motion } from "framer-motion";
 
-export default function DesignerGuide() {
+export default function DesignerGuide({
+	currentTool,
+}: {
+	currentTool: string;
+}) {
 	const [show, setShow] = useState<"hide" | "welcome" | "tutorial">(
 		"welcome"
 	);
@@ -43,7 +47,16 @@ export default function DesignerGuide() {
 					</div>
 				</motion.div>
 			)}
-			{show === "tutorial" && <Tutorial setShow={setShow} />}
+			{show === "tutorial" && (
+				<>
+					<Tutorial setShow={setShow} currentTool={currentTool} />
+					<button
+						onClick={() => setShow("hide")}
+						className="fixed right-4 bottom-4 flex gap-2 items-center font-semibold border-gray-300 border-2 hover:border-red-300 hover:bg-red-100 rounded-md px-4 py-2 transition-colors">
+						<FaTimes /> Avbryt tutorial
+					</button>
+				</>
+			)}
 		</>
 	);
 }
@@ -88,7 +101,13 @@ function Welcome({
 	);
 }
 
-function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
+function Tutorial({
+	setShow,
+	currentTool,
+}: {
+	setShow: (show: "hide") => void;
+	currentTool: string;
+}) {
 	const [step, setStep] = useState(0);
 
 	const steps = [
@@ -115,6 +134,8 @@ function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 			nextStep={NextStep}
 			elementID="texttool"
 			position="right"
+			nextOnToolSelect="text"
+			currentTool={currentTool}
 		/>,
 		<Step
 			title="Sätt ut text"
@@ -126,11 +147,20 @@ function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 			position="right"
 		/>,
 		<Step
+			title="Ändra text"
+			text="När du har placerat ut en text kan du ändra textens egenskaper i rutan till vänster. Du kan ändra textstorlek, typsnitt och färg."
+			nextStep={NextStep}
+			elementID="editor"
+			position="right"
+		/>,
+		<Step
 			title="Välj Bildverktyget"
 			text=""
 			nextStep={NextStep}
 			elementID="imagetool"
 			position="right"
+			nextOnToolSelect="image"
+			currentTool={currentTool}
 		/>,
 		<Step
 			title="Sätt ut bild"
@@ -143,9 +173,27 @@ function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 		/>,
 		<Step
 			title="Ändra bild"
-			text="När du har placerat ut en bild kan du ändra bilden och andra egenskaper genom att välja en bild i rutan till vänster. Du kan också ändra storlek och placering genom att dra i hörnen på bilden."
+			text="När du har placerat ut en bild kan du ändra bilden genom att välja en bild i rutan till vänster. Du kan även justera rundning på hörnen, och välja mellan olika fyllningslägen för bilden, 
+			till exempel om bilden ska fylla hela platsen eller behålla sin proportioner."
 			nextStep={NextStep}
 			elementID="editor"
+			position="right"
+		/>,
+		<Step
+			title="Välj Muspekaren"
+			text=""
+			nextStep={NextStep}
+			elementID="imagetool"
+			position="right"
+			nextOnToolSelect="select"
+			currentTool={currentTool}
+		/>,
+		<Step
+			title="Flytta objekt"
+			text="När du har valt muspekaren kan du flytta objekt genom att klicka på dem och dra dem till en ny plats. 
+			Du kan även ändra storlek på bilder och rektanglar genom att dra i hörnen på dem. När du är klar kan du avmarkera objektet genom att klicka utanför."
+			nextStep={NextStep}
+			elementID="canvasparent"
 			position="right"
 		/>,
 		<Step
@@ -174,12 +222,16 @@ function Step({
 	nextStep,
 	elementID,
 	position,
+	nextOnToolSelect,
+	currentTool,
 }: {
 	title: string;
 	text: string;
 	nextStep: () => void;
 	elementID?: string;
 	position?: "left" | "right" | "top" | "bottom";
+	nextOnToolSelect?: "select" | "text" | "image";
+	currentTool?: string;
 }) {
 	const gap = 16;
 	const ref = useRef<HTMLDivElement>(null);
@@ -219,6 +271,12 @@ function Step({
 			});
 		}
 	}, [elementID, position, gap, ref]);
+
+	useEffect(() => {
+		if (nextOnToolSelect && currentTool === nextOnToolSelect) {
+			nextStep();
+		}
+	}, [currentTool, nextOnToolSelect]);
 
 	return (
 		<div
