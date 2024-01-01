@@ -1,4 +1,11 @@
-import { useEffect, useState, useContext, createContext, useRef } from "react";
+import {
+	useEffect,
+	useState,
+	useContext,
+	createContext,
+	useRef,
+	useCallback,
+} from "react";
 import designs from "../../data/designs.json";
 import { useRouter } from "next/router";
 import {
@@ -25,6 +32,7 @@ import { FaCircleXmark } from "react-icons/fa6";
 import Link from "next/link";
 import { GetObjectDimensions } from "@/utils/design/Helper";
 import DesignerGuide from "@/components/DesignerGuide";
+import { useDropzone } from "react-dropzone";
 
 const SelectedObjectContext = createContext({
 	object: null as ObjectProps | null,
@@ -127,7 +135,7 @@ export default function Design({ products }: { products: any }) {
 		);
 
 		setTrayObject(tray);
-	}, [currentDesign.id]);
+	}, [currentDesign.id, products]);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -138,7 +146,7 @@ export default function Design({ products }: { products: any }) {
 			(obj) => obj.id === selectedObjectID
 		);
 
-		if (!trayObject || !canvas || !ctx || !rect) return;
+		if (!trayObject || !ctx || !rect) return;
 
 		let input: HTMLTextAreaElement | null = null;
 
@@ -150,7 +158,7 @@ export default function Design({ products }: { products: any }) {
 				selectedObjectID,
 				showCanvasSupport
 			);
-		}, 100);
+		}, 10);
 
 		LoadImages(currentDesign, (design) =>
 			Draw(
@@ -562,7 +570,7 @@ export default function Design({ products }: { products: any }) {
 										<FaSquare />
 									</button>
 									<br />
-									<DesignerGuide />
+									<DesignerGuide currentTool={selectedTool} />
 								</div>
 								<div className="flex gap-2">
 									<button
@@ -829,15 +837,26 @@ function DesignEditor({
 			<div
 				className="flex flex-col gap-2 bg-white border rounded-md p-4 z-50"
 				id="editor">
-				<div className="flex items-center gap-2 h-12">
-					{object?.type === "image" ? (
+				<div className="flex items-center gap-2">
+					{object?.type === "image" && (
 						<Input label="Bildkälla" objKey="content" type="file" />
-					) : (
-						object.type === "text" && (
-							<TextArea label="Text" objKey="content" />
-						)
 					)}
-					<div className="border border-gray-300 rounded-md flex items-center gap-4 h-full px-4">
+					{object?.type === "rectangle" && (
+						<Input
+							label="Färg"
+							objKey="color"
+							type="color"
+							className="h-16"
+						/>
+					)}
+					{object.type === "text" && (
+						<TextArea
+							label="Text"
+							objKey="content"
+							className="h-16"
+						/>
+					)}
+					<div className="border border-gray-300 rounded-md flex items-center gap-4 h-16 px-4">
 						{object?.type !== "text" && (
 							<button
 								onClick={() =>
@@ -852,8 +871,8 @@ function DesignEditor({
 								<FaExpand />
 							</button>
 						)}
-						<div className="flex flex-col items-center border-x">
-							<span className="text-sm leading-none -mt-6 mb-2 px-2 bg-white border-x">
+						<div className="flex flex-col items-center">
+							<span className="text-sm leading-none -mt-5 mb-1 px-2 bg-white text-muted_light font-semibold">
 								Lager
 							</span>
 							<div className="flex gap-4">
@@ -871,7 +890,9 @@ function DesignEditor({
 					</div>
 				</div>
 				<div className="h-12 flex gap-2">
-					<Input label="Färg" objKey="color" type="color" />
+					{object?.type === "text" && (
+						<Input label="Färg" objKey="color" type="color" />
+					)}
 					<Input
 						label="Textstorlek (px)"
 						objKey="size"
@@ -903,9 +924,9 @@ function DesignEditor({
 						label="Bildjustering"
 						objKey="fit"
 						options={[
-							{ value: "contain", text: "Rymm" },
-							{ value: "cover", text: "Täck" },
-							{ value: "fill", text: "Fyll" },
+							{ value: "cover", text: "Zoomad" },
+							{ value: "contain", text: "Proportionell" },
+							{ value: "fill", text: "Sträckt" },
 						]}
 					/>
 					<Input
@@ -920,20 +941,28 @@ function DesignEditor({
 	);
 }
 
-function TextArea({ label, objKey }: { label: string; objKey: "content" }) {
+function TextArea({
+	label,
+	objKey,
+	className,
+}: {
+	label: string;
+	objKey: "content";
+	className?: string;
+}) {
 	const { object, setObject } = useContext(SelectedObjectContext);
 
 	if (!object || !(objKey in object)) return null;
 
 	return (
-		<div className="flex flex-col gap-1 grow">
+		<div className={`flex flex-col gap-1 grow  ${className}`}>
 			<label className="sr-only" htmlFor={label}>
 				{label}
 			</label>
 			<textarea
 				name={label}
 				id={label}
-				className="border border-gray-300 rounded-md p-2 h-full"
+				className="border border-gray-300 rounded-md p-2 h-full resize-none"
 				rows={1}
 				placeholder={label}
 				value={object[objKey]}
@@ -952,6 +981,7 @@ function Input({
 	label,
 	objKey,
 	type = "text",
+	className,
 }: {
 	label: string;
 	objKey:
@@ -964,14 +994,48 @@ function Input({
 		| "color"
 		| "content";
 	type?: string;
+	className?: string;
 }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
+
+	const onDrop = useCallback((acceptedFiles: any) => {
+		if (acceptedFiles && acceptedFiles.length > 0) {
+			const reader = new FileReader();
+
+			reader.onloadend = () => {
+				const img = new Image();
+				img.src = reader.result as string;
+
+				img.onload = () => {
+					const resolution = img.width * img.height;
+					if (resolution < 500000) {
+						toast.error(
+							"Bilden är för lågupplöst. Välj en bild med högre upplösning."
+						);
+					} else {
+						setObject({
+							...(object as ObjectProps),
+							[objKey]: reader.result as string,
+						});
+					}
+				};
+			};
+
+			reader.readAsDataURL(acceptedFiles[0]);
+		}
+	}, []);
+
+	const { getRootProps, getInputProps, isDragActive } = useDropzone({
+		onDrop,
+		noClick: true,
+	});
 
 	if (!object || !(objKey in object)) return null;
 
 	if (type === "color")
 		return (
-			<div className="flex flex-col gap-1 h-full aspect-square">
+			<div
+				className={`flex flex-col gap-1 h-full aspect-square ${className}`}>
 				<label className="sr-only" htmlFor={label}>
 					{label}
 				</label>
@@ -1001,25 +1065,41 @@ function Input({
 	if (type === "file")
 		return (
 			<div className="flex flex-col gap-1 grow">
-				<label className="sr-only" htmlFor={label}>
-					{label}
+				<label
+					{...getRootProps()}
+					className="cursor-pointer border border-gray-300 rounded-md px-4 h-16 hover:border-gray-200"
+					htmlFor={label}>
+					<div className="flex items-center justify-center gap-2 h-full">
+						<svg
+							className="w-6 h-6 text-muted_light"
+							aria-hidden="true"
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 20 16">
+							<path
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+							/>
+						</svg>
+						<div>
+							<p className="text-sm text-muted_light font-semibold whitespace-nowrap">
+								Klicka för att ladda upp bild
+							</p>
+							<p className="text-sm text-muted_light whitespace-nowrap">
+								eller dra och släpp en bild här
+							</p>
+						</div>
+					</div>
+					<input
+						{...getInputProps()}
+						name={label}
+						id={label}
+						className="hidden"
+					/>
 				</label>
-				<input
-					type="file"
-					name={label}
-					id={label}
-					className="border border-gray-300 rounded-md p-2 h-full"
-					onChange={(e) => {
-						if (e.target.files && e.target.files[0]) {
-							setObject({
-								...(object as ObjectProps),
-								[objKey]: URL.createObjectURL(
-									e.target.files[0]
-								),
-							});
-						}
-					}}
-				/>
 			</div>
 		);
 
@@ -1034,7 +1114,7 @@ function Input({
 					name={label}
 					id={label}
 					min="0"
-					max="150"
+					max="200"
 					value={objKey in object ? object[objKey] : ""}
 					onChange={(e) =>
 						setObject({

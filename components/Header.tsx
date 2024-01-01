@@ -9,7 +9,9 @@ import {
 	FaExclamation,
 	FaStar,
 	FaPencilRuler,
+	FaUser,
 } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import { GoLaw } from "react-icons/go";
 import { BsChevronDown } from "react-icons/bs";
 import { AiFillLayout } from "react-icons/ai";
@@ -18,6 +20,9 @@ import { useShoppingCart } from "use-shopping-cart";
 import GetProducts from "@/utils/getProducts";
 import { useRouter } from "next/router";
 import { FaX } from "react-icons/fa6";
+import { signInWithGoogle } from "@/utils/firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase";
 
 const Header = () => {
 	return (
@@ -65,8 +70,9 @@ function Navbar() {
 				<div className="hidden md:flex items-center">
 					<Search />
 				</div>
-				<div className="flex items-center justify-end flex-1">
+				<div className="flex items-center justify-end flex-1 gap-4">
 					<CartButton />
+					<UserButton />
 				</div>
 			</div>
 		</div>
@@ -99,7 +105,7 @@ function HamburgerMenu() {
 			</button>
 			<motion.div
 				animate={controls}
-				className="absolute z-50 top-[73px] h-[calc(100vh-108px)] left-0 bg-white w-80 px-4 py-4">
+				className="absolute z-50 top-[76px] h-[calc(100vh-76px)] left-0 bg-white w-80 px-4 py-4 border-r-2 border-gray-300">
 				<div className="flex flex-col space-y-4">
 					<Search />
 				</div>
@@ -118,6 +124,14 @@ function HamburgerMenu() {
 							className="text-xl flex gap-4 items-center py-2">
 							<FaCrown className="text-xl" />
 							Våra produkter
+						</Link>
+					</li>
+					<li>
+						<Link
+							href="/terms"
+							className="text-xl flex gap-4 items-center py-2">
+							<GoLaw className="text-xl" />
+							Våra köpvillkor
 						</Link>
 					</li>
 				</ul>
@@ -205,6 +219,96 @@ function Search() {
 	);
 }
 
+function UserButton() {
+	const [isOpen, setIsOpen] = useState(false);
+
+	const controls = useAnimationControls();
+	const innerControls = useAnimationControls();
+
+	const [user, loading, error] = useAuthState(auth);
+
+	useEffect(() => {
+		if (isOpen) {
+			controls.start({ scaleY: 1, opacity: 1 });
+			innerControls.start({
+				opacity: 1,
+				translateY: 0,
+				transition: { delay: 0.1 },
+			});
+		} else {
+			controls.start({ scaleY: 0, opacity: 0 });
+			innerControls.start({
+				opacity: 0,
+				translateY: -20,
+				transition: { duration: 0 },
+			});
+		}
+	}, [isOpen]);
+
+	return (
+		<div className="relative md:block hidden">
+			<div
+				onClick={() => setIsOpen(false)}
+				className={`${
+					isOpen ? "" : "hidden"
+				} fixed top-0 left-0 right-0 bottom-0 z-20`}></div>
+			<button
+				className="p-2 text-gray-700 hover:text-gray-900 focus:outline-none"
+				onClick={() => setIsOpen((open) => !open)}>
+				<FaUser className="h-6 w-6" />
+			</button>
+			<motion.div
+				initial={{ scaleY: 0 }}
+				animate={controls}
+				className="origin-top absolute top-8 right-0 min-w-[256px] bg-white border rounded-xl z-30">
+				<motion.div
+					initial={{ opacity: 0, translateY: -20 }}
+					animate={innerControls}
+					className="p-4 space-y-4">
+					<span className="font-semibold whitespace-nowrap text-xl">
+						{user ? "Min profil" : "Du är inte inloggad"}
+					</span>
+					<div className="flex flex-col gap-2">
+						{user ? (
+							<>
+								<button
+									onClick={() => auth.signOut()}
+									className="w-full text-left border-2 border-red-200 bg-red-50 px-8 py-2 rounded-lg font-semibold hover:bg-red-100 transition-colors whitespace-nowrap">
+									Logga ut
+								</button>
+							</>
+						) : (
+							<>
+								<button
+									onClick={signInWithGoogle}
+									className="flex gap-2 items-center justify-center w-full border-2 px-4 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
+									<FcGoogle className="text-red-500 text-xl" />
+									Fortsätt med Google
+								</button>
+								<span className="text-center text-muted">
+									eller
+								</span>
+								<Link
+									href="/signup"
+									onClick={() => setIsOpen(false)}
+									className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
+									Skapa konto
+								</Link>
+								<Link
+									href="/login"
+									onClick={() => setIsOpen(false)}
+									className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
+									Logga in
+								</Link>
+							</>
+						)}
+					</div>
+				</motion.div>
+			</motion.div>
+		</div>
+	);
+}
+
 function CartButton() {
 	const { formattedTotalPrice, cartCount, cartDetails } = useShoppingCart();
 
@@ -237,7 +341,7 @@ function CartButton() {
 				onClick={() => setIsCartOpen(false)}
 				className={`${
 					isCartOpen ? "" : "hidden"
-				} fixed top-0 left-0 right-0 bottom-0`}></div>
+				} fixed top-0 left-0 right-0 bottom-0 z-20`}></div>
 			<button
 				className="p-2 text-gray-700 hover:text-gray-900 focus:outline-none"
 				onClick={() => setIsCartOpen((open) => !open)}>
@@ -249,7 +353,7 @@ function CartButton() {
 			<motion.div
 				initial={{ scaleY: 0 }}
 				animate={controls}
-				className="origin-top absolute top-8 right-0 min-w-[256px] bg-white border rounded-xl">
+				className="origin-top absolute top-8 right-0 min-w-[256px] bg-white border rounded-xl z-30">
 				<motion.div
 					initial={{ opacity: 0, translateY: -20 }}
 					animate={innerControls}

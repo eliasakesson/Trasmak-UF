@@ -11,7 +11,11 @@ import {
 import { LuTextCursor } from "react-icons/lu";
 import { motion } from "framer-motion";
 
-export default function DesignerGuide() {
+export default function DesignerGuide({
+	currentTool,
+}: {
+	currentTool: string;
+}) {
 	const [show, setShow] = useState<"hide" | "welcome" | "tutorial">(
 		"welcome"
 	);
@@ -43,7 +47,16 @@ export default function DesignerGuide() {
 					</div>
 				</motion.div>
 			)}
-			{show === "tutorial" && <Tutorial setShow={setShow} />}
+			{show === "tutorial" && (
+				<>
+					<Tutorial setShow={setShow} currentTool={currentTool} />
+					<button
+						onClick={() => setShow("hide")}
+						className="fixed right-4 bottom-4 flex gap-2 items-center font-semibold border-gray-300 border-2 hover:border-red-300 hover:bg-red-100 rounded-md px-4 py-2 transition-colors">
+						<FaTimes /> Avbryt tutorial
+					</button>
+				</>
+			)}
 		</>
 	);
 }
@@ -62,7 +75,7 @@ function Welcome({
 			<h1 className="xl:text-4xl lg:text-3xl text-2xl font-bold leading-tight text-gray-900 text-center">
 				Hej!
 			</h1>
-			<p className="xl:text-xl text-base text-gray-600 max-w-prose">
+			<p className="xl:text-xl text-base text-gray-600 1x-w-prose">
 				Ser ut som att du är ny till designverktyget. Hur vill du
 				fortsätta?
 			</p>
@@ -88,11 +101,18 @@ function Welcome({
 	);
 }
 
-function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
+function Tutorial({
+	setShow,
+	currentTool,
+}: {
+	setShow: (show: "hide") => void;
+	currentTool: string;
+}) {
 	const [step, setStep] = useState(0);
 
 	const steps = [
 		<Step
+			key={0}
 			title="Storlekar"
 			text="Här kan du välja vilken storlek du vill ha på din bricka. Prova
 		att välja en av storlekarna genom att klicka på den. Du kan alltid ändra storlek
@@ -102,6 +122,7 @@ function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 			position="left"
 		/>,
 		<Step
+			key={1}
 			title="Verktyg"
 			text="Här är alla verktyg du kan använda för att designa din bricka. Du kan
 			välja ett verktyg genom att klicka på det."
@@ -110,13 +131,17 @@ function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 			position="bottom"
 		/>,
 		<Step
+			key={2}
 			title="Välj Textverktyget"
 			text=""
 			nextStep={NextStep}
 			elementID="texttool"
 			position="right"
+			nextOnToolSelect="text"
+			currentTool={currentTool}
 		/>,
 		<Step
+			key={3}
 			title="Sätt ut text"
 			text="När du har valt textverktyget kan du sätta ut text på din bricka genom
 			att klicka på brickan där du vill ha texten. Du kan ändra texten genom att
@@ -126,13 +151,25 @@ function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 			position="right"
 		/>,
 		<Step
+			key={4}
+			title="Ändra text"
+			text="När du har placerat ut en text kan du ändra textens egenskaper i rutan till vänster. Du kan ändra textstorlek, typsnitt och färg."
+			nextStep={NextStep}
+			elementID="editor"
+			position="right"
+		/>,
+		<Step
+			key={5}
 			title="Välj Bildverktyget"
 			text=""
 			nextStep={NextStep}
 			elementID="imagetool"
 			position="right"
+			nextOnToolSelect="image"
+			currentTool={currentTool}
 		/>,
 		<Step
+			key={6}
 			title="Sätt ut bild"
 			text="När du har valt bildverktyget kan du sätta ut en bild på din bricka genom
 			att klicka på brickan där du vill ha bilden, alternativt hålla inne muspekaren och dra för att
@@ -142,19 +179,51 @@ function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 			position="right"
 		/>,
 		<Step
+			key={7}
 			title="Ändra bild"
-			text="När du har placerat ut en bild kan du ändra bilden och andra egenskaper genom att välja en bild i rutan till vänster. Du kan också ändra storlek och placering genom att dra i hörnen på bilden."
+			text="När du har placerat ut en bild kan du ändra bilden genom att välja en bild i rutan till vänster. Du kan även justera rundning på hörnen, och välja mellan olika fyllningslägen för bilden, 
+			till exempel om bilden ska fylla hela platsen eller behålla sin proportioner."
 			nextStep={NextStep}
 			elementID="editor"
 			position="right"
 		/>,
 		<Step
+			key={8}
+			title="Välj Muspekaren"
+			text=""
+			nextStep={NextStep}
+			elementID="imagetool"
+			position="right"
+			nextOnToolSelect="select"
+			currentTool={currentTool}
+		/>,
+		<Step
+			key={9}
+			title="Flytta objekt"
+			text="När du har valt muspekaren kan du flytta objekt genom att klicka på dem och dra dem till en ny plats. 
+			Du kan även ändra storlek på bilder och rektanglar genom att dra i hörnen på dem. När du är klar kan du avmarkera objektet genom att klicka utanför."
+			nextStep={NextStep}
+			elementID="canvasparent"
+			position="right"
+		/>,
+		<Step
+			key={10}
 			title="Mallar"
 			text="Här finns alla mallar du kan utgå ifrån när du designar din bricka. Du
 			kan välja en mall genom att klicka på den."
 			nextStep={NextStep}
 			elementID="templates"
 			position="top"
+		/>,
+		<Step
+			key={11}
+			title="Skapa egen design"
+			text="Nu är det dags att skapa din egen design. Du kan börja med att välja en
+			mall eller börja från en tom bricka. Du kan alltid ändra mall eller storlek
+			senare."
+			nextStep={NextStep}
+			elementID="canvasparent"
+			position="right"
 		/>,
 	];
 
@@ -174,12 +243,16 @@ function Step({
 	nextStep,
 	elementID,
 	position,
+	nextOnToolSelect,
+	currentTool,
 }: {
 	title: string;
 	text: string;
 	nextStep: () => void;
 	elementID?: string;
 	position?: "left" | "right" | "top" | "bottom";
+	nextOnToolSelect?: "select" | "text" | "image";
+	currentTool?: string;
 }) {
 	const gap = 16;
 	const ref = useRef<HTMLDivElement>(null);
@@ -219,6 +292,12 @@ function Step({
 			});
 		}
 	}, [elementID, position, gap, ref]);
+
+	useEffect(() => {
+		if (nextOnToolSelect && currentTool === nextOnToolSelect) {
+			nextStep();
+		}
+	}, [currentTool, nextOnToolSelect]);
 
 	return (
 		<div

@@ -18,7 +18,7 @@
         "width": 0.5,
         "height": 0.5,
         "radius": 0,
-        "fit": "contain"
+        "fit": "cover"
     },
     "rectangle": {
         "type": "rectangle",
