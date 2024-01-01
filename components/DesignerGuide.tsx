@@ -302,6 +302,7 @@ function Step({
 	return (
 		<div
 			ref={ref}
+			key={title}
 			className="absolute bg-white rounded-xl p-8 flex flex-col gap-4 z-50 shadow-md">
 			<h2 className="xl:text-2xl lg:text-xl text-lg font-semibold leading-tight text-gray-900">
 				{title}
