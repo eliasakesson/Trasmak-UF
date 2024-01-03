@@ -1,4 +1,4 @@
-import { ObjectProps } from "@/pages/design";
+import { DesignProps, ObjectProps } from "./Interfaces";
 
 export function GetObjectDimensions(
 	ctx: CanvasRenderingContext2D,
@@ -53,4 +53,120 @@ export function GetObjectDimensions(
 	const y = tray.y + (tray.height ?? 0) * obj.y;
 
 	return { x, y, width, height };
+}
+
+export function GetTrayObjFromCanvas(
+	canvas: HTMLCanvasElement,
+	heightProcentage: number = 0.85,
+	width: number = 43,
+	height: number = 33,
+	radius: number = 20,
+	bleed: number = 10,
+	edge: number = 20
+): ObjectProps {
+	const aspectRatio = (width + bleed / 10) / (height + bleed / 10);
+	const newWidth = canvas.height * heightProcentage * aspectRatio;
+	const newHeight = canvas.height * heightProcentage;
+	const newRadius =
+		(radius / 100) * (newWidth > newHeight ? newHeight : newWidth);
+	const newBleed = (bleed / 10) * (newWidth / width);
+	const newEdge = (edge / 20) * (newWidth / width);
+
+	return {
+		id: 0,
+		type: "tray",
+		content: "",
+		color: "#eeeeee",
+		x: (canvas.width - newWidth) / 2,
+		y: (canvas.height - newHeight) / 2,
+		width: newWidth,
+		height: newHeight,
+		radius: newRadius,
+		order: 0,
+		bleed: newBleed,
+		edge: newEdge,
+	};
+}
+
+export function LoadImages(
+	design: DesignProps,
+	Draw: (design: DesignProps) => void
+) {
+	design.objects.forEach((obj) => {
+		if (
+			obj.type === "image" &&
+			(!obj.image || obj.content !== obj.image.src)
+		) {
+			const img = new Image();
+			img.crossOrigin = "anonymous";
+			img.src = obj.content;
+			img.onload = () => {
+				obj.image = img;
+				Draw(design);
+			};
+		}
+	});
+}
+
+export function SetTrayObject(
+	products: any,
+	currentDesignID: string,
+	trayObject: ObjectProps | null,
+	setTrayObject: (tray: ObjectProps) => void
+) {
+	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+	if (!canvas) return;
+
+	const metadata = products.find(
+		(product: any) =>
+			product.id.substring(6, product.id.length) === currentDesignID
+	)?.metadata;
+
+	const tray = GetTrayObjFromCanvas(
+		canvas,
+		0.85,
+		metadata?.width,
+		metadata?.height,
+		metadata?.radius,
+		metadata?.bleed,
+		metadata?.edge
+	);
+
+	if (trayObject && trayObject.color) {
+		tray.color = trayObject.color;
+	}
+
+	if (tray) {
+		setTrayObject(tray);
+	}
+}
+
+export function LoopUntilSetTrayObject(
+	products: any,
+	currentDesignID: string,
+	trayObject: ObjectProps | null,
+	setTrayObject: (tray: ObjectProps) => void
+) {
+	function GetLoop() {
+		if (!trayObject) {
+			return setInterval(
+				() =>
+					SetTrayObject(
+						products,
+						currentDesignID,
+						trayObject,
+						setTrayObject
+					),
+				100
+			);
+		}
+
+		return null;
+	}
+
+	const loop: any = GetLoop();
+
+	return () => {
+		clearInterval(loop);
+	};
 }

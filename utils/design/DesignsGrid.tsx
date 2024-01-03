@@ -1,18 +1,27 @@
 import { useEffect } from "react";
-import designs from "@/data/designs.json";
-import Draw from "@/utils/design/Draw";
-import Link from "next/link";
-import { GetTrayObjFromCanvas } from "@/utils/design/Helper";
+import { DesignProps } from "./Interfaces";
+import { GetTrayObjFromCanvas } from "./Helper";
+import Draw from "./Draw";
 
-export default function TemplateRow({ products }: { products: any[] }) {
+export default function DesignsGrid({
+	designs,
+	products,
+	onSelect,
+	canvasClassKey,
+}: {
+	designs: DesignProps[];
+	products: any[];
+	onSelect: (design: DesignProps) => void;
+	canvasClassKey: string;
+}) {
 	useEffect(() => {
 		const timer = setTimeout(() => {
-			const canvases = document.querySelectorAll(".minicanvas");
+			const canvases = document.querySelectorAll(`.${canvasClassKey}`);
 			canvases.forEach((canvas, i) => {
 				const product = products.find(
 					(product) =>
 						product.id.substring(6, product.id.length) ===
-						designs[i].id
+						designs[i]?.id
 				);
 				if (!product) return;
 
@@ -35,19 +44,19 @@ export default function TemplateRow({ products }: { products: any[] }) {
 	}, [designs]);
 
 	return (
-		<div className="w-full grid lg:grid-cols-3 lg:gap-8 grid-cols-2 gap-4 text-left">
+		<ul className="grid grid-cols-3 gap-4" id="templates">
 			{designs.map((design, i) => (
 				<li key={i} className="list-none">
-					<Link
-						href={`/design?d=${design.id}&i=${i}`}
+					<button
+						onClick={() => onSelect(design)}
 						className="w-full aspect-video bg-gray-100 rounded-xl">
 						<canvas
-							className="minicanvas bg-gray-100 rounded-xl w-full"
+							className={`${canvasClassKey} bg-gray-100 rounded-xl w-full`}
 							width={1280}
 							height={720}></canvas>
-					</Link>
+					</button>
 				</li>
 			))}
-		</div>
+		</ul>
 	);
 }

@@ -1,91 +1,69 @@
-import {
-	useEffect,
-	useState,
-	useContext,
-	createContext,
-	useRef,
-	useCallback,
-} from "react";
-import designs from "../../data/designs.json";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
+import Head from "next/head";
+import Link from "next/link";
+import toast from "react-hot-toast";
+
+import DesignerGuide from "@/components/DesignerGuide";
+import DesignEditor, { MoveDesignEditor } from "@/utils/design/DesignEditor";
+import DesignsGrid from "@/utils/design/DesignsGrid";
+import CanvasTextEditorInput from "@/utils/design/TextEditorInput";
+
+import AddToCart from "@/utils/design/CartHelper";
+import Draw from "@/utils/design/Draw";
+import SetupMouseEvents from "@/utils/design/MouseEvents";
+import GetProducts from "@/utils/getProducts";
+
+import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
+import { useWindowSize } from "@/utils/hooks";
 import {
-	FaTrash,
+	LoadImages,
+	LoopUntilSetTrayObject,
+	SetTrayObject,
+} from "@/utils/design/Helper";
+
+import designs from "../../data/designs.json";
+
+import {
 	FaMousePointer,
 	FaImage,
 	FaSquare,
-	FaChevronUp,
-	FaChevronDown,
-	FaInfo,
 	FaCopy,
-	FaExpand,
 	FaSave,
 } from "react-icons/fa";
-import toast from "react-hot-toast";
-import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
-import GetProducts from "@/utils/getProducts";
-import { uploadFromCanvas } from "@/utils/firebase";
-import { Product } from "use-shopping-cart/core";
-import Head from "next/head";
-import SetupMouseEvents from "@/utils/design/MouseEvents";
-import { useWindowSize } from "@/utils/hooks";
 import { FaCircleXmark } from "react-icons/fa6";
-import Link from "next/link";
-import { GetObjectDimensions } from "@/utils/design/Helper";
-import DesignerGuide from "@/components/DesignerGuide";
-import { useDropzone } from "react-dropzone";
 
-const SelectedObjectContext = createContext({
-	object: null as ObjectProps | null,
-	setObject: (obj: ObjectProps) => {},
-});
-
-export interface DesignProps {
-	id: string;
-	objects: ObjectProps[];
-}
-
-export interface ObjectProps {
-	id: number;
-	type: string;
-	content: string;
-	x: number;
-	y: number;
-	order: number;
-
-	color?: string;
-	font?: string;
-	size?: number;
-
-	width?: number;
-	height?: number;
-	radius?: number;
-	image?: HTMLImageElement;
-	fit?: string;
-
-	bleed?: number;
-	edge?: number;
-}
+import { Product } from "use-shopping-cart/core";
+import { ObjectProps, DesignProps } from "@/utils/design/Interfaces";
+import SavedDesigns from "@/utils/design/SavedDesigns";
+import { SaveDesign } from "@/utils/design/DesignSaver";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase";
 
 export default function Design({ products }: { products: any }) {
 	const router = useRouter();
-
 	const windowSize = useWindowSize();
+	const { cartDetails, addItem } = useShoppingCart();
+
+	const [user, loading, error] = useAuthState(auth);
 
 	const [currentDesign, setCurrentDesign] = useState<DesignProps>(designs[0]);
-	const [selectedObjectID, setSelectedObjectID] = useState<number | null>(
-		null
-	);
+	const [trayObject, setTrayObject] = useState<ObjectProps | null>(null);
+
 	const [selectedTool, setSelectedTool] = useState<
 		"select" | "text" | "image" | "rectangle"
 	>("select");
+
+	const [selectedObjectID, setSelectedObjectID] = useState<number | null>(
+		null
+	);
 	const inputSelection = useRef<{ start: number | null; end: number | null }>(
 		{ start: null, end: null }
 	);
-	const [trayObject, setTrayObject] = useState<ObjectProps | null>(null);
-	const [showCanvasSupport, setShowCanvasSupport] = useState(false);
-	const designEditorRef = useRef<HTMLDivElement>(null);
 
-	const { cartDetails, addItem } = useShoppingCart();
+	const [showCanvasSupport, setShowCanvasSupport] = useState(false);
+
+	const designEditorRef = useRef<HTMLDivElement>(null);
 	const isAddingToCart = useRef(false);
 	const lastAddedImageURL = useRef<string | null>(null);
 
@@ -103,7 +81,7 @@ export default function Design({ products }: { products: any }) {
 				...designs[0],
 				id: router.query.d as string,
 			});
-		} else if (products[0]) {
+		} else if (products && products[0]) {
 			setCurrentDesign({
 				id: products[0].id.substring(6, products[0].id.length),
 				objects: designs[0].objects,
@@ -113,29 +91,34 @@ export default function Design({ products }: { products: any }) {
 
 	useEffect(() => {
 		lastAddedImageURL.current = null;
-	}, [selectedObjectID, currentDesign.id, trayObject?.color]);
+	}, [
+		selectedObjectID,
+		currentDesign.id,
+		trayObject?.color,
+		trayObject?.content,
+	]);
 
 	useEffect(() => {
-		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-		if (!canvas) return;
-
-		const metadata = products.find(
-			(product: any) =>
-				product.id.substring(6, product.id.length) === currentDesign.id
-		)?.metadata;
-
-		const tray = GetTrayObjFromCanvas(
-			canvas,
-			0.85,
-			metadata?.width,
-			metadata?.height,
-			metadata?.radius,
-			metadata?.bleed,
-			metadata?.edge
+		const unsub = LoopUntilSetTrayObject(
+			products,
+			currentDesign.id,
+			trayObject,
+			setTrayObject
 		);
 
-		setTrayObject(tray);
-	}, [currentDesign.id, products]);
+		return unsub;
+	}, [trayObject]);
+
+	useEffect(
+		() =>
+			SetTrayObject(
+				products,
+				currentDesign.id,
+				trayObject,
+				setTrayObject
+			),
+		[currentDesign.id, products]
+	);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -158,7 +141,7 @@ export default function Design({ products }: { products: any }) {
 				selectedObjectID,
 				showCanvasSupport
 			);
-		}, 10);
+		}, 1);
 
 		LoadImages(currentDesign, (design) =>
 			Draw(
@@ -170,28 +153,7 @@ export default function Design({ products }: { products: any }) {
 			)
 		);
 
-		if (selectedObject && designEditorRef.current) {
-			const { x, y, width, height } = GetObjectDimensions(
-				ctx,
-				trayObject,
-				selectedObject
-			);
-
-			const left = x * (rect.width / canvas.width) - 8;
-			const top = (y + height) * (rect.height / canvas.height) + 16;
-
-			if (left > rect.width) {
-				designEditorRef.current.style.left = `${rect.width}px`;
-			} else {
-				designEditorRef.current.style.left = `${left}px`;
-			}
-
-			if (top > rect.height) {
-				designEditorRef.current.style.top = `${rect.height}px`;
-			} else {
-				designEditorRef.current.style.top = `${top}px`;
-			}
-		}
+		MoveDesignEditor(designEditorRef, canvas, trayObject, selectedObject);
 
 		if (
 			selectedObject &&
@@ -255,187 +217,6 @@ export default function Design({ products }: { products: any }) {
 		}
 	}, [selectedObjectID]);
 
-	async function addToCart() {
-		const toastID = toast.loading("Laddar upp bilder...");
-
-		if (isAddingToCart.current === true) {
-			toast.error("Var god vänta...", { id: toastID });
-			return;
-		}
-
-		isAddingToCart.current = true;
-
-		const metadata = products.find(
-			(product: any) =>
-				product.id.substring(6, product.id.length) === currentDesign.id
-		)?.metadata;
-
-		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-
-		const height = (metadata?.height ?? 33) * 0.393701 * 300;
-		const upScaleFactor = height / canvas.height;
-
-		const newCanvas = document.createElement("canvas");
-		newCanvas.width =
-			height * ((metadata?.width ?? 1) / (metadata?.height ?? 1));
-		newCanvas.height = height;
-
-		const renderTray = GetTrayObjFromCanvas(
-			newCanvas,
-			1,
-			metadata?.width,
-			metadata?.height,
-			metadata?.radius,
-			metadata?.bleed,
-			metadata?.edge
-		);
-
-		renderTray.color = trayObject?.color ?? "#ffffff";
-
-		if (!renderTray) {
-			toast.error("Något gick fel", { id: toastID });
-			console.error("Tray is null");
-			return;
-		}
-
-		try {
-			const product = products.find(
-				(product: any) => product.id == "price_" + currentDesign.id
-			);
-
-			if (!product) {
-				throw new Error("Product is null");
-			}
-
-			if (lastAddedImageURL.current) {
-				incrementProduct(product, toastID);
-				isAddingToCart.current = false;
-				return;
-			}
-
-			await DrawRender(
-				newCanvas,
-				renderTray,
-				currentDesign,
-				upScaleFactor
-			);
-			console.log("Rendered");
-
-			const coverImage = uploadFromCanvas(canvas);
-			const renderImage = uploadFromCanvas(newCanvas);
-
-			Promise.all([renderImage, coverImage])
-				.then((values) => {
-					toast.loading("Lägger till i kundvagnen...", {
-						id: toastID,
-					});
-
-					console.log(values[0], values[1]);
-
-					addProductToCart(product, toastID, {
-						image: values[0],
-						cover: values[1],
-					});
-				})
-				.finally(() => {
-					isAddingToCart.current = false;
-				});
-		} catch (error) {
-			toast.error("Något gick fel", { id: toastID });
-			console.error(error);
-			isAddingToCart.current = false;
-		}
-	}
-
-	function incrementProduct(product: any, toastID: string) {
-		const products = (cartDetails?.[product.id]?.product_data as any)
-			?.products;
-
-		addItem(product, {
-			count: 1,
-			product_metadata: {
-				products: products.map((p: any) => {
-					if (p.image === lastAddedImageURL.current) {
-						return { ...p, count: p.count + 1 };
-					}
-					return p;
-				}),
-			},
-		});
-
-		toast.success("Produkten inkrementerades", { id: toastID });
-	}
-
-	function addProductToCart(
-		product: any,
-		toastID: string,
-		{ image, cover }: { image: string; cover: string }
-	) {
-		const products =
-			(cartDetails?.[product.id]?.product_data as any)?.products ?? [];
-
-		const metadata = {
-			products: [
-				...products,
-				{
-					name: product.name,
-					count: 1,
-					image,
-					cover,
-				},
-			],
-		};
-
-		addItem(product, {
-			count: 1,
-			product_metadata: metadata,
-		});
-
-		lastAddedImageURL.current = image;
-
-		toast.success("Produkten lades till i kundvagnen", {
-			id: toastID,
-		});
-	}
-
-	function changeOrder(order: number) {
-		const maxOrder = Math.max(...currentDesign.objects.map((o) => o.order));
-		const minOrder = Math.min(...currentDesign.objects.map((o) => o.order));
-
-		const selectedObject = currentDesign.objects.find(
-			(obj) => obj.id === selectedObjectID
-		);
-		if (!selectedObject) return;
-
-		if (order > 0 && selectedObject.order === maxOrder) return;
-		if (order < 0 && selectedObject.order === minOrder) return;
-
-		setCurrentDesign((design) => {
-			if (!design) return design;
-			const objects = design.objects.map((obj: ObjectProps) => {
-				if (order > 0) {
-					if (obj.id === selectedObjectID) {
-						return { ...obj, order: obj.order + 1 };
-					}
-					if (obj.order === selectedObject.order + 1) {
-						return { ...obj, order: obj.order - 1 };
-					}
-				} else {
-					if (obj.id === selectedObjectID) {
-						return { ...obj, order: obj.order - 1 };
-					}
-					if (obj.order === selectedObject.order - 1) {
-						return { ...obj, order: obj.order + 1 };
-					}
-				}
-
-				return obj;
-			});
-
-			return { ...design, objects };
-		});
-	}
-
 	if (windowSize.width < 768) {
 		return (
 			<>
@@ -483,6 +264,8 @@ export default function Design({ products }: { products: any }) {
 							<div className="absolute" ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
+										design={currentDesign}
+										setDesign={setCurrentDesign}
 										object={
 											currentDesign?.objects.find(
 												(obj) =>
@@ -514,7 +297,6 @@ export default function Design({ products }: { products: any }) {
 											});
 											setSelectedObjectID(null);
 										}}
-										changeOrder={changeOrder}
 									/>
 								)}
 							</div>
@@ -592,7 +374,17 @@ export default function Design({ products }: { products: any }) {
 										<FaCopy /> Kopiera design
 									</button>
 									<button
-										onClick={addToCart}
+										onClick={() =>
+											AddToCart(
+												products,
+												currentDesign,
+												trayObject,
+												cartDetails,
+												addItem,
+												isAddingToCart,
+												lastAddedImageURL
+											)
+										}
 										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
 										Lägg till i kundvagn
 									</button>
@@ -648,43 +440,22 @@ export default function Design({ products }: { products: any }) {
 										<p>Kanter</p>
 									</div>
 								</div>
-								<button
-									onClick={() => {
-										toast.success("Design sparad");
-										localStorage.setItem(
-											"lastDesign",
-											JSON.stringify({
-												...currentDesign,
-												objects:
-													currentDesign.objects.map(
-														(obj) => ({
-															...obj,
-															image: undefined,
-														})
-													),
-											})
-										);
-									}}
-									className="ml-auto border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
-									<FaSave /> Spara design
-								</button>
-								<button
-									onClick={() => {
-										const design =
-											localStorage.getItem("lastDesign");
-										const designObject = JSON.parse(
-											design ?? "null"
-										);
-										if (designObject) {
-											toast.success("Design laddad");
-											setCurrentDesign(designObject);
-										} else {
-											toast.error("Ingen design sparad");
+								{user && (
+									<button
+										onClick={() =>
+											toast.promise(
+												SaveDesign(currentDesign, user),
+												{
+													loading: "Sparar design...",
+													success: "Design sparad",
+													error: "Fel vid sparning",
+												}
+											)
 										}
-									}}
-									className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
-									<FaCopy /> Ladda spara design
-								</button>
+										className="ml-auto border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+										<FaSave /> Spara design
+									</button>
+								)}
 							</div>
 						</div>
 					</div>
@@ -743,975 +514,39 @@ export default function Design({ products }: { products: any }) {
 							))}
 						</ul>
 					</div>
-					<div className="col-span-3">
-						<h2 className="text-xl font-bold border-b pb-2 mb-4">
-							Mallar
-						</h2>
-						{/* <p>Kommer snart</p> */}
-						<DesignTemplates
-							designs={designs}
-							products={products}
-							onSelect={(design) => {
-								setSelectedObjectID(null);
-								setCurrentDesign(design);
-							}}
-						/>
+					<div className="col-span-3 flex flex-col gap-8">
+						<div>
+							<h2 className="text-xl font-bold border-b pb-2 mb-4">
+								Mina designs
+							</h2>
+							<SavedDesigns
+								products={products}
+								onSelect={(design) => {
+									setSelectedObjectID(null);
+									setCurrentDesign(design);
+								}}
+								canvasClassKey="saved-design-canvas"
+							/>
+						</div>
+						<div>
+							<h2 className="text-xl font-bold border-b pb-2 mb-4">
+								Mallar
+							</h2>
+							<DesignsGrid
+								designs={designs}
+								products={products}
+								onSelect={(design) => {
+									setSelectedObjectID(null);
+									setCurrentDesign(design);
+								}}
+								canvasClassKey="template-canvas"
+							/>
+						</div>
 					</div>
 				</div>
 			</main>
 		</>
 	);
-}
-
-function DesignTemplates({
-	designs,
-	products,
-	onSelect,
-}: {
-	designs: DesignProps[];
-	products: any[];
-	onSelect: (design: DesignProps) => void;
-}) {
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			const canvases = document.querySelectorAll(".minicanvas");
-			canvases.forEach((canvas, i) => {
-				const product = products.find(
-					(product) =>
-						product.id.substring(6, product.id.length) ===
-						designs[i].id
-				);
-				if (!product) return;
-
-				const tray = GetTrayObjFromCanvas(
-					canvas as HTMLCanvasElement,
-					0.85,
-					product.metadata?.width,
-					product.metadata?.height,
-					product.metadata?.radius,
-					product.metadata?.bleed,
-					product.metadata?.edge
-				);
-				Draw(canvas as HTMLCanvasElement, tray, designs[i]);
-			});
-		}, 1000);
-
-		return () => {
-			clearTimeout(timer);
-		};
-	}, [designs]);
-
-	return (
-		<ul className="grid grid-cols-3 gap-4" id="templates">
-			{designs.map((design, i) => (
-				<li key={i} className="list-none">
-					<button
-						onClick={() => onSelect(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl">
-						<canvas
-							className="minicanvas bg-gray-100 rounded-xl w-full"
-							width={1280}
-							height={720}></canvas>
-					</button>
-				</li>
-			))}
-		</ul>
-	);
-}
-
-function DesignEditor({
-	object,
-	setObject,
-	removeObject,
-	changeOrder,
-}: {
-	object: ObjectProps | null;
-	setObject: (obj: ObjectProps) => void;
-	removeObject: () => void;
-	changeOrder: (order: number) => void;
-}) {
-	if (!object) return null;
-
-	return (
-		<SelectedObjectContext.Provider value={{ object, setObject }}>
-			<div
-				className="flex flex-col gap-2 bg-white border rounded-md p-4 z-50"
-				id="editor">
-				<div className="flex items-center gap-2">
-					{object?.type === "image" && (
-						<Input label="Bildkälla" objKey="content" type="file" />
-					)}
-					{object?.type === "rectangle" && (
-						<Input
-							label="Färg"
-							objKey="color"
-							type="color"
-							className="h-16"
-						/>
-					)}
-					{object.type === "text" && (
-						<TextArea
-							label="Text"
-							objKey="content"
-							className="h-16"
-						/>
-					)}
-					<div className="border border-gray-300 rounded-md flex items-center gap-4 h-16 px-4">
-						{object?.type !== "text" && (
-							<button
-								onClick={() =>
-									setObject({
-										...object,
-										x: 0,
-										y: 0,
-										width: 1,
-										height: 1,
-									})
-								}>
-								<FaExpand />
-							</button>
-						)}
-						<div className="flex flex-col items-center">
-							<span className="text-sm leading-none -mt-5 mb-1 px-2 bg-white text-muted_light font-semibold">
-								Lager
-							</span>
-							<div className="flex gap-4">
-								<button onClick={() => changeOrder(1)}>
-									<FaChevronUp />
-								</button>
-								<button onClick={() => changeOrder(-1)}>
-									<FaChevronDown />
-								</button>
-							</div>
-						</div>
-						<button onClick={() => removeObject()}>
-							<FaTrash />
-						</button>
-					</div>
-				</div>
-				<div className="h-12 flex gap-2">
-					{object?.type === "text" && (
-						<Input label="Färg" objKey="color" type="color" />
-					)}
-					<Input
-						label="Textstorlek (px)"
-						objKey="size"
-						type="number"
-					/>
-					<Select
-						label="Font"
-						objKey="font"
-						options={[
-							{ value: "cinzel", text: "Cinzel" },
-							{ value: "dancing script", text: "Dancing Script" },
-							{ value: "comfortaa", text: "Comfortaa" },
-							{ value: "gourgette", text: "Gourgette" },
-							{ value: "sono", text: "Sono" },
-							{ value: "whisper", text: "Whisper" },
-							{
-								value: "plus jakarta sans",
-								text: "Plus Jakarta Sans",
-							},
-							{ value: "courier new", text: "Courier New" },
-							{
-								value: "times new roman",
-								text: "Times New Roman",
-							},
-							{ value: "arial", text: "Arial" },
-						]}
-					/>
-					<Select
-						label="Bildjustering"
-						objKey="fit"
-						options={[
-							{ value: "cover", text: "Zoomad" },
-							{ value: "contain", text: "Proportionell" },
-							{ value: "fill", text: "Sträckt" },
-						]}
-					/>
-					<Input
-						label="Rundning (px)"
-						objKey="radius"
-						type="number"
-					/>
-				</div>
-				<div className="flex items-stretch gap-2"></div>
-			</div>
-		</SelectedObjectContext.Provider>
-	);
-}
-
-function TextArea({
-	label,
-	objKey,
-	className,
-}: {
-	label: string;
-	objKey: "content";
-	className?: string;
-}) {
-	const { object, setObject } = useContext(SelectedObjectContext);
-
-	if (!object || !(objKey in object)) return null;
-
-	return (
-		<div className={`flex flex-col gap-1 grow  ${className}`}>
-			<label className="sr-only" htmlFor={label}>
-				{label}
-			</label>
-			<textarea
-				name={label}
-				id={label}
-				className="border border-gray-300 rounded-md p-2 h-full resize-none"
-				rows={1}
-				placeholder={label}
-				value={object[objKey]}
-				onChange={(e) =>
-					setObject({
-						...(object as ObjectProps),
-						[objKey]: e.target.value,
-					})
-				}
-			/>
-		</div>
-	);
-}
-
-function Input({
-	label,
-	objKey,
-	type = "text",
-	className,
-}: {
-	label: string;
-	objKey:
-		| "x"
-		| "y"
-		| "width"
-		| "height"
-		| "radius"
-		| "size"
-		| "color"
-		| "content";
-	type?: string;
-	className?: string;
-}) {
-	const { object, setObject } = useContext(SelectedObjectContext);
-
-	const onDrop = useCallback((acceptedFiles: any) => {
-		if (acceptedFiles && acceptedFiles.length > 0) {
-			const reader = new FileReader();
-
-			reader.onloadend = () => {
-				const img = new Image();
-				img.src = reader.result as string;
-
-				img.onload = () => {
-					const resolution = img.width * img.height;
-					if (resolution < 500000) {
-						toast.error(
-							"Bilden är för lågupplöst. Välj en bild med högre upplösning."
-						);
-					} else {
-						setObject({
-							...(object as ObjectProps),
-							[objKey]: reader.result as string,
-						});
-					}
-				};
-			};
-
-			reader.readAsDataURL(acceptedFiles[0]);
-		}
-	}, []);
-
-	const { getRootProps, getInputProps, isDragActive } = useDropzone({
-		onDrop,
-		noClick: true,
-	});
-
-	if (!object || !(objKey in object)) return null;
-
-	if (type === "color")
-		return (
-			<div
-				className={`flex flex-col gap-1 h-full aspect-square ${className}`}>
-				<label className="sr-only" htmlFor={label}>
-					{label}
-				</label>
-				<div className="relative rounded-md border border-gray-300 h-full w-full">
-					<input
-						type="color"
-						name={label}
-						id={label}
-						className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-						value={object[objKey]}
-						onChange={(e) =>
-							setObject({
-								...(object as ObjectProps),
-								[objKey]: e.target.value,
-							})
-						}
-					/>
-					<div
-						className="absolute inset-0 pointer-events-none rounded-[4px]"
-						style={{
-							backgroundColor: object[objKey] as string,
-						}}></div>
-				</div>
-			</div>
-		);
-
-	if (type === "file")
-		return (
-			<div className="flex flex-col gap-1 grow">
-				<label
-					{...getRootProps()}
-					className="cursor-pointer border border-gray-300 rounded-md px-4 h-16 hover:border-gray-200"
-					htmlFor={label}>
-					<div className="flex items-center justify-center gap-2 h-full">
-						<svg
-							className="w-6 h-6 text-muted_light"
-							aria-hidden="true"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 20 16">
-							<path
-								stroke="currentColor"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-							/>
-						</svg>
-						<div>
-							<p className="text-sm text-muted_light font-semibold whitespace-nowrap">
-								Klicka för att ladda upp bild
-							</p>
-							<p className="text-sm text-muted_light whitespace-nowrap">
-								eller dra och släpp en bild här
-							</p>
-						</div>
-					</div>
-					<input
-						{...getInputProps()}
-						name={label}
-						id={label}
-						className="hidden"
-					/>
-				</label>
-			</div>
-		);
-
-	if (type === "number")
-		return (
-			<div className="flex gap-2 grow border border-gray-300 rounded-md px-2">
-				<label className="sr-only" htmlFor={label}>
-					{label}
-				</label>
-				<input
-					type="range"
-					name={label}
-					id={label}
-					min="0"
-					max="200"
-					value={objKey in object ? object[objKey] : ""}
-					onChange={(e) =>
-						setObject({
-							...object,
-							[objKey]: e.target.value,
-						})
-					}
-				/>
-				<input
-					type="number"
-					name={label}
-					id={label}
-					className="py-2 h-full w-10 outline-none"
-					value={objKey in object ? object[objKey] : ""}
-					onChange={(e) =>
-						setObject({
-							...object,
-							[objKey]: e.target.value,
-						})
-					}
-				/>
-			</div>
-		);
-
-	return (
-		<div className="flex flex-col gap-1 grow">
-			<label className="sr-only" htmlFor={label}>
-				{label}
-			</label>
-			<input
-				type={type}
-				name={label}
-				id={label}
-				className="border border-gray-300 rounded-md p-2 h-full"
-				value={objKey in object ? object[objKey] : ""}
-				onChange={(e) =>
-					setObject({
-						...object,
-						[objKey]: e.target.value,
-					})
-				}
-			/>
-		</div>
-	);
-}
-
-function Select({
-	label,
-	objKey,
-	options,
-}: {
-	label: string;
-	objKey: "font" | "fit";
-	options: { value: string; text: string }[];
-}) {
-	const { object, setObject } = useContext(SelectedObjectContext);
-
-	if (!object || !(objKey in object)) return null;
-
-	return (
-		<div className="flex flex-col gap-1 grow">
-			<label className="sr-only" htmlFor={label}>
-				{label}
-			</label>
-			<select
-				name={label}
-				id={label}
-				className="border border-gray-300 rounded-md p-2 h-full"
-				style={objKey === "font" ? { fontFamily: object[objKey] } : {}}
-				value={object[objKey]}
-				onChange={(e) =>
-					setObject({
-						...(object as ObjectProps),
-						[objKey]: e.target.value,
-					})
-				}>
-				{options?.map((option, i) => (
-					<option
-						key={i}
-						value={option.value}
-						style={
-							objKey === "font"
-								? { fontFamily: option.value }
-								: {}
-						}>
-						{option.text}
-					</option>
-				))}
-			</select>
-		</div>
-	);
-}
-
-export async function Draw(
-	canvas: HTMLCanvasElement,
-	tray: ObjectProps,
-	design: DesignProps,
-	selectedObjectID?: number | null,
-	showSupport: boolean = false
-) {
-	const ctx = canvas.getContext("2d");
-	if (!ctx) return;
-
-	ctx.reset();
-	ctx.save();
-
-	DrawTray(ctx, tray);
-
-	design.objects.sort((a, b) => a.order - b.order);
-
-	for (let i = 0; i < design.objects.length; i++) {
-		const obj = design.objects[i];
-		if (obj.type === "text") {
-			DrawText(ctx, tray, obj);
-		} else if (obj.type === "rectangle") {
-			DrawRectangle(ctx, tray, obj);
-		} else if (obj.type === "image") {
-			await DrawImage(ctx, tray, obj);
-		}
-	}
-
-	if (showSupport) {
-		DrawTraySupport(ctx, tray);
-		DrawTrayShadow(ctx, tray);
-	}
-
-	DrawTrayShadow(ctx, tray);
-	DrawTrayBorder(ctx, tray);
-
-	ctx.restore();
-
-	HighlightSelectedObject(ctx, tray, design.objects, selectedObjectID);
-}
-
-async function DrawRender(
-	canvas: HTMLCanvasElement,
-	tray: ObjectProps,
-	design: DesignProps,
-	scale: number
-) {
-	const ctx = canvas.getContext("2d");
-	if (!ctx) return;
-
-	ctx.reset();
-	ctx.save();
-
-	DrawTray(ctx, tray);
-
-	design.objects.sort((a, b) => a.order - b.order);
-
-	for (let i = 0; i < design.objects.length; i++) {
-		const obj = design.objects[i];
-		console.log(obj);
-		if (obj.type === "text") {
-			DrawText(ctx, tray, obj, scale);
-		} else if (obj.type === "rectangle") {
-			DrawRectangle(ctx, tray, obj, scale);
-		} else if (obj.type === "image") {
-			await DrawImage(ctx, tray, obj, scale);
-		}
-	}
-}
-
-function DrawText(
-	ctx: CanvasRenderingContext2D,
-	tray: ObjectProps,
-	text: ObjectProps,
-	scale: number = 1
-) {
-	ctx.fillStyle = text.color ?? "#000";
-	ctx.font = `bold ${(text.size ?? 1) * scale}px ${
-		text.font ?? "sans-serif"
-	}`;
-	ctx.textAlign = "left";
-	ctx.textBaseline = "top";
-	const lines = text.content.split("\n");
-
-	lines.forEach((line, i) => {
-		const x = (tray.x ?? 0) + (tray.width ?? 0) * text.x;
-		const y =
-			(tray.y ?? 0) +
-			(tray.height ?? 0) * text.y +
-			(text.size ?? 0) * scale * i;
-
-		ctx.fillText(line, x, y);
-	});
-}
-
-function DrawRectangle(
-	ctx: CanvasRenderingContext2D,
-	tray: ObjectProps,
-	rectangle: ObjectProps,
-	scale: number = 1
-) {
-	const { x, y, width, height } = GetObjectDimensions(ctx, tray, rectangle);
-
-	// Make sure radius is not larger than half the width or height
-	const radius = Math.max(
-		Math.min(Math.min(width, height) / 2, (rectangle.radius ?? 0) * scale),
-		0
-	);
-
-	ctx.save();
-	GetRoundedRect(ctx, x, y, width, height, radius);
-	ctx.clip();
-
-	ctx.fillStyle = rectangle.color ?? "#000";
-	ctx.fillRect(x, y, width, height);
-	ctx.restore();
-}
-
-async function DrawImage(
-	ctx: CanvasRenderingContext2D,
-	tray: ObjectProps,
-	image: ObjectProps,
-	scale: number = 1
-) {
-	const loadImage = (image: ObjectProps): Promise<void> => {
-		function DrawImage(
-			image: ObjectProps,
-			img: HTMLImageElement,
-			resolve: any
-		) {
-			const { x, y, width, height } = GetObjectDimensions(
-				ctx,
-				tray,
-				image
-			);
-
-			// Make sure radius is not larger than half the width or height
-			const radius = Math.max(
-				Math.min(
-					Math.min(width, height) / 2,
-					(image.radius ?? 0) * scale
-				),
-				0
-			);
-
-			const { offsetX, offsetY, newWidth, newHeight } =
-				GetImageDimensions(
-					img,
-					image.fit || "contain",
-					x,
-					y,
-					width,
-					height
-				);
-
-			ctx.save();
-			GetRoundedRect(
-				ctx,
-				Math.max(x, offsetX),
-				Math.max(y, offsetY),
-				Math.min(width, newWidth),
-				Math.min(height, newHeight),
-				radius
-			);
-			ctx.clip();
-
-			ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
-			ctx.restore();
-			resolve();
-		}
-
-		return new Promise((resolve) => {
-			if (image.image) {
-				DrawImage(image, image.image, resolve);
-				return;
-			}
-
-			const img = new Image();
-			img.crossOrigin = "anonymous";
-			img.src = image.content;
-			img.onload = () => {
-				DrawImage(image, img, resolve);
-			};
-			img.onerror = () => {
-				resolve();
-			};
-		});
-	};
-
-	await loadImage(image);
-}
-
-function GetImageDimensions(
-	image: HTMLImageElement,
-	type: string,
-	x: number,
-	y: number,
-	width: number,
-	height: number
-) {
-	if (type === "fill") {
-		return { offsetX: x, offsetY: y, newWidth: width, newHeight: height };
-	}
-
-	// Calculate scaling factors for width and height
-	const scaleX = width / image.width;
-	const scaleY = height / image.height;
-
-	// Choose the larger scale to cover the target area
-	const scale =
-		type === "cover" ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY);
-
-	// Calculate the new image dimensions
-	const newWidth = image.width * scale;
-	const newHeight = image.height * scale;
-
-	// Calculate the position to center the image on the target area
-	const offsetX = x + (width - newWidth) / 2;
-	const offsetY = y + (height - newHeight) / 2;
-
-	return { offsetX, offsetY, newWidth, newHeight };
-}
-
-function HighlightSelectedObject(
-	ctx: CanvasRenderingContext2D,
-	tray: ObjectProps,
-	objects: ObjectProps[],
-	selectedObjectID?: number | null
-) {
-	if (selectedObjectID === null) return;
-
-	const selectedObject = objects.find(
-		(obj: ObjectProps) => obj.id === selectedObjectID
-	);
-	if (!selectedObject) return;
-
-	const { x, y, width, height } = GetObjectDimensions(
-		ctx,
-		tray,
-		selectedObject
-	);
-
-	const padding = selectedObject.type === "text" ? 8 : 2;
-
-	ctx.save();
-	ctx.strokeStyle = "#999";
-	ctx.lineWidth = 4;
-	ctx.setLineDash([10, 5]);
-	ctx.strokeRect(
-		x - padding,
-		y - padding,
-		width + padding * 2,
-		height + padding * 2
-	);
-	ctx.restore();
-}
-
-function DrawTray(
-	ctx: any,
-	{ x, y, width, height, radius, color }: ObjectProps
-) {
-	GetRoundedRect(ctx, x, y, width ?? 0, height ?? 0, radius ?? 0);
-	ctx.fillStyle = color ?? "#eeeeee";
-	ctx.fill();
-	ctx.clip();
-}
-
-function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
-	// Draw a stroke inside the tray with a width of half the bleed
-	ctx.save();
-	ctx.strokeStyle = "#ff676caa";
-	ctx.lineWidth = tray.bleed ?? 0;
-	GetRoundedRect(
-		ctx,
-		tray.x + (tray.bleed ?? 0) / 2,
-		tray.y + (tray.bleed ?? 0) / 2,
-		(tray.width ?? 0) - (tray.bleed ?? 0),
-		(tray.height ?? 0) - (tray.bleed ?? 0),
-		(tray.radius ?? 0) - (tray.bleed ?? 0) / 2
-	);
-	ctx.stroke();
-	ctx.restore();
-}
-
-function DrawTrayShadow(ctx: any, tray: ObjectProps) {
-	ctx.save();
-	ctx.strokeStyle = tray.color === "#ffffff" ? "#00000011" : "#ffffff55";
-	ctx.lineWidth = tray.edge ?? 0;
-	GetRoundedRect(
-		ctx,
-		tray.x + (tray.bleed ?? 0) + (tray.edge ?? 0) / 2,
-		tray.y + (tray.bleed ?? 0) + (tray.edge ?? 0) / 2,
-		(tray.width ?? 0) - (tray.bleed ?? 0) * 2 - (tray.edge ?? 0),
-		(tray.height ?? 0) - (tray.bleed ?? 0) * 2 - (tray.edge ?? 0),
-		(tray.radius ?? 0) - (tray.bleed ?? 0) - (tray.edge ?? 0) / 2
-	);
-	ctx.stroke();
-	ctx.restore();
-}
-
-function DrawTrayBorder(ctx: any, tray: ObjectProps) {
-	ctx.save();
-	ctx.strokeStyle = "#777";
-	ctx.lineWidth = 1;
-	GetRoundedRect(
-		ctx,
-		tray.x,
-		tray.y,
-		tray.width ?? 0,
-		tray.height ?? 0,
-		tray.radius ?? 0
-	);
-	ctx.stroke();
-	ctx.restore();
-}
-
-function DrawTrayShadowOld(ctx: any, { x, y, width, height, radius }: any) {
-	ctx.save();
-	let lineWidth = 12;
-	ctx.lineWidth = lineWidth;
-	ctx.strokeStyle = "#00000044";
-	GetRoundedRect(ctx, x, y, width ?? 0, height ?? 0, radius ?? 0);
-	ctx.stroke();
-	ctx.strokeStyle = "#00000022";
-	GetRoundedRect(
-		ctx,
-		x + lineWidth,
-		y + lineWidth,
-		width - lineWidth * 2,
-		height - lineWidth * 2,
-		radius - lineWidth
-	);
-	ctx.stroke();
-	lineWidth = 24;
-	GetRoundedRect(
-		ctx,
-		x + lineWidth,
-		y + lineWidth,
-		width - lineWidth * 2,
-		height - lineWidth * 2,
-		radius - lineWidth
-	);
-	ctx.stroke();
-	ctx.restore();
-}
-
-function GetRoundedRect(
-	ctx: any,
-	x: number,
-	y: number,
-	width: number,
-	height: number,
-	radius: number
-) {
-	ctx.beginPath();
-
-	if (height >= width && width / 2 <= radius) {
-		ctx.arc(x + radius, y + radius, radius, Math.PI / 2, (Math.PI * 3) / 2);
-		ctx.lineTo(x + width - radius, y);
-		ctx.arc(
-			x + width - radius,
-			y + radius,
-			radius,
-			(Math.PI * 3) / 2,
-			Math.PI / 2
-		);
-		ctx.lineTo(x + radius, y + height);
-	} else {
-		ctx.moveTo(x, y + radius);
-		ctx.lineTo(x, y + height - radius);
-		ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
-		ctx.lineTo(x + width - radius, y + height);
-		ctx.quadraticCurveTo(
-			x + width,
-			y + height,
-			x + width,
-			y + height - radius
-		);
-		ctx.lineTo(x + width, y + radius);
-		ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
-		ctx.lineTo(x + radius, y);
-		ctx.quadraticCurveTo(x, y, x, y + radius);
-	}
-
-	ctx.closePath();
-}
-
-export function GetTrayObjFromCanvas(
-	canvas: HTMLCanvasElement,
-	heightProcentage: number = 0.85,
-	width: number = 43,
-	height: number = 33,
-	radius: number = 20,
-	bleed: number = 10,
-	edge: number = 20
-): ObjectProps {
-	const aspectRatio = (width + bleed / 10) / (height + bleed / 10);
-	const newWidth = canvas.height * heightProcentage * aspectRatio;
-	const newHeight = canvas.height * heightProcentage;
-	const newRadius =
-		(radius / 100) * (newWidth > newHeight ? newHeight : newWidth);
-	const newBleed = (bleed / 10) * (newWidth / width);
-	const newEdge = (edge / 20) * (newWidth / width);
-
-	return {
-		id: 0,
-		type: "tray",
-		content: "",
-		color: "#eeeeee",
-		x: (canvas.width - newWidth) / 2,
-		y: (canvas.height - newHeight) / 2,
-		width: newWidth,
-		height: newHeight,
-		radius: newRadius,
-		order: 0,
-		bleed: newBleed,
-		edge: newEdge,
-	};
-}
-
-function LoadImages(design: DesignProps, Draw: (design: DesignProps) => void) {
-	design.objects.forEach((obj) => {
-		if (
-			obj.type === "image" &&
-			(!obj.image || obj.content !== obj.image.src)
-		) {
-			const img = new Image();
-			img.crossOrigin = "anonymous";
-			img.src = obj.content;
-			img.onload = () => {
-				obj.image = img;
-				Draw(design);
-			};
-		}
-	});
-}
-
-interface SelectionProps {
-	start: number | null;
-	end: number | null;
-}
-
-function CanvasTextEditorInput(
-	canvas: HTMLCanvasElement,
-	trayObject: ObjectProps,
-	selection: SelectionProps,
-	setSelection: (obj: SelectionProps) => void,
-	object: ObjectProps,
-	setObject: (obj: ObjectProps) => void
-) {
-	const input = document.createElement("textarea");
-	const ctx = canvas.getContext("2d");
-	const rect = canvas.getBoundingClientRect();
-	if (!ctx || !rect) return;
-
-	const { x, y, width, height } = GetObjectDimensions(
-		ctx,
-		trayObject,
-		object
-	);
-
-	// Set the initial value of the input to the current text
-	input.value = object.content ?? "";
-	input.selectionStart = selection.start ?? input.value.length;
-	input.selectionEnd = selection.end ?? input.value.length;
-	input.style.position = "absolute";
-	input.style.left = `${x * (rect.width / canvas.width) - 8}px`;
-	input.style.top = `${y * (rect.height / canvas.height) - 16}px`;
-	input.style.width = `${width * (rect.width / canvas.width)}px`;
-	input.style.height = `${height * (rect.height / canvas.height)}px`;
-	input.style.padding = "8px";
-	input.style.boxSizing = "content-box";
-	input.style.fontSize = `${
-		(object.size ?? 0) * (rect.width / canvas.width)
-	}px`;
-	input.style.fontFamily = object.font ?? "sans-serif";
-	input.style.verticalAlign = "top";
-	input.style.outline = "none";
-	input.style.border = "none";
-	input.style.background = "transparent";
-	input.style.webkitTextFillColor = "transparent";
-	input.style.resize = "none";
-	input.style.overflow = "hidden";
-	// Append the input to the body
-	(canvas.parentNode || document.body).appendChild(input);
-
-	// Focus on the input and select its text
-	input.focus();
-
-	// Event listener to handle the input changes
-	input.addEventListener("input", (e) => {
-		setSelection({
-			start: input?.selectionStart || null,
-			end: input?.selectionEnd || null,
-		});
-
-		const target = e.target as HTMLTextAreaElement;
-		setObject({
-			...object,
-			content: target.value,
-		});
-	});
-
-	return input;
 }
 
 export async function getStaticProps() {

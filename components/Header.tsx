@@ -70,7 +70,7 @@ function Navbar() {
 				<div className="hidden md:flex items-center">
 					<Search />
 				</div>
-				<div className="flex items-center justify-end flex-1 gap-4">
+				<div className="flex items-center justify-end flex-1 gap-6">
 					<CartButton />
 					<UserButton />
 				</div>
@@ -105,7 +105,7 @@ function HamburgerMenu() {
 			</button>
 			<motion.div
 				animate={controls}
-				className="absolute z-50 top-[76px] h-[calc(100vh-76px)] left-0 bg-white w-80 px-4 py-4 border-r-2 border-gray-300">
+				className="absolute z-50 top-[73px] h-[calc(100vh-73px)] left-0 bg-white w-80 px-4 py-4 border-r-2 border-gray-300">
 				<div className="flex flex-col space-y-4">
 					<Search />
 				</div>
@@ -253,9 +253,21 @@ function UserButton() {
 					isOpen ? "" : "hidden"
 				} fixed top-0 left-0 right-0 bottom-0 z-20`}></div>
 			<button
-				className="p-2 text-gray-700 hover:text-gray-900 focus:outline-none"
+				className={`${
+					user?.photoURL ? "" : "p-2"
+				} text-gray-700 hover:text-gray-900 focus:outline-none`}
 				onClick={() => setIsOpen((open) => !open)}>
-				<FaUser className="h-6 w-6" />
+				{user?.photoURL ? (
+					<Image
+						src={user.photoURL}
+						alt=""
+						width={32}
+						height={32}
+						className="rounded-full"
+					/>
+				) : (
+					<FaUser className="h-6 w-6" />
+				)}
 			</button>
 			<motion.div
 				initial={{ scaleY: 0 }}

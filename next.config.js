@@ -6,6 +6,7 @@ const nextConfig = {
 			"files.stripe.com",
 			"secure.webtoolhub.com",
 			"firebasestorage.googleapis.com",
+			"lh3.googleusercontent.com",
 		],
 	},
 };

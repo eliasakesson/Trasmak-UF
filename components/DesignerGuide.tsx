@@ -16,16 +16,14 @@ export default function DesignerGuide({
 }: {
 	currentTool: string;
 }) {
-	const [show, setShow] = useState<"hide" | "welcome" | "tutorial">(
-		"welcome"
-	);
+	const [show, setShow] = useState<"hide" | "welcome" | "tutorial">("hide");
 
-	// useEffect(() => {
-	// 	const hasVisitedDesigner = localStorage.getItem("hasVisitedDesigner");
-	// 	if (!hasVisitedDesigner) {
-	// 		setTimeout(() => setShow("welcome"), 500);
-	// 	}
-	// }, []);
+	useEffect(() => {
+		const hasVisitedDesigner = localStorage.getItem("hasVisitedDesigner");
+		if (!hasVisitedDesigner) {
+			setTimeout(() => setShow("welcome"), 500);
+		}
+	}, []);
 
 	return (
 		<>

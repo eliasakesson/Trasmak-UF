@@ -4,19 +4,47 @@ import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import Spinner from "@/components/Spinner";
+import toast from "react-hot-toast";
+import { useRouter } from "next/router";
 
 export default function Login() {
+	const router = useRouter();
+
 	const [input, setInput] = useState({
 		email: "",
 		password: "",
 	});
 
+	const [error, setError] = useState("");
+	const [loading, setLoading] = useState(false);
+
+	const errorMessages = {
+		"auth/invalid-credential": "Ogiltig inloggningsuppgift",
+		"auth/invalid-email": "Ogiltig email",
+		"auth/user-not-found": "Användaren finns inte",
+		"auth/wrong-password": "Fel lösenord",
+		"auth/too-many-requests":
+			"För många felaktiga inloggningsförsök. Försök igen senare",
+	};
+
 	const handleSubmit = async (e: any) => {
 		e.preventDefault();
+		setLoading(true);
 		try {
 			await signInWithEmailAndPassword(auth, input.email, input.password);
-		} catch (err) {
-			console.log(err);
+
+			toast.success("Du är nu inloggad");
+			router.push("/");
+		} catch (err: any) {
+			const error = err.code as keyof typeof errorMessages;
+			if (Object.keys(errorMessages).includes(error)) {
+				setError(errorMessages[error]);
+			} else {
+				setError("Något gick fel. Försök igen senare");
+			}
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -31,7 +59,7 @@ export default function Login() {
 			</Head>
 			<main className="relative pb-16">
 				<section className="lg:min-h-[calc(100vh-153px)] min-h-[calc(100vh-111px)] flex lg:flex-row flex-col-reverse max-lg:gap-8">
-					<div className="flex-1 flex max-lg:h-1/2 md:order-1 order-2">
+					<div className="flex-1 flex max-lg:h-1/2 lg:order-1 order-2">
 						<div className="flex-1 bg-primary relative overflow-hidden">
 							<Image
 								src="/images/section1.jpg"
@@ -50,6 +78,13 @@ export default function Login() {
 								Logga in på ditt konto för att fortsätta designa
 								dina brickor.
 							</p>
+							<span>
+								{error && (
+									<p className="text-red-500 text-sm">
+										{error}
+									</p>
+								)}
+							</span>
 							<form
 								onSubmit={handleSubmit}
 								className="flex flex-col gap-4">
@@ -68,6 +103,7 @@ export default function Login() {
 												email: e.target.value,
 											})
 										}
+										required
 									/>
 								</div>
 								<div className="flex flex-col gap-1">
@@ -85,14 +121,17 @@ export default function Login() {
 												password: e.target.value,
 											})
 										}
+										required
 									/>
 								</div>
+								<button
+									type="submit"
+									disabled={loading}
+									className="flex items-center gap-2 bg-primary text-white text-left w-fit text-lg font-semibold px-16 py-3 rounded-md disabled:bg-primary_dark transition-colors">
+									{loading && <Spinner />}
+									Logga in
+								</button>
 							</form>
-							<button
-								onClick={handleSubmit}
-								className="bg-primary text-white text-left w-fit text-lg font-semibold px-16 py-3 rounded-md">
-								Logga in
-							</button>
 							<p className="text-gray-600 text-sm">
 								Har du inget konto?{" "}
 								<Link

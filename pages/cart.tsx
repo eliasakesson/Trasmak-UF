@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
-import { ref, get, remove } from "firebase/database";
+import { ref, get } from "firebase/database";
 import { db } from "../firebase";
 import GetProducts from "@/utils/getProducts";
 
@@ -146,8 +146,7 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 									onClick={() =>
 										changeDesignCount(design, false)
 									}
-									className="md:p-2 p-1 font-semibold md:text-xl"
-								>
+									className="md:p-2 p-1 font-semibold md:text-xl">
 									-
 								</button>
 								<span className="font-semibold">
@@ -157,16 +156,14 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 									onClick={() =>
 										changeDesignCount(design, true)
 									}
-									className="md:p-2 p-1 font-semibold md:text-xl"
-								>
+									className="md:p-2 p-1 font-semibold md:text-xl">
 									+
 								</button>
 							</div>
 							<button
 								onClick={() => removeDesign(design)}
 								type="button"
-								className="p-2 text-muted"
-							>
+								className="p-2 text-muted">
 								<FaTrash />
 							</button>
 						</li>
@@ -274,14 +271,12 @@ function CartSummary({ config }: { config: any }) {
 					}
 					onClick={onCheckout}
 					type="button"
-					className="py-4 px-8 bg-primary text-white hover:bg-primary_light transition-colors rounded-lg font-semibold disabled:bg-primary_dark"
-				>
+					className="py-4 px-8 bg-primary text-white hover:bg-primary_light transition-colors rounded-lg font-semibold disabled:bg-primary_dark">
 					Gå till kassan
 				</button>
 				<Link
 					href="/products"
-					className="py-4 px-8 border-2 rounded-lg font-semibold text-center hover:bg-white transition-colors"
-				>
+					className="py-4 px-8 border-2 rounded-lg font-semibold text-center hover:bg-white transition-colors">
 					Fortsätt handla
 				</Link>
 			</div>

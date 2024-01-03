@@ -1,8 +1,56 @@
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase";
+import Spinner from "@/components/Spinner";
+import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 
 export default function Login() {
+	const router = useRouter();
+
+	const [input, setInput] = useState({
+		email: "",
+		password: "",
+	});
+
+	const [error, setError] = useState("");
+	const [loading, setLoading] = useState(false);
+
+	const errorMessages = {
+		"auth/email-already-in-use": "Emailen används redan",
+		"auth/invalid-email": "Ogiltig email",
+		"auth/weak-password": "Lösenordet är för svagt",
+		"auth/too-many-requests":
+			"För många felaktiga inloggningsförsök. Försök igen senare",
+	};
+
+	const handleSubmit = async (e: any) => {
+		e.preventDefault();
+		setLoading(true);
+		try {
+			await createUserWithEmailAndPassword(
+				auth,
+				input.email,
+				input.password
+			);
+
+			toast.success("Kontot har skapats");
+			router.push("/");
+		} catch (err: any) {
+			const error = err.code as keyof typeof errorMessages;
+			if (Object.keys(errorMessages).includes(error)) {
+				setError(errorMessages[error]);
+			} else {
+				setError("Något gick fel. Försök igen senare");
+			}
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	return (
 		<>
 			<Head>
@@ -23,7 +71,16 @@ export default function Login() {
 								Med ett konto kan du spara dina brickor och
 								fortsätta designa dem senare.
 							</p>
-							<div className="flex flex-col gap-4">
+							<span>
+								{error && (
+									<p className="text-red-500 text-sm">
+										{error}
+									</p>
+								)}
+							</span>
+							<form
+								onSubmit={handleSubmit}
+								className="flex flex-col gap-4">
 								<div className="flex flex-col gap-1">
 									<label htmlFor="email">Email</label>
 									<input
@@ -32,6 +89,14 @@ export default function Login() {
 										id="email"
 										placeholder="namn@test.com"
 										className="border border-gray-300 rounded-md p-3 h-full"
+										value={input.email}
+										onChange={(e) =>
+											setInput({
+												...input,
+												email: e.target.value,
+											})
+										}
+										required
 									/>
 								</div>
 								<div className="flex flex-col gap-1">
@@ -42,12 +107,24 @@ export default function Login() {
 										id="password"
 										placeholder="********"
 										className="border border-gray-300 rounded-md p-3 h-full"
+										value={input.password}
+										onChange={(e) =>
+											setInput({
+												...input,
+												password: e.target.value,
+											})
+										}
+										required
 									/>
 								</div>
-							</div>
-							<button className="bg-primary text-white text-left w-fit text-lg font-semibold px-16 py-3 rounded-md">
-								Skapa konto
-							</button>
+								<button
+									type="submit"
+									disabled={loading}
+									className="flex items-center gap-2 bg-primary text-white text-left w-fit text-lg font-semibold px-16 py-3 rounded-md disabled:bg-primary_dark transition-colors">
+									{loading && <Spinner />}
+									Skapa konto
+								</button>
+							</form>
 							<p className="text-gray-600 text-sm">
 								Har du redan ett konto?{" "}
 								<Link
