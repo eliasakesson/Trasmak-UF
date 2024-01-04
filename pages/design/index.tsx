@@ -5,14 +5,18 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 
 import DesignerGuide from "@/components/DesignerGuide";
-import DesignEditor, { MoveDesignEditor } from "@/utils/design/DesignEditor";
-import DesignsGrid from "@/utils/design/DesignsGrid";
+import DesignEditor, {
+	MoveDesignEditor,
+} from "@/components/design/DesignEditor";
+import DesignsGrid from "@/components/design/DesignsGrid";
 import CanvasTextEditorInput from "@/utils/design/TextEditorInput";
+import SavedDesigns from "@/components/design/SavedDesigns";
 
 import AddToCart from "@/utils/design/CartHelper";
 import Draw from "@/utils/design/Draw";
 import SetupMouseEvents from "@/utils/design/MouseEvents";
 import GetProducts from "@/utils/getProducts";
+import { SaveDesign } from "@/utils/design/DesignSaver";
 
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
 import { useWindowSize } from "@/utils/hooks";
@@ -21,7 +25,9 @@ import {
 	LoopUntilSetTrayObject,
 	SetTrayObject,
 } from "@/utils/design/Helper";
+import { useAuthState } from "react-firebase-hooks/auth";
 
+import { auth } from "@/firebase";
 import designs from "../../data/designs.json";
 
 import {
@@ -35,10 +41,7 @@ import { FaCircleXmark } from "react-icons/fa6";
 
 import { Product } from "use-shopping-cart/core";
 import { ObjectProps, DesignProps } from "@/utils/design/Interfaces";
-import SavedDesigns from "@/utils/design/SavedDesigns";
-import { SaveDesign } from "@/utils/design/DesignSaver";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase";
+import TemplateDesigns from "@/components/design/TemplateDesigns";
 
 export default function Design({ products }: { products: any }) {
 	const router = useRouter();
@@ -125,7 +128,7 @@ export default function Design({ products }: { products: any }) {
 		if (!canvas) return;
 		const ctx = canvas.getContext("2d");
 		const rect = canvas.getBoundingClientRect();
-		const selectedObject = currentDesign.objects.find(
+		const selectedObject = currentDesign.objects?.find(
 			(obj) => obj.id === selectedObjectID
 		);
 
@@ -253,7 +256,7 @@ export default function Design({ products }: { products: any }) {
 				<meta name="description" content="Designa din egen träbricka" />
 			</Head>
 			<main className="max-w-7xl mx-auto px-8 py-16 space-y-8">
-				<div className="grid lg:grid-cols-4 lg:grid-rows-2 gap-8">
+				<div className="grid lg:grid-cols-4 gap-8">
 					<div className="col-span-3 space-y-4">
 						<div className="relative" id="canvasparent">
 							<canvas
@@ -261,13 +264,15 @@ export default function Design({ products }: { products: any }) {
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
 								height={720}></canvas>
-							<div className="absolute" ref={designEditorRef}>
+							<div
+								className="absolute z-50"
+								ref={designEditorRef}>
 								{selectedObjectID && (
 									<DesignEditor
 										design={currentDesign}
 										setDesign={setCurrentDesign}
 										object={
-											currentDesign?.objects.find(
+											currentDesign?.objects?.find(
 												(obj) =>
 													obj.id === selectedObjectID
 											) ?? null
@@ -528,12 +533,11 @@ export default function Design({ products }: { products: any }) {
 								canvasClassKey="saved-design-canvas"
 							/>
 						</div>
-						<div>
+						<div id="templates">
 							<h2 className="text-xl font-bold border-b pb-2 mb-4">
 								Mallar
 							</h2>
-							<DesignsGrid
-								designs={designs}
+							<TemplateDesigns
 								products={products}
 								onSelect={(design) => {
 									setSelectedObjectID(null);

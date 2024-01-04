@@ -1,18 +1,23 @@
 import { useEffect } from "react";
-import { DesignProps } from "./Interfaces";
-import { GetTrayObjFromCanvas } from "./Helper";
-import Draw from "./Draw";
+import { DesignProps } from "../../utils/design/Interfaces";
+import { GetTrayObjFromCanvas } from "../../utils/design/Helper";
+import Draw from "../../utils/design/Draw";
+import { FaTrash, FaUpload } from "react-icons/fa";
 
 export default function DesignsGrid({
 	designs,
 	products,
 	onSelect,
 	canvasClassKey,
+	trashClicked,
+	uploadClicked,
 }: {
 	designs: DesignProps[];
 	products: any[];
 	onSelect: (design: DesignProps) => void;
 	canvasClassKey: string;
+	trashClicked?: (design: DesignProps) => void;
+	uploadClicked?: (design: DesignProps) => void;
 }) {
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -36,7 +41,7 @@ export default function DesignsGrid({
 				);
 				Draw(canvas as HTMLCanvasElement, tray, designs[i]);
 			});
-		}, 1000);
+		}, 10);
 
 		return () => {
 			clearTimeout(timer);
@@ -44,9 +49,9 @@ export default function DesignsGrid({
 	}, [designs]);
 
 	return (
-		<ul className="grid grid-cols-3 gap-4" id="templates">
+		<ul className="grid grid-cols-3 gap-4">
 			{designs.map((design, i) => (
-				<li key={i} className="list-none">
+				<li key={i} className="list-none relative">
 					<button
 						onClick={() => onSelect(design)}
 						className="w-full aspect-video bg-gray-100 rounded-xl">
@@ -55,6 +60,22 @@ export default function DesignsGrid({
 							width={1280}
 							height={720}></canvas>
 					</button>
+					<div className="absolute top-4 right-4 flex flex-col gap-2">
+						{trashClicked && (
+							<button
+								onClick={() => trashClicked(design)}
+								className="border-gray-300 text-muted border-2 p-2 rounded-md hover:bg-gray-200 transition-colors">
+								<FaTrash size={16} />
+							</button>
+						)}
+						{uploadClicked && (
+							<button
+								onClick={() => uploadClicked(design)}
+								className="border-gray-300 text-muted border-2 p-2 rounded-md hover:bg-gray-200 transition-colors">
+								<FaUpload size={16} />
+							</button>
+						)}
+					</div>
 				</li>
 			))}
 		</ul>

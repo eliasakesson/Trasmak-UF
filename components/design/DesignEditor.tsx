@@ -1,10 +1,10 @@
 import { RefObject, createContext, useCallback, useContext } from "react";
-import { DesignProps, ObjectProps } from "./Interfaces";
+import { DesignProps, ObjectProps } from "../../utils/design/Interfaces";
 
 import { FaTrash, FaChevronUp, FaChevronDown, FaExpand } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
-import { GetObjectDimensions } from "./Helper";
+import { GetObjectDimensions } from "../../utils/design/Helper";
 
 const SelectedObjectContext = createContext({
 	object: null as ObjectProps | null,
@@ -29,7 +29,7 @@ export default function DesignEditor({
 	return (
 		<SelectedObjectContext.Provider value={{ object, setObject }}>
 			<div
-				className="flex flex-col gap-2 bg-white border rounded-md p-4 z-50"
+				className="flex flex-col gap-2 bg-white border rounded-md p-4"
 				id="editor">
 				<div className="flex items-center gap-2">
 					{object?.type === "image" && (
@@ -329,9 +329,9 @@ function Input({
 							viewBox="0 0 20 16">
 							<path
 								stroke="currentColor"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
 								d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
 							/>
 						</svg>
@@ -378,7 +378,7 @@ function Input({
 					type="number"
 					name={label}
 					id={label}
-					className="py-2 h-full w-10 outline-none"
+					className="py-2 h-full w-[6ch] outline-none"
 					value={objKey in object ? object[objKey] : ""}
 					onChange={(e) =>
 						setObject({

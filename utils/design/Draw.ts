@@ -16,10 +16,10 @@ export default async function Draw(
 
 	DrawTray(ctx, tray);
 
-	design.objects.sort((a, b) => a.order - b.order);
+	design.objects?.sort((a, b) => a.order - b.order);
 
-	for (let i = 0; i < design.objects.length; i++) {
-		const obj = design.objects[i];
+	for (let i = 0; i < design.objects?.length; i++) {
+		const obj = design.objects?.[i];
 		if (obj.type === "text") {
 			DrawText(ctx, tray, obj);
 		} else if (obj.type === "rectangle") {
@@ -56,10 +56,10 @@ export async function DrawRender(
 
 	DrawTray(ctx, tray);
 
-	design.objects.sort((a, b) => a.order - b.order);
+	design.objects?.sort((a, b) => a.order - b.order);
 
-	for (let i = 0; i < design.objects.length; i++) {
-		const obj = design.objects[i];
+	for (let i = 0; i < design.objects?.length; i++) {
+		const obj = design.objects?.[i];
 		console.log(obj);
 		if (obj.type === "text") {
 			DrawText(ctx, tray, obj, scale);
@@ -232,7 +232,7 @@ function HighlightSelectedObject(
 ) {
 	if (selectedObjectID === null) return;
 
-	const selectedObject = objects.find(
+	const selectedObject = objects?.find(
 		(obj: ObjectProps) => obj.id === selectedObjectID
 	);
 	if (!selectedObject) return;

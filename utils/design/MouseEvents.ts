@@ -1,4 +1,4 @@
-import { DesignProps, ObjectProps } from "@/pages/design";
+import { DesignProps, ObjectProps } from "@/utils/design/Interfaces";
 import { GetObjectDimensions } from "./Helper";
 import defaultDesign from "../../data/defaultdesign.json";
 
