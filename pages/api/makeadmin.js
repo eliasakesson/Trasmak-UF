@@ -1,9 +1,17 @@
 import { auth } from "./firebase";
 
 export default async (req, res) => {
-	const { uid } = req.query;
+	const { uid, adminUID } = req.query;
 
 	try {
+		if (!uid || !adminUID) {
+			return res.status(400).json({ error: "Missing params" });
+		}
+		const adminUser = await auth.getUser(adminUID);
+		if (!adminUser.customClaims.admin) {
+			return res.status(403).json({ error: "Request not authorized" });
+		}
+
 		await auth.setCustomUserClaims(uid, { admin: true });
 
 		const user = await auth.getUser(uid);
