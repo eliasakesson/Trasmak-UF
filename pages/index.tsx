@@ -5,9 +5,16 @@ import Section1 from "@/components/Section1";
 import Section2 from "@/components/Section2";
 import Head from "next/head";
 import Inspiration from "@/components/Inspiration";
-import TemplateRow from "@/components/TemplateRow";
+import TemplateDesigns from "@/components/design/TemplateDesigns";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { useWindowSize } from "@/utils/hooks";
+import { FaArrowRight } from "react-icons/fa";
 
 export default function Home({ products }: { products: any }) {
+	const router = useRouter();
+	const { width } = useWindowSize();
+
 	return (
 		<>
 			<Head>
@@ -20,26 +27,44 @@ export default function Home({ products }: { products: any }) {
 			<main className="relative pb-16">
 				<div className="flex flex-col lg:gap-32 gap-16">
 					<Hero />
-					<div className="max-w-7xl mx-auto px-4">
+					<div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
 						<ProductRow
 							title="Bästsäljare"
 							description="Detta är de brickor som säljs som bäst. Passa på innan de tar
 							slut!"
 							products={products}
-							rows={3}
+							rows={width >= 1024 ? 1 : 2}
 						/>
+						<Link
+							href="/products"
+							className="flex items-center gap-2 font-semibold text-xl text-primary_light">
+							Se fler produkter
+							<FaArrowRight />
+						</Link>
 					</div>
 					<Section1 />
-					<div className="max-w-7xl mx-auto px-4">
+					<Section2 />
+					<div className="max-w-7xl mx-auto px-4 hidden md:block">
 						<ProductRow
 							title="Våra favoritmallar"
 							description="Skapa personliga brickor baserat på våra bästa mallar!"
 							products={products}
 							type="template"
 						/>
-						<TemplateRow products={products} />
+						<TemplateDesigns
+							products={products}
+							onSelect={(design) =>
+								router.push({
+									pathname: "/design",
+									query: { d: JSON.stringify(design) },
+								})
+							}
+							canvasClassKey="homepage-template-canvas"
+							maxDesigns={6}
+							sort={false}
+							hideDelete
+						/>
 					</div>
-					<Section2 />
 					<div className="max-w-7xl mx-auto px-4 w-full">
 						<Inspiration />
 					</div>

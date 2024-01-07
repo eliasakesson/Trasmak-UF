@@ -93,7 +93,7 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 			<div className="flex md:gap-8 gap-4">
 				<div className="-z-10 bg-gray-100 rounded-lg border">
 					<Image
-						className="mix-blend-multiply object-contain aspect-square"
+						className="mix-blend-multiply object-contain aspect-square hue-rotate-[50deg] saturate-150"
 						src={cartItem.image}
 						alt=""
 						width={64}

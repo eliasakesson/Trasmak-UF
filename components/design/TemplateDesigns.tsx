@@ -13,10 +13,16 @@ export default function TemplateDesigns({
 	products,
 	onSelect,
 	canvasClassKey,
+	maxDesigns,
+	sort = true,
+	hideDelete,
 }: {
 	products: Product[];
 	onSelect: (design: DesignProps) => void;
 	canvasClassKey: string;
+	maxDesigns?: number;
+	sort?: boolean;
+	hideDelete?: boolean;
 }) {
 	const [user, loading, error] = useAuthState(auth);
 	const isAdmin = useIsAdmin(user);
@@ -36,7 +42,10 @@ export default function TemplateDesigns({
 			}
 
 			const dataArray = Object.entries(data);
-			dataArray.sort((a: any, b: any) => b[0] - a[0]);
+
+			if (sort) {
+				dataArray.sort((a: any, b: any) => b[0] - a[0]);
+			}
 
 			const sortedDesigns = dataArray.map(
 				(data) => data[1]
@@ -70,11 +79,11 @@ export default function TemplateDesigns({
 
 	return (
 		<DesignsGrid
-			designs={designs}
+			designs={designs.slice(0, maxDesigns || designs.length)}
 			products={products}
 			onSelect={onSelect}
 			canvasClassKey={canvasClassKey}
-			trashClicked={isAdmin ? removeDesign : undefined}
+			trashClicked={isAdmin && !hideDelete ? removeDesign : undefined}
 		/>
 	);
 }

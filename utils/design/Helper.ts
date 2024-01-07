@@ -92,7 +92,17 @@ export function LoadImages(
 	design: DesignProps,
 	Draw: (design: DesignProps) => void
 ) {
-	design.objects.forEach((obj) => {
+	if (design.image && !design.imageElement) {
+		const img = new Image();
+		img.crossOrigin = "anonymous";
+		img.src = design.image;
+		img.onload = () => {
+			design.imageElement = img;
+			Draw(design);
+		};
+	}
+
+	design.objects?.forEach((obj) => {
 		if (
 			obj.type === "image" &&
 			(!obj.image || obj.content !== obj.image.src)
@@ -111,7 +121,6 @@ export function LoadImages(
 export function SetTrayObject(
 	products: any,
 	currentDesignID: string,
-	trayObject: ObjectProps | null,
 	setTrayObject: (tray: ObjectProps) => void
 ) {
 	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -132,10 +141,6 @@ export function SetTrayObject(
 		metadata?.edge
 	);
 
-	if (trayObject && trayObject.color) {
-		tray.color = trayObject.color;
-	}
-
 	if (tray) {
 		setTrayObject(tray);
 	}
@@ -150,13 +155,7 @@ export function LoopUntilSetTrayObject(
 	function GetLoop() {
 		if (!trayObject) {
 			return setInterval(
-				() =>
-					SetTrayObject(
-						products,
-						currentDesignID,
-						trayObject,
-						setTrayObject
-					),
+				() => SetTrayObject(products, currentDesignID, setTrayObject),
 				100
 			);
 		}

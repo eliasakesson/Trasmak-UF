@@ -1,5 +1,12 @@
-import { RefObject, createContext, useCallback, useContext } from "react";
+import {
+	RefObject,
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+} from "react";
 import { DesignProps, ObjectProps } from "../../utils/design/Interfaces";
+import debounce from "lodash.debounce";
 
 import { FaTrash, FaChevronUp, FaChevronDown, FaExpand } from "react-icons/fa";
 import toast from "react-hot-toast";
@@ -281,12 +288,15 @@ function Input({
 		noClick: true,
 	});
 
+	const debouncedSetObject = debounce((value) => {
+		setObject(value);
+	}, 10);
+
 	if (!object || !(objKey in object)) return null;
 
 	if (type === "color")
 		return (
-			<div
-				className={`flex flex-col gap-1 h-full aspect-square ${className}`}>
+			<div className={`flex flex-col gap-1 aspect-square ${className}`}>
 				<label className="sr-only" htmlFor={label}>
 					{label}
 				</label>
@@ -298,7 +308,7 @@ function Input({
 						className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
 						value={object[objKey]}
 						onChange={(e) =>
-							setObject({
+							debouncedSetObject({
 								...(object as ObjectProps),
 								[objKey]: e.target.value,
 							})

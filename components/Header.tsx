@@ -6,11 +6,11 @@ import {
 	FaSearch,
 	FaBars,
 	FaCrown,
-	FaExclamation,
 	FaStar,
 	FaPencilRuler,
 	FaUser,
 } from "react-icons/fa";
+import { TbTemplate } from "react-icons/tb";
 import { FcGoogle } from "react-icons/fc";
 import { GoLaw } from "react-icons/go";
 import { BsChevronDown } from "react-icons/bs";
@@ -206,7 +206,7 @@ function Search() {
 										<img
 											src={product.image}
 											alt={product.name}
-											className="w-8 h-8 object-contain"
+											className="w-8 h-8 object-contain hue-rotate-[50deg] saturate-150 rounded-sm"
 										/>
 										<span>{product.name}</span>
 									</div>
@@ -283,6 +283,12 @@ function UserButton() {
 					<div className="flex flex-col gap-2">
 						{user ? (
 							<>
+								<Link
+									href="/profile"
+									onClick={() => setIsOpen(false)}
+									className="w-full text-left border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
+									Min profil
+								</Link>
 								<button
 									onClick={() => auth.signOut()}
 									className="w-full text-left border-2 border-red-200 bg-red-50 px-8 py-2 rounded-lg font-semibold hover:bg-red-100 transition-colors whitespace-nowrap">
@@ -386,7 +392,7 @@ function CartButton() {
 											alt={item.name}
 											width={56}
 											height={56}
-											className="object-contain aspect-square"
+											className="object-contain aspect-square hue-rotate-[50deg] saturate-150"
 										/>
 									</div>
 									<div className="flex flex-col justify-center">
@@ -515,15 +521,15 @@ function ProductsNav() {
 						href="/products"
 						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
 						<FaStar className="text-4xl" />
-						<span className="text-lg">Utvalda</span>
+						<span className="text-lg">Produkter</span>
 					</Link>
 				</li>
 				<li>
 					<Link
-						href="/products"
+						href="/templates"
 						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
-						<FaExclamation className="text-4xl" />
-						<span className="text-lg">Nya</span>
+						<TbTemplate className="text-4xl" />
+						<span className="text-lg">Mallar</span>
 					</Link>
 				</li>
 			</ul>
@@ -539,7 +545,7 @@ function DesignNav() {
 			animate={{ opacity: 1, translateX: 0 }}>
 			<li>
 				<Link
-					href="/design"
+					href="/templates"
 					className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
 					<AiFillLayout className="text-4xl" />
 					<span className="text-lg">Starta från mall</span>

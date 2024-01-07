@@ -4,11 +4,10 @@ import Head from "next/head";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-import DesignerGuide from "@/components/DesignerGuide";
+import DesignerGuide from "@/components/design/DesignerGuide";
 import DesignEditor, {
 	MoveDesignEditor,
 } from "@/components/design/DesignEditor";
-import DesignsGrid from "@/components/design/DesignsGrid";
 import CanvasTextEditorInput from "@/utils/design/TextEditorInput";
 import SavedDesigns from "@/components/design/SavedDesigns";
 
@@ -30,18 +29,13 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 import designs from "../../data/designs.json";
 
-import {
-	FaMousePointer,
-	FaImage,
-	FaSquare,
-	FaCopy,
-	FaSave,
-} from "react-icons/fa";
+import { FaMousePointer, FaImage, FaSquare, FaSave } from "react-icons/fa";
 import { FaCircleXmark } from "react-icons/fa6";
 
 import { Product } from "use-shopping-cart/core";
 import { ObjectProps, DesignProps } from "@/utils/design/Interfaces";
 import TemplateDesigns from "@/components/design/TemplateDesigns";
+import TrayBackgroundPopup from "@/components/design/TrayBackgroundPopup";
 
 export default function Design({ products }: { products: any }) {
 	const router = useRouter();
@@ -50,7 +44,11 @@ export default function Design({ products }: { products: any }) {
 
 	const [user, loading, error] = useAuthState(auth);
 
-	const [currentDesign, setCurrentDesign] = useState<DesignProps>(designs[0]);
+	const [currentDesign, setCurrentDesign] = useState<DesignProps>({
+		id: "",
+		color: "#eeeeee",
+		objects: [],
+	});
 	const [trayObject, setTrayObject] = useState<ObjectProps | null>(null);
 
 	const [selectedTool, setSelectedTool] = useState<
@@ -71,23 +69,36 @@ export default function Design({ products }: { products: any }) {
 	const lastAddedImageURL = useRef<string | null>(null);
 
 	useEffect(() => {
-		if (router.query.d && currentDesign.id !== router.query.d) {
-			if (router.query.i) {
-				const rtDesign = designs[parseInt(router.query.i as string)];
-				if (rtDesign) {
-					setCurrentDesign(rtDesign);
+		if (Object.keys(router.query).includes("d")) {
+			if (!router.query.d) return;
+			try {
+				const design = JSON.parse(router.query.d as string);
+				if (design) {
+					setCurrentDesign(design);
+					router.replace("/design?d");
 					return;
 				}
+			} catch (e) {
+				console.error(e);
 			}
 
-			setCurrentDesign({
-				...designs[0],
-				id: router.query.d as string,
-			});
-		} else if (products && products[0]) {
+			const product = products.find(
+				(p: Product) =>
+					p.id.substring(6, p.id.length) === router.query.d
+			);
+			if (product) {
+				setCurrentDesign({
+					id: product.id.substring(6, product.id.length),
+					objects: designs[0].objects,
+					color: "#eeeeee",
+				});
+				router.replace("/design?d");
+			}
+		} else if (products.length > 0) {
 			setCurrentDesign({
 				id: products[0].id.substring(6, products[0].id.length),
 				objects: designs[0].objects,
+				color: "#eeeeee",
 			});
 		}
 	}, [router.query.d, products]);
@@ -113,13 +124,7 @@ export default function Design({ products }: { products: any }) {
 	}, [trayObject]);
 
 	useEffect(
-		() =>
-			SetTrayObject(
-				products,
-				currentDesign.id,
-				trayObject,
-				setTrayObject
-			),
+		() => SetTrayObject(products, currentDesign.id, setTrayObject),
 		[currentDesign.id, products]
 	);
 
@@ -359,41 +364,21 @@ export default function Design({ products }: { products: any }) {
 									<br />
 									<DesignerGuide currentTool={selectedTool} />
 								</div>
-								<div className="flex gap-2">
-									<button
-										onClick={() => {
-											navigator.clipboard.writeText(
-												JSON.stringify({
-													...currentDesign,
-													objects:
-														currentDesign.objects.map(
-															(obj) => ({
-																...obj,
-																image: undefined,
-															})
-														),
-												})
-											);
-										}}
-										className="border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
-										<FaCopy /> Kopiera design
-									</button>
-									<button
-										onClick={() =>
-											AddToCart(
-												products,
-												currentDesign,
-												trayObject,
-												cartDetails,
-												addItem,
-												isAddingToCart,
-												lastAddedImageURL
-											)
-										}
-										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
-										Lägg till i kundvagn
-									</button>
-								</div>
+								<button
+									onClick={() =>
+										AddToCart(
+											products,
+											currentDesign,
+											trayObject,
+											cartDetails,
+											addItem,
+											isAddingToCart,
+											lastAddedImageURL
+										)
+									}
+									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+									Lägg till i kundvagn
+								</button>
 							</div>
 						</div>
 						<div className="flex flex-col gap-2">
@@ -401,14 +386,14 @@ export default function Design({ products }: { products: any }) {
 								Bakgrundsfärg och stödlinjer
 							</h3>
 							<div className="flex gap-2 h-12">
-								<div className="relative rounded-md border aspect-square h-full">
+								{/* <div className="relative rounded-md border aspect-square h-full">
 									<input
 										type="color"
 										className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-										value={trayObject?.color ?? "#000"}
+										value={currentDesign?.color ?? "#000"}
 										onChange={(e) =>
-											setTrayObject((tray) => ({
-												...(tray as ObjectProps),
+											setCurrentDesign((design) => ({
+												...design,
 												color: e.target.value,
 											}))
 										}
@@ -417,11 +402,13 @@ export default function Design({ products }: { products: any }) {
 										className="absolute inset-0 pointer-events-none rounded-[4px]"
 										style={{
 											backgroundColor:
-												trayObject?.color ?? "",
+												currentDesign?.color ?? "",
 										}}></div>
-								</div>
-								<br />
-								<br />
+								</div> */}
+								<TrayBackgroundPopup
+									currentDesign={currentDesign}
+									setCurrentDesign={setCurrentDesign}
+								/>
 								<button
 									onClick={() =>
 										setShowCanvasSupport((s) => !s)
@@ -436,13 +423,13 @@ export default function Design({ products }: { products: any }) {
 										<p>Säkerhetsmarginal</p>
 									</div>
 									<div className="h-full flex gap-2">
-										<div
-											className={`${
-												trayObject?.color === "#ffffff"
-													? "bg-gray-300"
-													: "bg-white"
-											} border aspect-square h-full rounded`}></div>
-										<p>Kanter</p>
+										<div className="bg-white border aspect-square h-full rounded"></div>
+										<p className="whitespace-nowrap">
+											Kanter{" "}
+											<span className="text-muted">
+												(Ej exakt pga säkerhetsmarginal)
+											</span>
+										</p>
 									</div>
 								</div>
 								{user && (
@@ -463,6 +450,13 @@ export default function Design({ products }: { products: any }) {
 								)}
 							</div>
 						</div>
+						<p className="text-muted">
+							OBS! Brickorna är handgjorda och motivet kan därmed
+							flyttas några millimeter i sidled. Detta är inget vi
+							kan påverka. Säkerhetsmarginalen finns för att
+							garantera att viktiga motiv inte ska hamna utanför
+							brickan.
+						</p>
 					</div>
 					<div className="row-span-2 lg:col-span-1 col-span-3">
 						<h2 className="text-xl font-bold border-b pb-2 mb-4">

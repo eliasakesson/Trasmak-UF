@@ -1,9 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { motion, useAnimationControls } from "framer-motion";
 
 export default function Hero() {
 	const [scrollY, setScrollY] = useState(0);
+	const [currentSlide, setCurrentSlide] = useState(0);
+
+	const slides = [
+		"/images/hero.jpg",
+		"/images/valnöt.jpg",
+		"/images/hero.jpg",
+		"/images/valnöt.jpg",
+	];
 
 	useEffect(() => {
 		function handleScroll() {
@@ -18,10 +27,22 @@ export default function Hero() {
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
 
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setCurrentSlide((currentSlide) =>
+				currentSlide === slides.length - 1 ? 0 : currentSlide + 1
+			);
+		}, 5000);
+
+		return () => clearInterval(interval);
+	}, [currentSlide]);
+
+	const controls = useAnimationControls();
+
 	return (
 		<section className="lg:min-h-[calc(100vh-153px)] min-h-[calc(100vh-111px)] flex lg:flex-row flex-col-reverse max-lg:gap-8">
 			<div className="lg:flex-1 flex max-lg:h-1/2">
-				<div className="lg:pl-[10vw] lg:pr-[5vw] px-8 lg:h-md:pb-[153px] py-8 flex flex-col justify-center gap-8 h-full">
+				<div className="lg:pl-[10vw] lg:pr-[5vw] px-8 lg:h-md:pb-[153px] lg:py-8 py-4 flex flex-col justify-center lg:gap-8 gap-2 h-full">
 					<h1 className="xl:text-7xl lg:text-6xl text-4xl font-bold leading-tight text-gray-900">
 						<span className="text-primary">Personlig</span> design
 						<br />
@@ -33,7 +54,7 @@ export default function Hero() {
 						design. Välj mellan olika storlekar och få en
 						närproducerad bricka levererad till dörren.
 					</p>
-					<div className="flex gap-4 lg:flex-row flex-col md:pt-4">
+					<div className="flex lg:gap-4 gap-2 lg:flex-row flex-col pt-4 lg:pb-0 pb-16">
 						<Link
 							href="/design"
 							className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
@@ -51,12 +72,26 @@ export default function Hero() {
 				<div
 					className="flex-1 bg-primary relative overflow-hidden"
 					style={{ borderBottomLeftRadius: scrollY }}>
-					<Image
-						src="/images/hero.jpg"
-						layout="fill"
-						alt=""
-						className="object-cover"
-					/>
+					<motion.div animate={controls}>
+						<Image
+							src={slides[currentSlide]}
+							layout="fill"
+							alt=""
+							className="object-cover"
+						/>
+					</motion.div>
+					<div className="absolute lg:bottom-8 bottom-4 left-1/2 -translate-x-1/2 p-1 bg-gray-50 flex gap-1 rounded-full">
+						{slides.map((slide, i) => (
+							<button
+								key={i}
+								className={`h-3 rounded-full transition-all ${
+									currentSlide === i
+										? "bg-primary_light opacity-50 w-12"
+										: "bg-gray-300 w-3"
+								}`}
+								onClick={() => setCurrentSlide(i)}></button>
+						))}
+					</div>
 				</div>
 			</div>
 		</section>

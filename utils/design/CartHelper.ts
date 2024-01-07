@@ -49,8 +49,6 @@ export default async function AddToCart(
 		metadata?.edge
 	);
 
-	renderTray.color = trayObject?.color ?? "#ffffff";
-
 	if (!renderTray) {
 		toast.error("Något gick fel", { id: toastID });
 		console.error("Tray is null");

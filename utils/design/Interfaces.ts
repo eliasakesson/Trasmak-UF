@@ -1,5 +1,8 @@
 export interface DesignProps {
 	id: string;
+	color: string;
+	image?: string;
+	imageElement?: HTMLImageElement;
 	objects: ObjectProps[];
 }
 

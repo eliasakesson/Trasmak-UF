@@ -14,7 +14,8 @@ export default async function Draw(
 	ctx.reset();
 	ctx.save();
 
-	DrawTray(ctx, tray);
+	await DrawTray(ctx, design, tray);
+	console.log("after draw tray");
 
 	design.objects?.sort((a, b) => a.order - b.order);
 
@@ -54,7 +55,7 @@ export async function DrawRender(
 	ctx.reset();
 	ctx.save();
 
-	DrawTray(ctx, tray);
+	await DrawTray(ctx, design, tray);
 
 	design.objects?.sort((a, b) => a.order - b.order);
 
@@ -168,6 +169,7 @@ async function DrawImage(
 			ctx.clip();
 
 			ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+			console.log("after draw image");
 			ctx.restore();
 			resolve();
 		}
@@ -258,17 +260,69 @@ function HighlightSelectedObject(
 	ctx.restore();
 }
 
-function DrawTray(
-	ctx: any,
-	{ x, y, width, height, radius, color, content }: ObjectProps
-) {
-	if (content) {
-	} else {
-		GetRoundedRect(ctx, x, y, width ?? 0, height ?? 0, radius ?? 0);
-		ctx.fillStyle = color ?? "#eeeeee";
-		ctx.fill();
-	}
+async function DrawTray(ctx: any, design: DesignProps, tray: ObjectProps) {
+	GetRoundedRect(
+		ctx,
+		tray.x,
+		tray.y,
+		tray.width ?? 0,
+		tray.height ?? 0,
+		tray.radius ?? 0
+	);
+	ctx.save();
+	ctx.fillStyle = "#000000ff";
+	ctx.shadowColor = "#00000055";
+	ctx.shadowBlur = 50;
+	ctx.shadowOffsetX = 0;
+	ctx.shadowOffsetY = 0;
+	ctx.fill();
 	ctx.clip();
+
+	function DrawImage(img: HTMLImageElement, resolve: any) {
+		const { offsetX, offsetY, newWidth, newHeight } = GetImageDimensions(
+			img,
+			"cover",
+			tray.x,
+			tray.y,
+			tray.width ?? 0,
+			tray.height ?? 0
+		);
+
+		GetRoundedRect(
+			ctx,
+			Math.max(tray.x, offsetX),
+			Math.max(tray.y, offsetY),
+			Math.min(tray.width ?? 0, newWidth),
+			Math.min(tray.height ?? 0, newHeight),
+			tray.radius ?? 0
+		);
+		ctx.clip();
+
+		ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+		ctx.restore();
+		resolve();
+	}
+
+	await new Promise<void>((resolve) => {
+		if (design.image) {
+			let img = new Image();
+			if (!design.imageElement) {
+				img.crossOrigin = "anonymous";
+				img.src = design.image ?? "";
+				img.onload = () => DrawImage(img, resolve);
+				img.onerror = () => {
+					resolve();
+				};
+			} else {
+				DrawImage(design.imageElement, resolve);
+			}
+		} else {
+			ctx.fillStyle = design.color ?? "#eeeeee";
+			ctx.fill();
+			resolve();
+		}
+	});
+	ctx.restore();
 }
 
 function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
@@ -290,7 +344,7 @@ function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
 
 function DrawTrayShadow(ctx: any, tray: ObjectProps) {
 	ctx.save();
-	ctx.strokeStyle = tray.color === "#ffffff" ? "#00000011" : "#ffffff55";
+	ctx.strokeStyle = "#ffffff55";
 	ctx.lineWidth = tray.edge ?? 0;
 	GetRoundedRect(
 		ctx,
@@ -320,36 +374,6 @@ function DrawTrayBorder(ctx: any, tray: ObjectProps) {
 	ctx.restore();
 }
 
-function DrawTrayShadowOld(ctx: any, { x, y, width, height, radius }: any) {
-	ctx.save();
-	let lineWidth = 12;
-	ctx.lineWidth = lineWidth;
-	ctx.strokeStyle = "#00000044";
-	GetRoundedRect(ctx, x, y, width ?? 0, height ?? 0, radius ?? 0);
-	ctx.stroke();
-	ctx.strokeStyle = "#00000022";
-	GetRoundedRect(
-		ctx,
-		x + lineWidth,
-		y + lineWidth,
-		width - lineWidth * 2,
-		height - lineWidth * 2,
-		radius - lineWidth
-	);
-	ctx.stroke();
-	lineWidth = 24;
-	GetRoundedRect(
-		ctx,
-		x + lineWidth,
-		y + lineWidth,
-		width - lineWidth * 2,
-		height - lineWidth * 2,
-		radius - lineWidth
-	);
-	ctx.stroke();
-	ctx.restore();
-}
-
 function GetRoundedRect(
 	ctx: any,
 	x: number,
@@ -359,34 +383,10 @@ function GetRoundedRect(
 	radius: number
 ) {
 	ctx.beginPath();
-
-	if (height >= width && width / 2 <= radius) {
-		ctx.arc(x + radius, y + radius, radius, Math.PI / 2, (Math.PI * 3) / 2);
-		ctx.lineTo(x + width - radius, y);
-		ctx.arc(
-			x + width - radius,
-			y + radius,
-			radius,
-			(Math.PI * 3) / 2,
-			Math.PI / 2
-		);
-		ctx.lineTo(x + radius, y + height);
-	} else {
-		ctx.moveTo(x, y + radius);
-		ctx.lineTo(x, y + height - radius);
-		ctx.quadraticCurveTo(x, y + height, x + radius, y + height);
-		ctx.lineTo(x + width - radius, y + height);
-		ctx.quadraticCurveTo(
-			x + width,
-			y + height,
-			x + width,
-			y + height - radius
-		);
-		ctx.lineTo(x + width, y + radius);
-		ctx.quadraticCurveTo(x + width, y, x + width - radius, y);
-		ctx.lineTo(x + radius, y);
-		ctx.quadraticCurveTo(x, y, x, y + radius);
-	}
-
+	ctx.moveTo(x + radius, y);
+	ctx.arcTo(x + width, y, x + width, y + height, radius);
+	ctx.arcTo(x + width, y + height, x, y + height, radius);
+	ctx.arcTo(x, y + height, x, y, radius);
+	ctx.arcTo(x, y, x + width, y, radius);
 	ctx.closePath();
 }
