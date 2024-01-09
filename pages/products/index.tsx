@@ -43,7 +43,8 @@ function ProductsAndFilterGrid({ products }: { products: any }) {
 				<span>{products.length} Resultat</span>
 				<select
 					onChange={(e) => setSortVal(e.target.value)}
-					className="px-2 py-1 border rounded-lg">
+					className="px-2 py-1 border rounded-lg"
+				>
 					<option value="1">Sortera efter</option>
 					<option value="2">Popularitet</option>
 					<option value="3">Betyg</option>
@@ -206,7 +207,6 @@ function ProductGrid({
 						price={product.price}
 						image={product.image}
 						currency={product.currency}
-						type={product.metadata["type"]}
 					/>
 				))}
 			</>
@@ -221,7 +221,6 @@ function ProductGrid({
 			price={product.price}
 			image={product.image}
 			currency={product.currency}
-			type={product.metadata["type"]}
 		/>
 	));
 }

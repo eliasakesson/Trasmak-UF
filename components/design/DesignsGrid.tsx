@@ -54,24 +54,28 @@ export default function DesignsGrid({
 				<li key={i} className="list-none relative">
 					<button
 						onClick={() => onSelect(design)}
-						className="w-full aspect-video bg-gray-100 rounded-xl">
+						className="w-full aspect-video bg-gray-100 rounded-xl"
+					>
 						<canvas
 							className={`${canvasClassKey} bg-[#AFC0CE] rounded-xl w-full`}
 							width={1280}
-							height={720}></canvas>
+							height={720}
+						></canvas>
 					</button>
 					<div className="absolute top-4 right-4 flex flex-col gap-2">
 						{trashClicked && (
 							<button
 								onClick={() => trashClicked(design)}
-								className="border-gray-300 text-red-500 border-2 p-2 rounded-md hover:bg-gray-200 transition-colors">
+								className="border-gray-300 text-red-500 border-2 p-2 rounded-md hover:bg-gray-200 transition-colors"
+							>
 								<FaTrash size={16} />
 							</button>
 						)}
 						{uploadClicked && (
 							<button
 								onClick={() => uploadClicked(design)}
-								className="border-gray-300 text-white border-2 p-2 rounded-md hover:bg-gray-200 transition-colors">
+								className="border-gray-300 text-white border-2 p-2 rounded-md hover:bg-gray-200 transition-colors"
+							>
 								<FaUpload size={16} />
 							</button>
 						)}

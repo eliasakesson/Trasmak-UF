@@ -1,12 +1,15 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductRow from "@/components/ProductRow";
+import Stars from "@/components/Stars";
 import GetProducts, { GetProduct } from "@/utils/getProducts";
+import { useWindowSize } from "@/utils/hooks";
 import { stripe } from "@/utils/stripe";
 import Image from "next/image";
+import Link from "next/link";
 import toast from "react-hot-toast";
-import { FaStar, FaHeart, FaCreditCard } from "react-icons/fa";
+import { FaCreditCard } from "react-icons/fa";
 import { FaEarthAmericas } from "react-icons/fa6";
-import { MdDiscount, MdLocalShipping } from "react-icons/md";
+import { MdLocalShipping } from "react-icons/md";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
 
 export default function Product({
@@ -16,21 +19,23 @@ export default function Product({
 	product: any;
 	products: any;
 }) {
+	const { width } = useWindowSize();
+
 	return (
-		<div className="max-w-7xl mx-auto px-8 py-16 space-y-8">
+		<div className="max-w-7xl mx-auto px-8 py-8 space-y-4">
 			<Breadcrumbs productName={product.name} />
-			<div className="grid md:grid-cols-2 md:grid-rows-2 gap-16">
+			<div className="grid md:grid-cols-2 md:grid-rows-2 lg:gap-16 md:gap-8 gap-4">
 				<Images image={product.image} />
 				<ProductInfo product={product} />
-				<div className="col-span-1">{product.description}</div>
 			</div>
 			<ProductRow
 				title="Liknande produkter"
-				description=""
 				products={products}
 				left
 				type={product.metadata.type}
 				ignore={product.id}
+				rows={width >= 768 ? 1 : 2}
+				toProductPage
 			/>
 		</div>
 	);
@@ -43,7 +48,7 @@ function Images({ image }: { image: string }) {
 				<Image
 					src={image}
 					alt="Product"
-					className="object-contain mix-blend-multiply"
+					className="object-contain mix-blend-multiply hue-rotate-[50deg] saturate-150"
 					fill
 					sizes="100%"
 				/>
@@ -55,16 +60,19 @@ function Images({ image }: { image: string }) {
 function ProductInfo({ product }: { product: any }) {
 	const { addItem } = useShoppingCart();
 
+	const { width } = useWindowSize();
+
 	return (
 		<div className="md:row-span-2 row-end-2 space-y-8">
 			<div className="space-y-2">
 				<h1 className="text-4xl font-semibold">{product.name}</h1>
 				<div className="flex items-center gap-4">
-					<Stars rating={4} />
-					<p className="text-muted">157 Reviews</p>
+					<Stars rating={5} amount={3} />
 				</div>
 			</div>
-
+			<p className="text-muted lg:text-lg text-base max-w-prose">
+				{product.description}
+			</p>
 			<div className="space-y-2">
 				<p className="text-4xl font-semibold">
 					{formatCurrencyString({
@@ -72,24 +80,31 @@ function ProductInfo({ product }: { product: any }) {
 						currency: product.currency,
 					})}
 				</p>
-				<div className="flex gap-2 items-center text-muted">
-					<MdDiscount />
-					Köp 3 få 1 gratis
-				</div>
 			</div>
 			<div className="flex gap-4">
-				<button
-					onClick={() => {
-						addItem(product, {
-							count: 1,
-							product_metadata: { images: [product.image] },
-						});
-						toast.success(`${product.name} tillagd i varukorgen`);
-					}}
-					type="button"
-					className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold">
-					Lägg i varukorgen
-				</button>
+				{width >= 768 ? (
+					<Link
+						href={`/design?d=${product.id.substring(
+							6,
+							product.id.length
+						)}`}
+						className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold"
+					>
+						Designa nu
+					</Link>
+				) : (
+					<button
+						onClick={() =>
+							toast.error(
+								"Designern fungerar bäst på större skärmar. Vänligen byt enhet för att börja designa."
+							)
+						}
+						type="button"
+						className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold"
+					>
+						Designa nu
+					</button>
+				)}
 			</div>
 
 			<ul className="space-y-2 text-muted">
@@ -108,21 +123,6 @@ function ProductInfo({ product }: { product: any }) {
 					Tillverkad i Sverige
 				</li>
 			</ul>
-		</div>
-	);
-}
-
-function Stars({ rating }: { rating: number }) {
-	return (
-		<div className="flex gap-1">
-			{[...Array(5)].map((_, index) => (
-				<FaStar
-					key={index}
-					className={`${
-						rating > index ? "text-yellow-500" : "text-gray-400"
-					} text-xl`}
-				/>
-			))}
 		</div>
 	);
 }

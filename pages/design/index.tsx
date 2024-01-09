@@ -42,7 +42,7 @@ export default function Design({ products }: { products: any }) {
 	const windowSize = useWindowSize();
 	const { cartDetails, addItem } = useShoppingCart();
 
-	const [user, loading, error] = useAuthState(auth);
+	const [user] = useAuthState(auth);
 
 	const [currentDesign, setCurrentDesign] = useState<DesignProps>({
 		id: "",
@@ -246,7 +246,8 @@ export default function Design({ products }: { products: any }) {
 					</p>
 					<Link
 						href="/"
-						className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+						className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors"
+					>
 						Gå tillbaka
 					</Link>
 				</main>
@@ -268,10 +269,12 @@ export default function Design({ products }: { products: any }) {
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
-								height={720}></canvas>
+								height={720}
+							></canvas>
 							<div
 								className="absolute z-50"
-								ref={designEditorRef}>
+								ref={designEditorRef}
+							>
 								{selectedObjectID && (
 									<DesignEditor
 										design={currentDesign}
@@ -315,7 +318,8 @@ export default function Design({ products }: { products: any }) {
 							<h3 className="font-semibold">Verktyg</h3>
 							<div
 								className="flex justify-between max-sm:flex-col gap-4"
-								id="tools">
+								id="tools"
+							>
 								<div className="flex items-center gap-2 h-12">
 									<button
 										className={`flex items-center justify-center h-full aspect-square font-bold rounded-xl border ${
@@ -326,7 +330,8 @@ export default function Design({ products }: { products: any }) {
 										onClick={() =>
 											setSelectedTool("select")
 										}
-										id="selecttool">
+										id="selecttool"
+									>
 										<FaMousePointer />
 									</button>
 									<button
@@ -336,7 +341,8 @@ export default function Design({ products }: { products: any }) {
 												: "bg-gray-100"
 										}`}
 										onClick={() => setSelectedTool("text")}
-										id="texttool">
+										id="texttool"
+									>
 										T
 									</button>
 									<button
@@ -346,7 +352,8 @@ export default function Design({ products }: { products: any }) {
 												: "bg-gray-100"
 										}`}
 										onClick={() => setSelectedTool("image")}
-										id="imagetool">
+										id="imagetool"
+									>
 										<FaImage />
 									</button>
 									<button
@@ -358,27 +365,37 @@ export default function Design({ products }: { products: any }) {
 										onClick={() =>
 											setSelectedTool("rectangle")
 										}
-										id="rectangletool">
+										id="rectangletool"
+									>
 										<FaSquare />
 									</button>
 									<br />
 									<DesignerGuide currentTool={selectedTool} />
 								</div>
-								<button
-									onClick={() =>
-										AddToCart(
-											products,
-											currentDesign,
-											trayObject,
-											cartDetails,
-											addItem,
-											isAddingToCart,
-											lastAddedImageURL
-										)
-									}
-									className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
-									Lägg till i kundvagn
-								</button>
+								<div className="flex gap-4">
+									<Link
+										href={`/products/${currentDesign.id}`}
+										className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors"
+									>
+										Gå till produktsidan
+									</Link>
+									<button
+										onClick={() =>
+											AddToCart(
+												products,
+												currentDesign,
+												trayObject,
+												cartDetails,
+												addItem,
+												isAddingToCart,
+												lastAddedImageURL
+											)
+										}
+										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
+									>
+										Lägg till i kundvagn
+									</button>
+								</div>
 							</div>
 						</div>
 						<div className="flex flex-col gap-2">
@@ -413,7 +430,8 @@ export default function Design({ products }: { products: any }) {
 									onClick={() =>
 										setShowCanvasSupport((s) => !s)
 									}
-									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}>
+									className={`flex items-center justify-center h-full font-bold rounded-xl bg-gray-100 px-4 border`}
+								>
 									{showCanvasSupport ? "Dölj" : "Visa"}{" "}
 									stödlinjer
 								</button>
@@ -444,7 +462,8 @@ export default function Design({ products }: { products: any }) {
 												}
 											)
 										}
-										className="ml-auto border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+										className="ml-auto border-2 bg-gray-50 rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
+									>
 										<FaSave /> Spara design
 									</button>
 								)}
@@ -464,7 +483,8 @@ export default function Design({ products }: { products: any }) {
 						</h2>
 						<ul
 							className="lg:flex flex-col grid grid-cols-2 gap-2"
-							id="products">
+							id="products"
+						>
 							{products.map((product: Product) => (
 								<li
 									key={product.id}
@@ -476,7 +496,8 @@ export default function Design({ products }: { products: any }) {
 										)
 											? "border-muted_light"
 											: ""
-									}`}>
+									}`}
+								>
 									<button
 										onClick={() =>
 											setCurrentDesign((design) => ({
@@ -487,7 +508,8 @@ export default function Design({ products }: { products: any }) {
 												),
 											}))
 										}
-										className="w-full flex gap-4 items-center max-sm:flex-col sm:text-left max-sm:pb-2">
+										className="w-full flex gap-4 items-center max-sm:flex-col sm:text-left max-sm:pb-2"
+									>
 										<div className="flex-shrink-0">
 											<img
 												src={product.image ?? ""}

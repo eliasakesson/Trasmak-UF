@@ -1,8 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaStar } from "react-icons/fa";
-import { FaPlus } from "react-icons/fa6";
 import { formatCurrencyString } from "use-shopping-cart";
+import { useWindowSize } from "@/utils/hooks";
+import { useRouter } from "next/router";
+import Stars from "./Stars";
 
 export default function ProductRow({
 	title,
@@ -13,28 +15,35 @@ export default function ProductRow({
 	metadata,
 	type,
 	ignore,
+	toProductPage,
 }: {
 	title: string;
-	description: string;
+	description?: string;
 	products: any;
 	rows?: number;
 	left?: boolean;
 	metadata?: string;
 	type?: string;
 	ignore?: string;
+	toProductPage?: boolean;
 }) {
 	return (
 		<section
 			className={`flex flex-col ${
 				!left ? "items-center text-center" : ""
-			} space-y-4 w-full`}>
-			{title && <h2 className="text-4xl font-bold">{title}</h2>}
+			} space-y-4 w-full`}
+		>
+			{title && (
+				<h2 className="lg:text-4xl md:text-3xl text-2xl font-semibold">
+					{title}
+				</h2>
+			)}
 			{description && (
 				<p className="text-muted text-lg max-w-[calc(100%-16px)]">
 					{description}
 				</p>
 			)}
-			<br />
+			<span className="md:h-4 h-0"></span>
 			<div className="w-full grid lg:grid-cols-3 lg:gap-8 grid-cols-2 gap-4 text-left">
 				{products
 					?.filter(
@@ -56,7 +65,7 @@ export default function ProductRow({
 							price={product.price}
 							image={product.image}
 							currency={product.currency}
-							type={product?.metadata["type"]}
+							toProductPage={toProductPage}
 						/>
 					))}
 			</div>
@@ -70,18 +79,25 @@ export function ProductCard({
 	price,
 	image,
 	currency,
-	type,
+	toProductPage,
 }: {
 	id: string;
 	name: string;
 	price: number;
 	image: string;
 	currency: string;
-	type: string;
+	toProductPage?: boolean;
 }) {
+	const router = useRouter();
+	const { width } = useWindowSize();
+
 	return (
-		<Link href={`/design?d=${id.substring(6, id.length)}`}>
-			<div className="h-full">
+		<Link
+			href={`/${
+				width < 768 || toProductPage ? "products/" : "design?d="
+			}${id.substring(6, id.length)}`}
+		>
+			<div className="h-full flex flex-col">
 				<div className="relative aspect-square">
 					<div className="w-full h-full">
 						<Image
@@ -93,8 +109,13 @@ export function ProductCard({
 						/>
 					</div>
 				</div>
-				<div className="py-4 sm:space-y-2 space-y-1">
-					<h3 className="font-medium sm:text-xl text-base">{name}</h3>
+				<div className="flex-1 flex flex-col justify-between py-4 sm:space-y-2 space-y-1">
+					<div className="flex flex-wrap justify-between items-center">
+						<h3 className="font-medium sm:text-xl text-base">
+							{name}
+						</h3>
+						<Stars rating={5} amount={3} small />
+					</div>
 					<div className="flex justify-between sm:items-end sm:flex-row flex-col gap-4">
 						<div className="flex items-center gap-2">
 							<p className="text-xl font-semibold">
