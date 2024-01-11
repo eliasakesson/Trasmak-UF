@@ -37,7 +37,8 @@ export default function DesignEditor({
 		<SelectedObjectContext.Provider value={{ object, setObject }}>
 			<div
 				className="flex flex-col gap-2 bg-white border rounded-md p-4"
-				id="editor">
+				id="editor"
+			>
 				<div className="flex items-center gap-2">
 					{object?.type === "image" && (
 						<Input label="Bildkälla" objKey="content" type="file" />
@@ -68,7 +69,8 @@ export default function DesignEditor({
 										width: 1,
 										height: 1,
 									})
-								}>
+								}
+							>
 								<FaExpand />
 							</button>
 						)}
@@ -85,7 +87,8 @@ export default function DesignEditor({
 											object,
 											1
 										)
-									}>
+									}
+								>
 									<FaChevronUp />
 								</button>
 								<button
@@ -96,7 +99,8 @@ export default function DesignEditor({
 											object,
 											-1
 										)
-									}>
+									}
+								>
 									<FaChevronDown />
 								</button>
 							</div>
@@ -266,7 +270,7 @@ function Input({
 
 				img.onload = () => {
 					const resolution = img.width * img.height;
-					if (resolution < 500000) {
+					if (resolution < 250000) {
 						toast.error(
 							"Bilden är för lågupplöst. Välj en bild med högre upplösning."
 						);
@@ -318,7 +322,8 @@ function Input({
 						className="absolute inset-0 pointer-events-none rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}></div>
+						}}
+					></div>
 				</div>
 			</div>
 		);
@@ -329,14 +334,16 @@ function Input({
 				<label
 					{...getRootProps()}
 					className="cursor-pointer border border-gray-300 rounded-md px-4 h-16 hover:border-gray-200"
-					htmlFor={label}>
+					htmlFor={label}
+				>
 					<div className="flex items-center justify-center gap-2 h-full">
 						<svg
 							className="w-6 h-6 text-muted_light"
 							aria-hidden="true"
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
-							viewBox="0 0 20 16">
+							viewBox="0 0 20 16"
+						>
 							<path
 								stroke="currentColor"
 								strokeLinecap="round"
@@ -451,7 +458,8 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}>
+				}
+			>
 				{options?.map((option, i) => (
 					<option
 						key={i}
@@ -460,7 +468,8 @@ function Select({
 							objKey === "font"
 								? { fontFamily: option.value }
 								: {}
-						}>
+						}
+					>
 						{option.text}
 					</option>
 				))}
