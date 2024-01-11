@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { DesignProps, ObjectProps } from "@/utils/design/Interfaces";
 import { MdFormatColorFill } from "react-icons/md";
 import { motion, useAnimation } from "framer-motion";
@@ -20,12 +20,19 @@ export default function TrayBackgroundPopup({
 	setCurrentDesign: (currentDesign: DesignProps) => void;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
+	const ref = useRef<HTMLDivElement>(null);
 
 	const controls = useAnimation();
 	const innerControls = useAnimation();
 
 	useEffect(() => {
 		if (isOpen) {
+			const rect = ref.current?.getBoundingClientRect();
+
+			window.scroll({
+				top: (rect?.bottom ?? 0) - window.innerHeight + 100,
+				behavior: "smooth",
+			});
 			controls.start({ scaleY: 1, opacity: 1 });
 			innerControls.start({
 				opacity: 1,
@@ -45,7 +52,7 @@ export default function TrayBackgroundPopup({
 	return (
 		<TrayBackgroundPopupContext.Provider
 			value={{ currentDesign, setCurrentDesign }}>
-			<div className="relative">
+			<div className="relative" ref={ref}>
 				<div
 					onClick={() => setIsOpen(false)}
 					className={`${

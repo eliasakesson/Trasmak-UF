@@ -260,7 +260,12 @@ function HighlightSelectedObject(
 	ctx.restore();
 }
 
-async function DrawTray(ctx: any, design: DesignProps, tray: ObjectProps) {
+async function DrawTray(
+	ctx: any,
+	design: DesignProps,
+	tray: ObjectProps,
+	shadow: boolean = true
+) {
 	GetRoundedRect(
 		ctx,
 		tray.x,
@@ -276,6 +281,7 @@ async function DrawTray(ctx: any, design: DesignProps, tray: ObjectProps) {
 	ctx.shadowOffsetX = 0;
 	ctx.shadowOffsetY = 0;
 	ctx.fill();
+	ctx.restore();
 	ctx.clip();
 
 	function DrawImage(img: HTMLImageElement, resolve: any) {
@@ -322,7 +328,6 @@ async function DrawTray(ctx: any, design: DesignProps, tray: ObjectProps) {
 			resolve();
 		}
 	});
-	ctx.restore();
 }
 
 function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
