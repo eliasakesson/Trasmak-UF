@@ -21,7 +21,7 @@ export default function Home({ products }: { products: any }) {
 				<title>Träsmak UF</title>
 				<meta
 					name="description"
-					content="Skapa en personlig bricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
+					content="Designa din egen träbricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
 				/>
 			</Head>
 			<main className="relative pb-16">
@@ -37,7 +37,8 @@ export default function Home({ products }: { products: any }) {
 						/>
 						<Link
 							href="/products"
-							className="flex items-center gap-2 font-semibold text-xl text-primary_light">
+							className="flex items-center gap-2 font-semibold text-xl text-primary_light"
+						>
 							Se fler produkter
 							<FaArrowRight />
 						</Link>

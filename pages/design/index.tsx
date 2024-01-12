@@ -232,7 +232,7 @@ export default function Design({ products }: { products: any }) {
 					<title>Designer - Träsmak</title>
 					<meta
 						name="description"
-						content="Designa din egen träbricka"
+						content="Designa din egen träbricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
 					/>
 				</Head>
 				<main className="min-h-[90vh] flex flex-col gap-4 items-center justify-center px-8 pb-32">
@@ -259,7 +259,10 @@ export default function Design({ products }: { products: any }) {
 		<>
 			<Head>
 				<title>Designer - Träsmak</title>
-				<meta name="description" content="Designa din egen träbricka" />
+				<meta
+					name="description"
+					content="Designa din egen träbricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
+				/>
 			</Head>
 			<main className="max-w-7xl mx-auto px-8 py-16 space-y-8">
 				<div className="grid lg:grid-cols-4 gap-8">
