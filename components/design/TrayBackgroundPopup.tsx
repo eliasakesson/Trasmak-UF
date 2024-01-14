@@ -27,12 +27,6 @@ export default function TrayBackgroundPopup({
 
 	useEffect(() => {
 		if (isOpen) {
-			const rect = ref.current?.getBoundingClientRect();
-
-			window.scroll({
-				top: (rect?.bottom ?? 0) - window.innerHeight + 100,
-				behavior: "smooth",
-			});
 			controls.start({ scaleY: 1, opacity: 1 });
 			innerControls.start({
 				opacity: 1,
@@ -52,7 +46,7 @@ export default function TrayBackgroundPopup({
 	return (
 		<TrayBackgroundPopupContext.Provider
 			value={{ currentDesign, setCurrentDesign }}>
-			<div className="relative" ref={ref}>
+			<div className="relative h-full">
 				<div
 					onClick={() => setIsOpen(false)}
 					className={`${
@@ -61,12 +55,15 @@ export default function TrayBackgroundPopup({
 				<button
 					onClick={() => setIsOpen(!isOpen)}
 					className="h-12 w-12 border-2 rounded-md relative">
-					{currentDesign?.image ? (
+					{/* {currentDesign?.image ? (
 						<img src={currentDesign.image} alt="" />
 					) : (
 						<div
-							className={`w-full h-full bg-[${currentDesign?.color}]`}></div>
-					)}
+							className="w-full h-full rounded-sm"
+							style={{
+								backgroundColor: currentDesign?.color,
+							}}></div>
+					)} */}
 					<MdFormatColorFill
 						size={20}
 						className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
