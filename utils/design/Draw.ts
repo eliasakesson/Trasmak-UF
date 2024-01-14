@@ -55,7 +55,7 @@ export async function DrawRender(
 	ctx.reset();
 	ctx.save();
 
-	await DrawTray(ctx, design, tray);
+	await DrawTray(ctx, design, tray, false);
 
 	design.objects?.sort((a, b) => a.order - b.order);
 
@@ -274,14 +274,16 @@ async function DrawTray(
 		tray.height ?? 0,
 		tray.radius ?? 0
 	);
-	ctx.save();
-	ctx.fillStyle = "#000000ff";
-	ctx.shadowColor = "#00000055";
-	ctx.shadowBlur = 50;
-	ctx.shadowOffsetX = 0;
-	ctx.shadowOffsetY = 0;
-	ctx.fill();
-	ctx.restore();
+	if (shadow) {
+		ctx.save();
+		ctx.fillStyle = "#000000ff";
+		ctx.shadowColor = "#00000055";
+		ctx.shadowBlur = 50;
+		ctx.shadowOffsetX = 0;
+		ctx.shadowOffsetY = 0;
+		ctx.fill();
+		ctx.restore();
+	}
 	ctx.clip();
 
 	function DrawImage(img: HTMLImageElement, resolve: any) {
