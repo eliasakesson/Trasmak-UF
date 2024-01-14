@@ -1,35 +1,41 @@
 import { useState } from "react";
 import { ProductCard } from "@/components/ProductRow";
-import { stripe } from "@/utils/stripe";
 import GetProducts from "@/utils/getProducts";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 export default function Products({ products }: { products: any }) {
 	const router = useRouter();
 
 	return (
-		<div className="max-w-7xl w-full mx-auto px-8 py-16 flex flex-col items-center space-y-8 min-h-[calc(100vh-108px)]">
-			<div className="text-center flex flex-col gap-4">
-				<h1 className="text-4xl font-bold text-gray-900">
-					Våra produkter
-				</h1>
-				{router.query.search_input ? (
-					<span className="max-w-prose text-muted">
-						Du sökte efter{" "}
-						<span className="text-black">
-							{router.query.search_input}
+		<>
+			<Head>
+				<title>Produkter - Träsmak UF</title>
+				<meta name="description" content="Våra brickor" />
+			</Head>
+			<div className="max-w-7xl w-full mx-auto px-8 py-16 flex flex-col items-center space-y-8 min-h-[calc(100vh-108px)]">
+				<div className="text-center flex flex-col gap-4">
+					<h1 className="text-4xl font-bold text-gray-900">
+						Våra produkter
+					</h1>
+					{router.query.search_input ? (
+						<span className="max-w-prose text-muted">
+							Du sökte efter{" "}
+							<span className="text-black">
+								{router.query.search_input}
+							</span>
 						</span>
-					</span>
-				) : (
-					<p className="max-w-prose text-muted">
-						Här hittar du våra produkter. Mallar hittar du efter du
-						valt storlek. Välj en produkt för att komma till
-						designern.
-					</p>
-				)}
+					) : (
+						<p className="max-w-prose text-muted">
+							Här hittar du våra produkter. Mallar hittar du efter
+							du valt storlek. Välj en produkt för att komma till
+							designern.
+						</p>
+					)}
+				</div>
+				<ProductsAndFilterGrid products={products} />
 			</div>
-			<ProductsAndFilterGrid products={products} />
-		</div>
+		</>
 	);
 }
 
