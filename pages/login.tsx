@@ -51,11 +51,12 @@ export default function Login() {
 	return (
 		<>
 			<Head>
-				<title>Träsmak UF</title>
+				<title>Logga in - Träsmak UF</title>
 				<meta
 					name="description"
-					content="Skapa en personlig bricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
+					content="Logga in på ditt konto för att fortsätta designa dina brickor."
 				/>
+				<meta name="robots" content="noindex, follow" />
 			</Head>
 			<main className="relative pb-16">
 				<section className="lg:min-h-[calc(100vh-153px)] min-h-[calc(100vh-111px)] flex lg:flex-row flex-col-reverse max-lg:gap-8">

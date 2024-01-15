@@ -11,9 +11,13 @@ export default function Products({ products }: { products: any }) {
 		<>
 			<Head>
 				<title>Produkter - Träsmak UF</title>
-				<meta name="description" content="Våra brickor" />
+				<meta
+					name="description"
+					content="Här hittar du alla våra bästa brickor och glasunderlägg. Välj en produkt för att komma till designern."
+				/>
+				<meta name="robots" content="index, follow" />
 			</Head>
-			<div className="max-w-7xl w-full mx-auto px-8 py-16 flex flex-col items-center space-y-8 min-h-[calc(100vh-108px)]">
+			<main className="max-w-7xl w-full mx-auto px-8 py-16 flex flex-col items-center space-y-8 min-h-[calc(100vh-108px)]">
 				<div className="text-center flex flex-col gap-4">
 					<h1 className="text-4xl font-bold text-gray-900">
 						Våra produkter
@@ -34,7 +38,7 @@ export default function Products({ products }: { products: any }) {
 					)}
 				</div>
 				<ProductsAndFilterGrid products={products} />
-			</div>
+			</main>
 		</>
 	);
 }
@@ -47,11 +51,16 @@ function ProductsAndFilterGrid({ products }: { products: any }) {
 		<div className="w-full">
 			<div className="flex justify-between w-full border-b py-4">
 				<span>{products.length} Resultat</span>
+				<label htmlFor="sort" className="sr-only">
+					Sortera efter
+				</label>
 				<select
+					id="sort"
 					onChange={(e) => setSortVal(e.target.value)}
-					className="px-2 py-1 border rounded-lg"
-				>
-					<option value="1">Sortera efter</option>
+					className="px-2 py-1 border rounded-lg">
+					<option value="1" aria-label="">
+						Sortera efter
+					</option>
 					<option value="2">Popularitet</option>
 					<option value="3">Betyg</option>
 					<option value="4">Pris (Lågt till högt)</option>
@@ -227,6 +236,7 @@ function ProductGrid({
 			price={product.price}
 			image={product.image}
 			currency={product.currency}
+			h2
 		/>
 	));
 }

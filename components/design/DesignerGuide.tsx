@@ -1,21 +1,15 @@
-import { useEffect, useState, createContext, useContext, useRef } from "react";
-import {
-	FaArrowLeft,
-	FaArrowRight,
-	FaImage,
-	FaInfo,
-	FaMousePointer,
-	FaSquare,
-	FaTimes,
-} from "react-icons/fa";
-import { LuTextCursor } from "react-icons/lu";
+import { useEffect, useState, useRef } from "react";
+import { FaArrowRight, FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
+import { ObjectProps } from "@/utils/design/Interfaces";
 
 export default function DesignerGuide({
 	currentTool,
+	selectedObject,
 }: {
 	currentTool: string;
+	selectedObject: ObjectProps | null;
 }) {
 	const router = useRouter();
 	const [show, setShow] = useState<
@@ -40,9 +34,9 @@ export default function DesignerGuide({
 	return (
 		<>
 			<button
-				className="flex items-center justify-center h-full aspect-square font-bold rounded-xl border hover:bg-gray-100 transition-colors"
+				className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
 				onClick={() => setShow("tutorial")}>
-				<FaInfo />
+				Starta guide
 			</button>
 			{show === "welcome" && (
 				<motion.div
@@ -72,7 +66,11 @@ export default function DesignerGuide({
 			)}
 			{show === "tutorial" && (
 				<>
-					<Tutorial setShow={setShow} currentTool={currentTool} />
+					<Tutorial
+						setShow={setShow}
+						currentTool={currentTool}
+						selectedObject={selectedObject}
+					/>
 					<button
 						onClick={() => setShow("hide")}
 						className="fixed right-4 bottom-4 flex gap-2 items-center font-semibold border-gray-300 border-2 hover:border-red-300 hover:bg-red-100 rounded-md px-4 py-2 transition-colors">
@@ -167,9 +165,11 @@ function StartTutorial({
 function Tutorial({
 	setShow,
 	currentTool,
+	selectedObject,
 }: {
 	setShow: (show: "hide") => void;
 	currentTool: string;
+	selectedObject: ObjectProps | null;
 }) {
 	const [step, setStep] = useState(0);
 
@@ -201,7 +201,7 @@ function Tutorial({
 			title="Välj Textverktyget"
 			text=""
 			nextStep={NextStep}
-			elementID="texttool"
+			elementID="text-tool"
 			position="right"
 			nextOnToolSelect="text"
 			currentTool={currentTool}
@@ -220,6 +220,17 @@ function Tutorial({
 		<Step
 			key={4}
 			step={5}
+			title="Markera texten"
+			text="Klicka på texten för att markera den."
+			nextStep={NextStep}
+			nextOnSelectType="text"
+			selectedObject={selectedObject}
+			position="right"
+			elementID="canvasparent"
+		/>,
+		<Step
+			key={5}
+			step={6}
 			title="Ändra text"
 			text="När du har placerat ut en text kan du ändra textens egenskaper i rutan till vänster. Du kan ändra textstorlek, typsnitt och färg."
 			nextStep={NextStep}
@@ -227,19 +238,19 @@ function Tutorial({
 			position="right"
 		/>,
 		<Step
-			key={5}
-			step={6}
+			key={6}
+			step={7}
 			title="Välj Bildverktyget"
 			text=""
 			nextStep={NextStep}
-			elementID="imagetool"
+			elementID="image-tool"
 			position="right"
 			nextOnToolSelect="image"
 			currentTool={currentTool}
 		/>,
 		<Step
-			key={6}
-			step={7}
+			key={7}
+			step={8}
 			title="Sätt ut bild"
 			text="När du har valt bildverktyget kan du sätta ut en bild på din bricka genom
 			att klicka på brickan där du vill ha bilden, alternativt hålla inne muspekaren och dra för att
@@ -249,8 +260,19 @@ function Tutorial({
 			position="right"
 		/>,
 		<Step
-			key={7}
-			step={8}
+			key={8}
+			step={9}
+			title="Markera bilden"
+			text="Klicka på bilden för att markera den."
+			nextStep={NextStep}
+			nextOnSelectType="image"
+			selectedObject={selectedObject}
+			position="right"
+			elementID="canvasparent"
+		/>,
+		<Step
+			key={9}
+			step={10}
 			title="Ändra bild"
 			text="När du har placerat ut en bild kan du ändra bilden genom att välja en bild i rutan till vänster. Du kan även justera rundning på hörnen, och välja mellan olika fyllningslägen för bilden, 
 			till exempel om bilden ska fylla hela platsen eller behålla sin proportioner."
@@ -259,19 +281,19 @@ function Tutorial({
 			position="right"
 		/>,
 		<Step
-			key={8}
-			step={9}
+			key={10}
+			step={11}
 			title="Välj Muspekaren"
 			text=""
 			nextStep={NextStep}
-			elementID="imagetool"
+			elementID="select-tool"
 			position="right"
 			nextOnToolSelect="select"
 			currentTool={currentTool}
 		/>,
 		<Step
-			key={9}
-			step={10}
+			key={11}
+			step={12}
 			title="Flytta objekt"
 			text="När du har valt muspekaren kan du flytta objekt genom att klicka på dem och dra dem till en ny plats. 
 			Du kan även ändra storlek på bilder och rektanglar genom att dra i hörnen på dem. När du är klar kan du avmarkera objektet genom att klicka utanför."
@@ -280,8 +302,17 @@ function Tutorial({
 			position="right"
 		/>,
 		<Step
-			key={10}
-			step={11}
+			key={12}
+			step={13}
+			title="Spara design"
+			text="När du är klar med din design kan du spara den genom att klicka på knappen Spara design. Du måste vara inloggad för att spara en design."
+			nextStep={NextStep}
+			elementID="save-design"
+			position="right"
+		/>,
+		<Step
+			key={13}
+			step={14}
 			title="Mallar"
 			text="Här finns alla mallar du kan utgå ifrån när du designar din bricka. Du
 			kan välja en mall genom att klicka på den."
@@ -290,8 +321,8 @@ function Tutorial({
 			position="top"
 		/>,
 		<Step
-			key={11}
-			step={12}
+			key={14}
+			step={15}
 			title="Skapa egen design"
 			text="Nu är det dags att skapa din egen design. Du kan börja med att välja en
 			mall eller börja från en tom bricka. Du kan alltid ändra mall eller storlek
@@ -322,6 +353,8 @@ function Step({
 	position,
 	nextOnToolSelect,
 	currentTool,
+	nextOnSelectType,
+	selectedObject,
 	isLastStep,
 }: {
 	step: number;
@@ -332,6 +365,8 @@ function Step({
 	position?: "left" | "right" | "top" | "bottom" | "center";
 	nextOnToolSelect?: "select" | "text" | "image";
 	currentTool?: string;
+	nextOnSelectType?: string;
+	selectedObject?: ObjectProps | null;
 	isLastStep?: boolean;
 }) {
 	const gap = 16;
@@ -358,22 +393,25 @@ function Step({
 		if (element) {
 			const rect = element.getBoundingClientRect();
 
+			const rectTop = rect.top + window.scrollY;
+			const rectLeft = rect.left + window.scrollX;
+
 			ref.current?.style.setProperty(
 				"left",
 				position === "left"
-					? rect.left - (ref.current?.offsetWidth || 0) - gap + "px"
+					? rectLeft - (ref.current?.offsetWidth || 0) - gap + "px"
 					: position === "right"
-					? rect.left + rect.width + gap + "px"
-					: rect.left + "px"
+					? rectLeft + rect.width + gap + "px"
+					: rectLeft + "px"
 			);
 
 			ref.current?.style.setProperty(
 				"top",
 				position === "top"
-					? rect.top - (ref.current?.offsetHeight || 0) - gap + "px"
+					? rectTop - (ref.current?.offsetHeight || 0) - gap + "px"
 					: position === "bottom"
-					? rect.top + rect.height + gap + "px"
-					: rect.top + gap + "px"
+					? rectTop + rect.height + gap + "px"
+					: rectTop + gap + "px"
 			);
 
 			window.scrollTo({
@@ -393,11 +431,17 @@ function Step({
 		}
 	}, [currentTool, nextOnToolSelect]);
 
+	useEffect(() => {
+		if (nextOnSelectType && selectedObject?.type === nextOnSelectType) {
+			nextStep();
+		}
+	}, [selectedObject, nextOnSelectType]);
+
 	return (
 		<div
 			ref={ref}
 			key={title}
-			className="absolute bg-white rounded-xl p-8 flex flex-col gap-4 z-50 shadow-md">
+			className="absolute bg-white rounded-xl p-8 flex flex-col gap-4 z-40 shadow-md">
 			<div>
 				<span className="font-semibold text-muted">Steg {step}</span>
 				<h2 className="xl:text-2xl lg:text-xl text-lg font-semibold leading-tight text-gray-900">

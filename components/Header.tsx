@@ -38,7 +38,7 @@ const Header = () => {
 
 function Announcement() {
 	return (
-		<div className="bg-red-500 text-white py-2">
+		<div className="bg-primary_dark text-white py-2">
 			<div className="container mx-auto flex justify-center items-center">
 				<p className="text-sm font-semibold text-center">
 					HEMSIDAN ÄR UNDER UPPBYGGNAD, DET GÅR INTE ATT BESTÄLLA ÄN!
@@ -95,6 +95,7 @@ function HamburgerMenu() {
 	return (
 		<>
 			<button
+				aria-label="Open menu"
 				onClick={() => setIsMenuOpen((open) => !open)}
 				className="text-gray-700 hover:text-gray-900 focus:outline-none">
 				{isMenuOpen ? (
@@ -170,6 +171,7 @@ function Search() {
 				/>
 			</form>
 			<Link
+				aria-label="Search"
 				href={`/products?serach_input=${searchInput}`}
 				className="absolute inset-y-0 right-0 flex items-center pr-3">
 				<FaSearch className="h-5 w-5 text-gray-400" />
@@ -195,6 +197,7 @@ function Search() {
 						.map((product: any) => (
 							<li key={product.id}>
 								<Link
+									aria-label={`Search for ${product.name}`}
 									href={`/design?d=${product.id.substring(
 										6,
 										product.id.length
@@ -253,6 +256,7 @@ function UserButton() {
 					isOpen ? "" : "hidden"
 				} fixed top-0 left-0 right-0 bottom-0 z-20`}></div>
 			<button
+				aria-label="User menu"
 				className={`${
 					user?.photoURL ? "" : "p-2"
 				} text-gray-700 hover:text-gray-900 focus:outline-none`}

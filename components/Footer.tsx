@@ -48,12 +48,12 @@ export default function Footer() {
 						<h3 className="text-2xl font-semibold">Kontakt</h3>
 						<div className="flex flex-col gap-2">
 							<a href="mailto:trasmak@gmail.com">
-								<span className="text-blue-500 hover:text-blue-600">
+								<span className="text-primary hover:text-primary_light">
 									trasmakuf@gmail.com
 								</span>
 							</a>
 							<a href="tel:0701234567">
-								<span className="text-blue-500 hover:text-blue-600">
+								<span className="text-primary hover:text-primary_light">
 									070-344 23 65
 								</span>
 							</a>
@@ -61,7 +61,7 @@ export default function Footer() {
 					</div>
 				</div>
 				<div className="py-4 border-t flex sm:flex-row flex-col-reverse gap-2 justify-between items-center">
-					<p className="text-gray-500">
+					<p className="text-muted">
 						© 2024 Träsmak UF. All rights reserved.
 					</p>
 					{/* <p className="text-gray-500">

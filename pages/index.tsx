@@ -18,14 +18,15 @@ export default function Home({ products }: { products: any }) {
 	return (
 		<>
 			<Head>
-				<title>Träsmak UF</title>
+				<title>Designa & Beställ din träbricka - Träsmak UF</title>
 				<meta
 					name="description"
-					content="Designa din egen träbricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
+					content="Designa din egen träbricka eller glasunderlägg med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
 				/>
+				<meta name="robots" content="index, follow" />
 			</Head>
 			<main className="relative pb-16">
-				<div className="flex flex-col lg:gap-32 gap-16">
+				<article className="flex flex-col lg:gap-32 gap-16">
 					<Hero />
 					<div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
 						<ProductRow
@@ -37,8 +38,7 @@ export default function Home({ products }: { products: any }) {
 						/>
 						<Link
 							href="/products"
-							className="flex items-center gap-2 font-semibold text-xl text-primary_light"
-						>
+							className="flex items-center gap-2 font-semibold text-xl text-primary_light">
 							Se fler produkter
 							<FaArrowRight />
 						</Link>
@@ -69,7 +69,7 @@ export default function Home({ products }: { products: any }) {
 					<div className="max-w-7xl mx-auto px-4 w-full">
 						<Inspiration />
 					</div>
-				</div>
+				</article>
 			</main>
 		</>
 	);

@@ -262,6 +262,7 @@ export default function Design({ products }: { products: any }) {
 					name="description"
 					content="Designa din egen träbricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
 				/>
+				<meta name="robots" content="index, follow" />
 			</Head>
 			<main className="max-w-7xl mx-auto px-8 py-16 space-y-8">
 				<div className="grid lg:grid-cols-4 gap-8">
@@ -379,9 +380,17 @@ export default function Design({ products }: { products: any }) {
 						</div>
 						<div className="flex flex-col gap-2">
 							<h3 className="font-semibold">
-								Bakgrundsfärg och stödlinjer
+								Guide och stödlinjer
 							</h3>
 							<div className="flex gap-2">
+								<DesignerGuide
+									currentTool={selectedTool}
+									selectedObject={
+										currentDesign.objects.find(
+											(obj) => obj.id === selectedObjectID
+										) || null
+									}
+								/>
 								<button
 									onClick={() =>
 										setShowCanvasSupport((s) => !s)
@@ -390,37 +399,41 @@ export default function Design({ products }: { products: any }) {
 									{showCanvasSupport ? "Dölj" : "Visa"}{" "}
 									stödlinjer
 								</button>
-								<div className="grid grid-rows-2 gap-1">
-									<div className="h-full flex gap-2">
-										<div className="bg-red-300 border aspect-square h-full rounded"></div>
-										<p>Säkerhetsmarginal</p>
-									</div>
-									<div className="h-full flex gap-2">
-										<div className="bg-white border aspect-square h-full rounded"></div>
-										<p className="whitespace-nowrap">
-											Kanter{" "}
-											<span className="text-muted">
-												(Ej exakt pga säkerhetsmarginal)
-											</span>
-										</p>
-									</div>
-								</div>
-								{user && (
-									<button
-										onClick={() =>
-											toast.promise(
-												SaveDesign(currentDesign, user),
-												{
-													loading: "Sparar design...",
-													success: "Design sparad",
-													error: "Fel vid sparning",
-												}
-											)
-										}
-										className="ml-auto flex gap-2 items-center border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
-										<FaSave /> Spara design
-									</button>
-								)}
+								<button
+									id="save-design"
+									disabled={!user}
+									onClick={() =>
+										user &&
+										toast.promise(
+											SaveDesign(currentDesign, user),
+											{
+												loading: "Sparar design...",
+												success: "Design sparad",
+												error: "Fel vid sparning",
+											}
+										)
+									}
+									className="ml-auto flex gap-2 items-center border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors disabled:bg-gray-100 cursor-not-allowed">
+									<FaSave />{" "}
+									{user
+										? "Spara design"
+										: "Logga in för att spara"}
+								</button>
+							</div>
+						</div>
+						<div className="flex gap-4 h-6">
+							<div className="h-full flex gap-2">
+								<div className="bg-red-300 border aspect-square h-full rounded"></div>
+								<p>Säkerhetsmarginal</p>
+							</div>
+							<div className="h-full flex gap-2">
+								<div className="bg-white border aspect-square h-full rounded"></div>
+								<p className="whitespace-nowrap">
+									Kanter{" "}
+									<span className="text-muted">
+										(Ej exakt pga säkerhetsmarginal)
+									</span>
+								</p>
 							</div>
 						</div>
 						<p className="text-muted">
@@ -533,6 +546,7 @@ function Tool({
 }) {
 	return (
 		<button
+			aria-label={`Select tool ${tool}`}
 			className={`flex items-center justify-center h-full aspect-square font-bold rounded-lg border-2 ${
 				selectedTool === tool ? "bg-primary_light bg-opacity-20" : ""
 			}`}

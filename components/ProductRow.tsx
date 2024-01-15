@@ -16,6 +16,7 @@ export default function ProductRow({
 	type,
 	ignore,
 	toProductPage,
+	h2,
 }: {
 	title: string;
 	description?: string;
@@ -26,13 +27,13 @@ export default function ProductRow({
 	type?: string;
 	ignore?: string;
 	toProductPage?: boolean;
+	h2?: boolean;
 }) {
 	return (
 		<section
 			className={`flex flex-col ${
 				!left ? "items-center text-center" : ""
-			} space-y-4 w-full`}
-		>
+			} space-y-4 w-full`}>
 			{title && (
 				<h2 className="lg:text-4xl md:text-3xl text-2xl font-semibold">
 					{title}
@@ -66,6 +67,7 @@ export default function ProductRow({
 							image={product.image}
 							currency={product.currency}
 							toProductPage={toProductPage}
+							h2={h2}
 						/>
 					))}
 			</div>
@@ -80,6 +82,7 @@ export function ProductCard({
 	image,
 	currency,
 	toProductPage,
+	h2,
 }: {
 	id: string;
 	name: string;
@@ -87,6 +90,7 @@ export function ProductCard({
 	image: string;
 	currency: string;
 	toProductPage?: boolean;
+	h2?: boolean;
 }) {
 	const router = useRouter();
 	const { width } = useWindowSize();
@@ -95,8 +99,7 @@ export function ProductCard({
 		<Link
 			href={`/${
 				width < 768 || toProductPage ? "products/" : "design?d="
-			}${id.substring(6, id.length)}`}
-		>
+			}${id.substring(6, id.length)}`}>
 			<div className="h-full flex flex-col">
 				<div className="relative aspect-square">
 					<div className="w-full h-full">
@@ -111,9 +114,15 @@ export function ProductCard({
 				</div>
 				<div className="flex-1 flex flex-col justify-between py-4 sm:space-y-2 space-y-1">
 					<div className="flex flex-wrap justify-between items-center">
-						<h3 className="font-medium sm:text-xl text-base">
-							{name}
-						</h3>
+						{h2 ? (
+							<h2 className="font-medium sm:text-xl text-base">
+								{name}
+							</h2>
+						) : (
+							<h3 className="font-medium sm:text-xl text-base">
+								{name}
+							</h3>
+						)}
 						<Stars rating={5} amount={3} small />
 					</div>
 					<div className="flex justify-between sm:items-end sm:flex-row flex-col gap-4">

@@ -83,11 +83,12 @@ export default function Hero() {
 					<div className="absolute lg:bottom-8 bottom-4 left-1/2 -translate-x-1/2 p-1 bg-gray-50 flex gap-1 rounded-full">
 						{slides.map((slide, i) => (
 							<button
+								aria-label={`Button slide ${i + 1}`}
 								key={i}
-								className={`h-3 rounded-full transition-all ${
+								className={`h-4 rounded-full transition-all ${
 									currentSlide === i
-										? "bg-primary_light opacity-50 w-12"
-										: "bg-gray-300 w-3"
+										? "bg-primary_light opacity-50 w-16"
+										: "bg-gray-300 w-4"
 								}`}
 								onClick={() => setCurrentSlide(i)}></button>
 						))}

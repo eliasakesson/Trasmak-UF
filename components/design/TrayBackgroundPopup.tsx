@@ -53,6 +53,7 @@ export default function TrayBackgroundPopup({
 						isOpen ? "" : "hidden"
 					} fixed top-0 left-0 right-0 bottom-0 z-20`}></div>
 				<button
+					aria-label="Select tray background color"
 					onClick={() => setIsOpen(!isOpen)}
 					className="h-12 w-12 border-2 rounded-md relative">
 					{/* {currentDesign?.image ? (
@@ -124,6 +125,7 @@ function ColorSwatch({ color }: { color: string }) {
 
 	return (
 		<button
+			aria-label={`Select color ${color}`}
 			onClick={() =>
 				setCurrentDesign({
 					...currentDesign,
@@ -158,7 +160,10 @@ function ImageSwatch({ image }: { image: string }) {
 	}
 
 	return (
-		<button onClick={onClick} className="border w-full h-8 rounded-lg">
+		<button
+			aria-label="Select birch image as tray background"
+			onClick={onClick}
+			className="border w-full h-8 rounded-lg">
 			<img src={image} alt="" className="object-cover h-full w-full" />
 		</button>
 	);

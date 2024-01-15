@@ -7,15 +7,26 @@ import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
 import { ref, get } from "firebase/database";
 import { db } from "../firebase";
 import GetProducts from "@/utils/getProducts";
+import Head from "next/head";
 
 export default function Cart({ products, config }: any) {
 	return (
-		<div className="max-w-7xl mx-auto px-8 py-16 space-y-8 min-h-[calc(100vh-108px)]">
-			<div className="grid lg:grid-cols-3 grid-cols-1 lg:gap-x-16 gap-x-0 gap-y-16">
-				<CartItems products={products} />
-				<CartSummary config={config} />
-			</div>
-		</div>
+		<>
+			<Head>
+				<title>Varukorg - Träsmak UF</title>
+				<meta
+					name="description"
+					content="Varukorgen för dina designade brickor."
+				/>
+				<meta name="robots" content="index, follow" />
+			</Head>
+			<main className="max-w-7xl mx-auto px-8 py-16 space-y-8 min-h-[calc(100vh-108px)]">
+				<article className="grid lg:grid-cols-3 grid-cols-1 lg:gap-x-16 gap-x-0 gap-y-16">
+					<CartItems products={products} />
+					<CartSummary config={config} />
+				</article>
+			</main>
+		</>
 	);
 }
 
