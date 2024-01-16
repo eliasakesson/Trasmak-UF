@@ -77,7 +77,7 @@ function ProductInfo({ product }: { product: any }) {
 			<div className="space-y-2">
 				<h1 className="text-4xl font-semibold">{product.name}</h1>
 				<div className="flex items-center gap-4">
-					<Stars rating={5} amount={3} />
+					<Stars productID={product.id} />
 				</div>
 			</div>
 			<p className="text-muted lg:text-lg text-base max-w-prose">

@@ -123,7 +123,7 @@ export function ProductCard({
 								{name}
 							</h3>
 						)}
-						<Stars rating={5} amount={3} small />
+						<Stars productID={id} small />
 					</div>
 					<div className="flex justify-between sm:items-end sm:flex-row flex-col gap-4">
 						<div className="flex items-center gap-2">
@@ -138,18 +138,5 @@ export function ProductCard({
 				</div>
 			</div>
 		</Link>
-	);
-}
-
-function Rating({ rating }: { rating: number }) {
-	return (
-		<div className="flex items-center">
-			{Array.from(Array(5)).map((_, i) => (
-				<FaStar
-					key={i}
-					className={i < rating ? "text-yellow-500" : "text-muted"}
-				/>
-			))}
-		</div>
 	);
 }
