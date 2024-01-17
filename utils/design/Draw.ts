@@ -15,7 +15,6 @@ export default async function Draw(
 	ctx.save();
 
 	await DrawTray(ctx, design, tray);
-	console.log("after draw tray");
 
 	design.objects?.sort((a, b) => a.order - b.order);
 
@@ -61,7 +60,6 @@ export async function DrawRender(
 
 	for (let i = 0; i < design.objects?.length; i++) {
 		const obj = design.objects?.[i];
-		console.log(obj);
 		if (obj.type === "text") {
 			DrawText(ctx, tray, obj, scale);
 		} else if (obj.type === "rectangle") {
@@ -169,7 +167,6 @@ async function DrawImage(
 			ctx.clip();
 
 			ctx.drawImage(img, offsetX, offsetY, newWidth, newHeight);
-			console.log("after draw image");
 			ctx.restore();
 			resolve();
 		}

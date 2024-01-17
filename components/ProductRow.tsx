@@ -33,7 +33,8 @@ export default function ProductRow({
 		<section
 			className={`flex flex-col ${
 				!left ? "items-center text-center" : ""
-			} space-y-4 w-full`}>
+			} space-y-4 w-full`}
+		>
 			{title && (
 				<h2 className="lg:text-4xl md:text-3xl text-2xl font-semibold">
 					{title}
@@ -99,7 +100,8 @@ export function ProductCard({
 		<Link
 			href={`/${
 				width < 768 || toProductPage ? "products/" : "design?d="
-			}${id.substring(6, id.length)}`}>
+			}${id.substring(6, id.length)}`}
+		>
 			<div className="h-full flex flex-col">
 				<div className="relative aspect-square">
 					<div className="w-full h-full">

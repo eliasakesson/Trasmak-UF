@@ -32,7 +32,8 @@ export default function Footer() {
 								<li>
 									<Link
 										href="/products"
-										className="underline">
+										className="underline"
+									>
 										Produkter
 									</Link>
 								</li>
@@ -47,7 +48,7 @@ export default function Footer() {
 					<div className="space-y-8">
 						<h3 className="text-2xl font-semibold">Kontakt</h3>
 						<div className="flex flex-col gap-2">
-							<a href="mailto:trasmak@gmail.com">
+							<a href="mailto:trasmakuf@gmail.com">
 								<span className="text-primary hover:text-primary_light">
 									trasmakuf@gmail.com
 								</span>

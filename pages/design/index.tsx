@@ -246,7 +246,8 @@ export default function Design({ products }: { products: any }) {
 					</p>
 					<Link
 						href="/"
-						className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+						className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors"
+					>
 						Gå tillbaka
 					</Link>
 				</main>
@@ -272,10 +273,12 @@ export default function Design({ products }: { products: any }) {
 								id="canvas"
 								className="bg-gray-100 rounded-xl w-full"
 								width={1280}
-								height={720}></canvas>
+								height={720}
+							></canvas>
 							<div
 								className="absolute z-50"
-								ref={designEditorRef}>
+								ref={designEditorRef}
+							>
 								{selectedObjectID && (
 									<DesignEditor
 										design={currentDesign}
@@ -321,30 +324,35 @@ export default function Design({ products }: { products: any }) {
 							</h3>
 							<div
 								className="flex justify-between max-sm:flex-col gap-4"
-								id="tools">
+								id="tools"
+							>
 								<div className="flex items-center gap-2 h-12">
 									<Tool
 										tool="select"
 										selectedTool={selectedTool}
-										setSelectedTool={setSelectedTool}>
+										setSelectedTool={setSelectedTool}
+									>
 										<FaMousePointer />
 									</Tool>
 									<Tool
 										tool="text"
 										selectedTool={selectedTool}
-										setSelectedTool={setSelectedTool}>
+										setSelectedTool={setSelectedTool}
+									>
 										T
 									</Tool>
 									<Tool
 										tool="image"
 										selectedTool={selectedTool}
-										setSelectedTool={setSelectedTool}>
+										setSelectedTool={setSelectedTool}
+									>
 										<FaImage />
 									</Tool>
 									<Tool
 										tool="rectangle"
 										selectedTool={selectedTool}
-										setSelectedTool={setSelectedTool}>
+										setSelectedTool={setSelectedTool}
+									>
 										<FaSquare />
 									</Tool>
 									<br />
@@ -357,7 +365,8 @@ export default function Design({ products }: { products: any }) {
 								<div className="flex gap-4">
 									<Link
 										href={`/products/${currentDesign.id}`}
-										className="border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
+										className="border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors"
+									>
 										Gå till produktsidan
 									</Link>
 									<button
@@ -372,7 +381,8 @@ export default function Design({ products }: { products: any }) {
 												lastAddedImageURL
 											)
 										}
-										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
+									>
 										Lägg till i kundvagn
 									</button>
 								</div>
@@ -395,7 +405,8 @@ export default function Design({ products }: { products: any }) {
 									onClick={() =>
 										setShowCanvasSupport((s) => !s)
 									}
-									className="border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
+									className="border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors"
+								>
 									{showCanvasSupport ? "Dölj" : "Visa"}{" "}
 									stödlinjer
 								</button>
@@ -413,7 +424,8 @@ export default function Design({ products }: { products: any }) {
 											}
 										)
 									}
-									className="ml-auto flex gap-2 items-center border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors disabled:bg-gray-100 cursor-not-allowed">
+									className="ml-auto flex gap-2 items-center border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors disabled:bg-gray-100"
+								>
 									<FaSave />{" "}
 									{user
 										? "Spara design"
@@ -450,7 +462,8 @@ export default function Design({ products }: { products: any }) {
 						</h2>
 						<ul
 							className="lg:flex flex-col grid grid-cols-2 gap-2"
-							id="products">
+							id="products"
+						>
 							{products.map((product: Product) => (
 								<li
 									key={product.id}
@@ -462,7 +475,8 @@ export default function Design({ products }: { products: any }) {
 										)
 											? "border-muted_light"
 											: ""
-									}`}>
+									}`}
+								>
 									<button
 										onClick={() =>
 											setCurrentDesign((design) => ({
@@ -473,7 +487,8 @@ export default function Design({ products }: { products: any }) {
 												),
 											}))
 										}
-										className="w-full flex gap-4 items-center max-sm:flex-col sm:text-left max-sm:pb-2">
+										className="w-full flex gap-4 items-center max-sm:flex-col sm:text-left max-sm:pb-2"
+									>
 										<div className="flex-shrink-0">
 											<img
 												src={product.image ?? ""}
@@ -551,7 +566,8 @@ function Tool({
 				selectedTool === tool ? "bg-primary_light bg-opacity-20" : ""
 			}`}
 			onClick={() => setSelectedTool(tool)}
-			id={`${tool}-tool`}>
+			id={`${tool}-tool`}
+		>
 			{children}
 		</button>
 	);

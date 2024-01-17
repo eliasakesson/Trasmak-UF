@@ -27,7 +27,7 @@ export default function SavedDesigns({
 	useEffect(() => {
 		if (!user || loading || error) return;
 
-		const userRef = ref(db, "users/" + user.uid);
+		const userRef = ref(db, "users/" + user.uid + "/savedDesigns");
 
 		onValue(userRef, (snapshot) => {
 			const data = snapshot.val();

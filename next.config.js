@@ -9,6 +9,12 @@ const nextConfig = {
 			"lh3.googleusercontent.com",
 		],
 	},
+	headers: [
+		{
+		  key: 'Access-Control-Allow-Origin',
+		  value: '*',
+		},
+	],
 };
 
 module.exports = nextConfig;
