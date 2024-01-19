@@ -26,7 +26,7 @@ export const db = getDatabase(app);
 
 export const storage = getStorage(app);
 
-let analytics = null;
+let analytics: FirebaseApp | undefined = undefined;
 export const auth = getAuth(app);
 if (app.name && typeof window !== 'undefined') {
     analytics = getAnalytics(app);
