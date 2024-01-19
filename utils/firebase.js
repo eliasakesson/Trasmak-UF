@@ -1,4 +1,4 @@
-import { storage } from "../firebase";
+import { analytics, storage } from "../firebase";
 import { v4 as uuidv4 } from "uuid";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "../firebase";
@@ -51,7 +51,6 @@ export function shortenDownloadURL(url) {
 export function signInWithGoogle() {
 	const provider = new GoogleAuthProvider();
 	signInWithPopup(auth, provider).then((result) => {
-		const analytics = getAnalytics();
 		logEvent(analytics, "login", {
 			method: "google",
 		});

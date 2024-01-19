@@ -10,7 +10,8 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useWindowSize } from "@/utils/hooks";
 import { FaArrowRight } from "react-icons/fa";
-import { logEvent, getAnalytics } from "firebase/analytics";
+import { logEvent } from "firebase/analytics";
+import { analytics } from "@/firebase";
 import { useEffect } from "react";
 
 export default function Home({ products }: { products: any }) {
@@ -18,7 +19,6 @@ export default function Home({ products }: { products: any }) {
 	const { width } = useWindowSize();
 
 	useEffect(() => {
-		const analytics = getAnalytics();
 		logEvent(analytics, "homepage_view");
 	}, []);
 

@@ -3,10 +3,10 @@ import { DesignProps } from "./Interfaces";
 import { db } from "@/firebase";
 import { User } from "firebase/auth";
 import { uploadBlob } from "../firebase";
-import { getAnalytics, logEvent } from "firebase/analytics";
+import { logEvent } from "firebase/analytics";
+import { analytics } from "@/firebase";
 
 export async function SaveDesign(design: DesignProps, user: User) {
-	const analytics = getAnalytics();
 	logEvent(analytics, "save_design", {
 		user: user.uid,
 		design: design.id,

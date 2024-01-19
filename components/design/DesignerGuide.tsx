@@ -3,7 +3,8 @@ import { FaArrowRight, FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { ObjectProps } from "@/utils/design/Interfaces";
-import { getAnalytics, logEvent } from "firebase/analytics";
+import { logEvent } from "firebase/analytics";
+import { analytics } from "@/firebase";
 
 export default function DesignerGuide({
 	currentTool,
@@ -92,8 +93,6 @@ function Welcome({
 }: {
 	setShow: (show: "tutorial" | "hide") => void;
 }) {
-	const analytics = getAnalytics();
-
 	function SetHasVisitedDesigner() {
 		localStorage.setItem("hasVisitedDesigner", "true");
 	}

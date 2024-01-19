@@ -37,11 +37,11 @@ import { ObjectProps, DesignProps } from "@/utils/design/Interfaces";
 import TemplateDesigns from "@/components/design/TemplateDesigns";
 import TrayBackgroundPopup from "@/components/design/TrayBackgroundPopup";
 
-import { getAnalytics, logEvent } from "firebase/analytics";
+import { analytics } from "@/firebase";
+import { logEvent } from "firebase/analytics";
 
 export default function Design({ products }: { products: any }) {
 	const router = useRouter();
-	const analytics = getAnalytics();
 	const windowSize = useWindowSize();
 	const { cartDetails, addItem } = useShoppingCart();
 

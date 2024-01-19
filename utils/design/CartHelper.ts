@@ -6,6 +6,7 @@ import { DrawRender } from "./Draw";
 import { DesignProps, ObjectProps } from "./Interfaces";
 import { MutableRefObject } from "react";
 import { getAnalytics, logEvent } from "firebase/analytics";
+import { analytics } from "@/firebase";
 
 export default async function AddToCart(
 	products: any,
@@ -145,8 +146,6 @@ function AddProductToCart(
 	toastID: string,
 	{ image, cover }: { image: string; cover: string }
 ) {
-	const analytics = getAnalytics();
-
 	logEvent(analytics, "add_to_cart");
 
 	const products =
