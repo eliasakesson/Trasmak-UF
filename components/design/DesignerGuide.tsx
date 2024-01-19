@@ -3,6 +3,7 @@ import { FaArrowRight, FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { ObjectProps } from "@/utils/design/Interfaces";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 export default function DesignerGuide({
 	currentTool,
@@ -35,7 +36,8 @@ export default function DesignerGuide({
 		<>
 			<button
 				className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-				onClick={() => setShow("tutorial")}>
+				onClick={() => setShow("tutorial")}
+			>
 				Starta guide
 			</button>
 			{show === "welcome" && (
@@ -45,7 +47,8 @@ export default function DesignerGuide({
 						backdropFilter: "blur(2px)",
 						opacity: 1,
 					}}
-					className="z-50 fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center backdrop-blur-[2px]">
+					className="z-50 fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center backdrop-blur-[2px]"
+				>
 					<div className="bg-white rounded-xl p-16 max-w-3xl w-full relative">
 						<Welcome setShow={setShow} />
 					</div>
@@ -58,7 +61,8 @@ export default function DesignerGuide({
 						backdropFilter: "blur(2px)",
 						opacity: 1,
 					}}
-					className="z-50 fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center backdrop-blur-[2px]">
+					className="z-50 fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center backdrop-blur-[2px]"
+				>
 					<div className="bg-white rounded-xl p-16 max-w-3xl w-full relative">
 						<StartTutorial setShow={setShow} />
 					</div>
@@ -73,7 +77,8 @@ export default function DesignerGuide({
 					/>
 					<button
 						onClick={() => setShow("hide")}
-						className="fixed right-4 bottom-4 flex gap-2 items-center font-semibold border-gray-300 border-2 hover:border-red-300 hover:bg-red-100 rounded-md px-4 py-2 transition-colors">
+						className="fixed right-4 bottom-4 flex gap-2 items-center font-semibold border-gray-300 border-2 hover:border-red-300 hover:bg-red-100 rounded-md px-4 py-2 transition-colors"
+					>
 						<FaTimes /> Avbryt guide
 					</button>
 				</>
@@ -87,6 +92,8 @@ function Welcome({
 }: {
 	setShow: (show: "tutorial" | "hide") => void;
 }) {
+	const analytics = getAnalytics();
+
 	function SetHasVisitedDesigner() {
 		localStorage.setItem("hasVisitedDesigner", "true");
 	}
@@ -105,16 +112,24 @@ function Welcome({
 					onClick={() => {
 						setShow("tutorial");
 						SetHasVisitedDesigner();
+						logEvent(analytics, "designer_guide", {
+							action: "start_tutorial",
+						});
 					}}
-					className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
+					className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors"
+				>
 					Visa mig hur det funkar
 				</button>
 				<button
 					onClick={() => {
 						setShow("hide");
 						SetHasVisitedDesigner();
+						logEvent(analytics, "designer_guide", {
+							action: "hide_guide",
+						});
 					}}
-					className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
+					className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors"
+				>
 					Jag vet vad jag gör
 				</button>
 			</div>
@@ -146,7 +161,8 @@ function StartTutorial({
 						setShow("tutorial");
 						SetHasVisitedDesigner();
 					}}
-					className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
+					className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors"
+				>
 					Visa mig hur det funkar
 				</button>
 				<button
@@ -154,7 +170,8 @@ function StartTutorial({
 						setShow("hide");
 						SetHasVisitedDesigner();
 					}}
-					className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
+					className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors"
+				>
 					Jag vet vad jag gör
 				</button>
 			</div>
@@ -441,7 +458,8 @@ function Step({
 		<div
 			ref={ref}
 			key={title}
-			className="absolute bg-white rounded-xl p-8 flex flex-col gap-4 z-40 shadow-md">
+			className="absolute bg-white rounded-xl p-8 flex flex-col gap-4 z-40 shadow-md"
+		>
 			<div>
 				<span className="font-semibold text-muted">Steg {step}</span>
 				<h2 className="xl:text-2xl lg:text-xl text-lg font-semibold leading-tight text-gray-900">
@@ -451,7 +469,8 @@ function Step({
 			<p className="max-w-[40ch]">{text}</p>
 			<button
 				onClick={nextStep}
-				className="flex gap-2 items-center text-muted font-medium">
+				className="flex gap-2 items-center text-muted font-medium"
+			>
 				{isLastStep ? "Avsluta guide" : "Nästa steg"} <FaArrowRight />
 			</button>
 		</div>

@@ -7,9 +7,11 @@ import { auth } from "@/firebase";
 import Spinner from "@/components/Spinner";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
+import { logEvent, getAnalytics } from "firebase/analytics";
 
 export default function Login() {
 	const router = useRouter();
+	const analytics = getAnalytics();
 
 	const [input, setInput] = useState({
 		email: "",
@@ -38,6 +40,9 @@ export default function Login() {
 			);
 
 			toast.success("Kontot har skapats");
+			logEvent(analytics, "signup", {
+				method: "email",
+			});
 			router.push("/");
 		} catch (err: any) {
 			const error = err.code as keyof typeof errorMessages;
@@ -81,7 +86,8 @@ export default function Login() {
 							</span>
 							<form
 								onSubmit={handleSubmit}
-								className="flex flex-col gap-4">
+								className="flex flex-col gap-4"
+							>
 								<div className="flex flex-col gap-1">
 									<label htmlFor="email">Email</label>
 									<input
@@ -121,7 +127,8 @@ export default function Login() {
 								<button
 									type="submit"
 									disabled={loading}
-									className="flex items-center gap-2 bg-primary text-white text-left w-fit text-lg font-semibold px-16 py-3 rounded-md disabled:bg-primary_dark transition-colors">
+									className="flex items-center gap-2 bg-primary text-white text-left w-fit text-lg font-semibold px-16 py-3 rounded-md disabled:bg-primary_dark transition-colors"
+								>
 									{loading && <Spinner />}
 									Skapa konto
 								</button>
@@ -130,7 +137,8 @@ export default function Login() {
 								Har du redan ett konto?{" "}
 								<Link
 									href="/login"
-									className="text-primary font-semibold">
+									className="text-primary font-semibold"
+								>
 									Logga in
 								</Link>
 							</p>

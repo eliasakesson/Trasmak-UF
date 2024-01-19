@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "../firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 export async function uploadBlob(blob) {
 	const imageRef = ref(storage, `images/${uuidv4()}`);
@@ -49,5 +50,12 @@ export function shortenDownloadURL(url) {
 
 export function signInWithGoogle() {
 	const provider = new GoogleAuthProvider();
-	return signInWithPopup(auth, provider);
+	signInWithPopup(auth, provider).then((result) => {
+		const analytics = getAnalytics();
+		logEvent(analytics, "login", {
+			method: "google",
+		});
+	}).catch((error) => {
+		console.error(error);
+	});
 }

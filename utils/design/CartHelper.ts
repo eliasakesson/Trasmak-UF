@@ -5,6 +5,7 @@ import { useShoppingCart } from "use-shopping-cart";
 import { DrawRender } from "./Draw";
 import { DesignProps, ObjectProps } from "./Interfaces";
 import { MutableRefObject } from "react";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 export default async function AddToCart(
 	products: any,
@@ -144,6 +145,10 @@ function AddProductToCart(
 	toastID: string,
 	{ image, cover }: { image: string; cover: string }
 ) {
+	const analytics = getAnalytics();
+
+	logEvent(analytics, "add_to_cart");
+
 	const products =
 		(cartDetails?.[product.id]?.product_data as any)?.products ?? [];
 

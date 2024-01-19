@@ -37,8 +37,11 @@ import { ObjectProps, DesignProps } from "@/utils/design/Interfaces";
 import TemplateDesigns from "@/components/design/TemplateDesigns";
 import TrayBackgroundPopup from "@/components/design/TrayBackgroundPopup";
 
+import { getAnalytics, logEvent } from "firebase/analytics";
+
 export default function Design({ products }: { products: any }) {
 	const router = useRouter();
+	const analytics = getAnalytics();
 	const windowSize = useWindowSize();
 	const { cartDetails, addItem } = useShoppingCart();
 
@@ -67,6 +70,10 @@ export default function Design({ products }: { products: any }) {
 	const designEditorRef = useRef<HTMLDivElement>(null);
 	const isAddingToCart = useRef(false);
 	const lastAddedImageURL = useRef<string | null>(null);
+
+	useEffect(() => {
+		logEvent(analytics, "design_view");
+	}, []);
 
 	useEffect(() => {
 		if (Object.keys(router.query).includes("d")) {

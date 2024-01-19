@@ -81,15 +81,14 @@ function ProductInfo({ product }: { product: any }) {
 				</div>
 			</div>
 			<p className="text-muted lg:text-lg text-base max-w-prose">
-				{product.description ?? "" + " "}
-				Brickan är perfekt för dig som vill servera fika eller mat. Med
-				designverktyget kan du sätta en personlig prägel på brickan och
-				det är din fantasi som sätter gränserna. Designa brickor med
-				egna motiv som matchar din stil och gör varje måltid till en
-				personlig upplevelse. Brickan passar till både vardagliga
-				måltider och speciella tillfällen. Brickan är tillverkad av
-				högkvalitativt material för att garantera hållbarhet och
-				långvarig användning.
+				{product.description ?? ""} Brickan är perfekt för dig som vill
+				servera fika eller mat. Med designverktyget kan du sätta en
+				personlig prägel på brickan och det är din fantasi som sätter
+				gränserna. Designa brickor med egna motiv som matchar din stil
+				och gör varje måltid till en personlig upplevelse. Brickan
+				passar till både vardagliga måltider och speciella tillfällen.
+				Brickan är tillverkad av högkvalitativt material för att
+				garantera hållbarhet och långvarig användning.
 			</p>
 			<p className="text-4xl font-semibold">
 				{formatCurrencyString({
@@ -104,7 +103,8 @@ function ProductInfo({ product }: { product: any }) {
 							6,
 							product.id.length
 						)}`}
-						className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold">
+						className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold"
+					>
 						Designa nu
 					</Link>
 				) : (
@@ -115,7 +115,8 @@ function ProductInfo({ product }: { product: any }) {
 							)
 						}
 						type="button"
-						className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold">
+						className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold"
+					>
 						Designa nu
 					</button>
 				)}

@@ -10,10 +10,17 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useWindowSize } from "@/utils/hooks";
 import { FaArrowRight } from "react-icons/fa";
+import { logEvent, getAnalytics } from "firebase/analytics";
+import { useEffect } from "react";
 
 export default function Home({ products }: { products: any }) {
 	const router = useRouter();
 	const { width } = useWindowSize();
+
+	useEffect(() => {
+		const analytics = getAnalytics();
+		logEvent(analytics, "homepage_view");
+	}, []);
 
 	return (
 		<>
@@ -38,7 +45,8 @@ export default function Home({ products }: { products: any }) {
 						/>
 						<Link
 							href="/products"
-							className="flex items-center gap-2 font-semibold text-xl text-primary_light">
+							className="flex items-center gap-2 font-semibold text-xl text-primary_light"
+						>
 							Se fler produkter
 							<FaArrowRight />
 						</Link>

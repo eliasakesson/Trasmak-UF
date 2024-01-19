@@ -56,15 +56,15 @@ function Announcement() {
 	return (
 		<div className="bg-primary_dark text-white py-2">
 			<div className="container mx-auto flex justify-center items-center">
-				<p className="text-sm font-semibold text-center">
-					FRI FRAKT VI KÖP ÖVER{" "}
-					{freeShippingThreshold
-						? formatCurrencyString({
-								value: freeShippingThreshold,
-								currency: "sek",
-						  })
-						: "???"}
-				</p>
+				{freeShippingThreshold && (
+					<p className="text-sm font-semibold text-center">
+						FRI FRAKT VI KÖP ÖVER{" "}
+						{formatCurrencyString({
+							value: freeShippingThreshold,
+							currency: "sek",
+						})}
+					</p>
+				)}
 			</div>
 		</div>
 	);
