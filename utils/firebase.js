@@ -51,7 +51,7 @@ export function shortenDownloadURL(url) {
 export function signInWithGoogle() {
 	const provider = new GoogleAuthProvider();
 	signInWithPopup(auth, provider).then((result) => {
-		logEvent(analytics, "login", {
+		analytics && logEvent(analytics, "login", {
 			method: "google",
 		});
 	}).catch((error) => {

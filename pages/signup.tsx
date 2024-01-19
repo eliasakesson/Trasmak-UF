@@ -39,9 +39,10 @@ export default function Login() {
 			);
 
 			toast.success("Kontot har skapats");
-			logEvent(analytics, "signup", {
-				method: "email",
-			});
+			analytics &&
+				logEvent(analytics, "signup", {
+					method: "email",
+				});
 			router.push("/");
 		} catch (err: any) {
 			const error = err.code as keyof typeof errorMessages;

@@ -72,7 +72,7 @@ export default function Design({ products }: { products: any }) {
 	const lastAddedImageURL = useRef<string | null>(null);
 
 	useEffect(() => {
-		logEvent(analytics, "design_view");
+		analytics && logEvent(analytics, "design_view");
 	}, []);
 
 	useEffect(() => {

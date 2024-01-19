@@ -146,7 +146,7 @@ function AddProductToCart(
 	toastID: string,
 	{ image, cover }: { image: string; cover: string }
 ) {
-	logEvent(analytics, "add_to_cart");
+	analytics && logEvent(analytics, "add_to_cart");
 
 	const products =
 		(cartDetails?.[product.id]?.product_data as any)?.products ?? [];

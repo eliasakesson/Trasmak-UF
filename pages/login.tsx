@@ -36,9 +36,10 @@ export default function Login() {
 			await signInWithEmailAndPassword(auth, input.email, input.password);
 
 			toast.success("Du är nu inloggad");
-			logEvent(analytics, "login", {
-				method: "email",
-			});
+			analytics &&
+				logEvent(analytics, "login", {
+					method: "email",
+				});
 			router.push("/");
 		} catch (err: any) {
 			const error = err.code as keyof typeof errorMessages;

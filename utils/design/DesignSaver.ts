@@ -7,7 +7,7 @@ import { logEvent } from "firebase/analytics";
 import { analytics } from "@/firebase";
 
 export async function SaveDesign(design: DesignProps, user: User) {
-	logEvent(analytics, "save_design", {
+	analytics && logEvent(analytics, "save_design", {
 		user: user.uid,
 		design: design.id,
 	});

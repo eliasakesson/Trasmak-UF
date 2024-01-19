@@ -111,9 +111,10 @@ function Welcome({
 					onClick={() => {
 						setShow("tutorial");
 						SetHasVisitedDesigner();
-						logEvent(analytics, "designer_guide", {
-							action: "start_tutorial",
-						});
+						analytics &&
+							logEvent(analytics, "designer_guide", {
+								action: "start_tutorial",
+							});
 					}}
 					className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors"
 				>
@@ -123,9 +124,10 @@ function Welcome({
 					onClick={() => {
 						setShow("hide");
 						SetHasVisitedDesigner();
-						logEvent(analytics, "designer_guide", {
-							action: "hide_guide",
-						});
+						analytics &&
+							logEvent(analytics, "designer_guide", {
+								action: "hide_guide",
+							});
 					}}
 					className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors"
 				>

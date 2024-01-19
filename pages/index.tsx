@@ -19,7 +19,7 @@ export default function Home({ products }: { products: any }) {
 	const { width } = useWindowSize();
 
 	useEffect(() => {
-		logEvent(analytics, "homepage_view");
+		analytics && logEvent(analytics, "homepage_view");
 	}, []);
 
 	return (
