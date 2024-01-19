@@ -5,7 +5,7 @@ import { useShoppingCart } from "use-shopping-cart";
 import { DrawRender } from "./Draw";
 import { DesignProps, ObjectProps } from "./Interfaces";
 import { MutableRefObject } from "react";
-import { getAnalytics, logEvent } from "firebase/analytics";
+import { logEvent } from "firebase/analytics";
 import { analytics } from "@/firebase";
 
 export default async function AddToCart(
