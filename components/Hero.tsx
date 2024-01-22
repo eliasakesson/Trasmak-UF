@@ -61,9 +61,9 @@ export default function Hero() {
 							Designa din bricka
 						</Link>
 						<Link
-							href="/products"
+							href="/design-generator"
 							className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
-							Se våra brickor
+							Skapa design från bild
 						</Link>
 					</div>
 				</div>
@@ -81,7 +81,7 @@ export default function Hero() {
 						/>
 					</motion.div>
 					<div className="absolute lg:bottom-8 bottom-4 left-1/2 -translate-x-1/2 p-1 bg-gray-50 flex gap-1 rounded-full">
-						{slides.map((slide, i) => (
+						{slides.map((_, i) => (
 							<button
 								aria-label={`Button slide ${i + 1}`}
 								key={i}

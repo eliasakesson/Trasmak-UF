@@ -1,11 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaBookmark, FaImage, FaInfo, FaPen } from "react-icons/fa";
-import { HiArrowLongRight } from "react-icons/hi2";
+import { FaBookmark, FaImage, FaPen } from "react-icons/fa";
 
 export default function Section2() {
 	return (
-		<div className="max-w-7xl mx-auto w-full lg:space-y-32 space-y-16 px-4">
+		<div className="max-w-7xl mx-auto w-full lg:space-y-32 space-y-16 px-8">
 			<div className="text-center flex flex-col items-center gap-4">
 				<h2 className="xl:text-5xl lg:text-4xl text-3xl font-bold leading-tight text-gray-900">
 					Hur designar jag en bricka?
@@ -15,9 +14,9 @@ export default function Section2() {
 					olika sätt att komma igång, beroende på hur du vill göra.
 				</p>
 			</div>
-			<div className="flex lg:flex-row flex-col-reverse items-center justify-between gap-8">
+			<div className="flex lg:flex-row flex-col-reverse items-center justify-between lg:gap-16 gap-8">
 				<div className="flex flex-col space-y-4">
-					<h3 className="lg:text-4xl text-3xl font-bold flex items-center gap-4">
+					<h3 className="text-3xl font-bold flex items-center gap-4">
 						<FaPen />
 						Designa själv
 					</h3>
@@ -33,7 +32,7 @@ export default function Section2() {
 					<br />
 					<div className="flex lg:flex-row flex-col lg:gap-4 gap-2">
 						<Link
-							href="/design?t"
+							href="/design?t=guide"
 							className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
 							Starta guiden
 						</Link>
@@ -44,28 +43,26 @@ export default function Section2() {
 						</Link>
 					</div>
 				</div>
-				<div>
+				<div className="relative flex-1 aspect-video lg:w-auto w-full">
 					<Image
 						src="/images/designer.png"
 						alt=""
-						width={500}
-						height={300}
-						className="h-f aspect-video object-cover object-top border-2 border-gray-300 rounded-lg"
+						fill
+						className="object-cover object-top border-2 border-gray-300 rounded-lg"
 					/>
 				</div>
 			</div>
-			<div className="flex lg:flex-row flex-col items-center justify-between gap-8">
-				<div>
+			<div className="flex lg:flex-row flex-col items-center justify-between lg:gap-16 gap-8">
+				<div className="relative flex-1 aspect-video lg:w-auto w-full">
 					<Image
-						src="/images/designer.png"
+						src="/images/templates.png"
 						alt=""
-						width={500}
-						height={300}
-						className="h-f aspect-video object-cover object-top border-2 border-gray-300 rounded-lg"
+						fill
+						className="object-cover object-top border-2 border-gray-300 rounded-lg"
 					/>
 				</div>
 				<div className="flex flex-col lg:items-end lg:text-right space-y-4">
-					<h3 className="lg:text-4xl text-3xl font-bold flex items-center gap-4">
+					<h3 className="text-3xl font-bold flex items-center gap-4">
 						<FaBookmark />
 						Utgå från en mall
 					</h3>
@@ -82,9 +79,9 @@ export default function Section2() {
 					</Link>
 				</div>
 			</div>
-			<div className="flex lg:flex-row flex-col-reverse items-center justify-between gap-8">
+			<div className="flex lg:flex-row flex-col-reverse items-center justify-between lg:gap-16 gap-8">
 				<div className="flex flex-col space-y-4">
-					<h3 className="lg:text-4xl text-3xl font-bold flex items-center gap-4">
+					<h3 className="text-3xl font-bold flex items-center gap-4">
 						<FaImage />
 						Utgå från en bild
 					</h3>
@@ -95,18 +92,17 @@ export default function Section2() {
 					</p>
 					<br />
 					<Link
-						href="/design"
+						href="/design-generator"
 						className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
 						Ta mig till bildverktyget
 					</Link>
 				</div>
-				<div>
+				<div className="relative flex-1 aspect-video lg:w-auto w-full">
 					<Image
-						src="/images/designer.png"
+						src="/images/design-generator.png"
 						alt=""
-						width={500}
-						height={300}
-						className="h-f aspect-video object-cover object-top border-2 border-gray-300 rounded-lg"
+						fill
+						className="object-cover object-top border-2 border-gray-300 rounded-lg"
 					/>
 				</div>
 			</div>

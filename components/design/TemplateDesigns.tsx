@@ -45,6 +45,8 @@ export default function TemplateDesigns({
 
 			if (sort) {
 				dataArray.sort((a: any, b: any) => b[0] - a[0]);
+			} else {
+				dataArray.sort(() => Math.random() - 0.5);
 			}
 
 			const sortedDesigns = dataArray.map(

@@ -9,7 +9,7 @@ export default function Inspiration() {
 
 	return (
 		<section className="flex flex-col space-y-4 w-full text-center">
-			<h2 className="text-4xl font-bold">Inspiration</h2>
+			<h2 className="lg:text-4xl text-3xl font-bold">Inspiration</h2>
 			<p className="text-muted text-lg">
 				Få inspiration till din nästa bricka
 			</p>

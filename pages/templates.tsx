@@ -2,10 +2,13 @@ import TemplateDesigns from "@/components/design/TemplateDesigns";
 import GetProducts from "@/utils/getProducts";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useContext } from "react";
 import { Product } from "use-shopping-cart/core";
+import { SiteContext } from "./_app";
 
 export default function Templates({ products }: { products: Product[] }) {
 	const router = useRouter();
+	const { setDesign } = useContext(SiteContext);
 
 	return (
 		<>
@@ -15,6 +18,7 @@ export default function Templates({ products }: { products: Product[] }) {
 					name="description"
 					content="Här hittar du våra favoritmallar, perfekta för att designa din egen bricka eller glasunderlägg ifrån."
 				/>
+				<meta name="robots" content="index, follow" />
 			</Head>
 			<main className="max-w-7xl mx-auto px-8 flex flex-col items-center gap-16 py-16">
 				<div className="text-center flex flex-col gap-4">
@@ -29,12 +33,12 @@ export default function Templates({ products }: { products: Product[] }) {
 				</div>
 				<TemplateDesigns
 					products={products}
-					onSelect={(design) =>
+					onSelect={(design) => {
+						setDesign(design);
 						router.push({
 							pathname: "/design",
-							query: { d: JSON.stringify(design) },
-						})
-					}
+						});
+					}}
 					canvasClassKey="homepage-template-canvas"
 					maxDesigns={6}
 					sort={false}

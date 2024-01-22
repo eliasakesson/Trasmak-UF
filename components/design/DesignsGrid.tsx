@@ -49,7 +49,7 @@ export default function DesignsGrid({
 	}, [designs]);
 
 	return (
-		<ul className="grid grid-cols-3 gap-4">
+		<ul className="grid lg:grid-cols-3 grid-cols-1 gap-4">
 			{designs.map((design, i) => (
 				<li key={i} className="list-none relative">
 					<button

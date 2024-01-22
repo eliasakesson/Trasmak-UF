@@ -12,11 +12,13 @@ import { useWindowSize } from "@/utils/hooks";
 import { FaArrowRight } from "react-icons/fa";
 import { logEvent } from "firebase/analytics";
 import { analytics } from "@/firebase";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { SiteContext } from "./_app";
 
 export default function Home({ products }: { products: any }) {
 	const router = useRouter();
 	const { width } = useWindowSize();
+	const { setDesign } = useContext(SiteContext);
 
 	useEffect(() => {
 		analytics && logEvent(analytics, "homepage_view");
@@ -35,6 +37,10 @@ export default function Home({ products }: { products: any }) {
 			<main className="relative pb-16">
 				<article className="flex flex-col lg:gap-32 gap-16">
 					<Hero />
+					<div className="flex lg:flex-col flex-col-reverse lg:gap-32 gap-16">
+						<Section2 />
+						<Section1 />
+					</div>
 					<div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
 						<ProductRow
 							title="Bästsäljare"
@@ -45,15 +51,12 @@ export default function Home({ products }: { products: any }) {
 						/>
 						<Link
 							href="/products"
-							className="flex items-center gap-2 font-semibold text-xl text-primary_light"
-						>
+							className="flex items-center gap-2 font-semibold text-xl text-primary_light">
 							Se fler produkter
 							<FaArrowRight />
 						</Link>
 					</div>
-					<Section1 />
-					<Section2 />
-					<div className="max-w-7xl mx-auto px-4 hidden md:block">
+					<div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
 						<ProductRow
 							title="Våra favoritmallar"
 							description="Skapa personliga brickor baserat på våra bästa mallar!"
@@ -62,17 +65,23 @@ export default function Home({ products }: { products: any }) {
 						/>
 						<TemplateDesigns
 							products={products}
-							onSelect={(design) =>
+							onSelect={(design) => {
+								setDesign(design);
 								router.push({
 									pathname: "/design",
-									query: { d: JSON.stringify(design) },
-								})
-							}
+								});
+							}}
 							canvasClassKey="homepage-template-canvas"
-							maxDesigns={6}
+							maxDesigns={width >= 768 ? 6 : 3}
 							sort={false}
 							hideDelete
 						/>
+						<Link
+							href="/templates"
+							className="flex items-center gap-2 font-semibold text-xl text-primary_light">
+							Se fler mallar
+							<FaArrowRight />
+						</Link>
 					</div>
 					<div className="max-w-7xl mx-auto px-4 w-full">
 						<Inspiration />

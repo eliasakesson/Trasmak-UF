@@ -61,7 +61,7 @@ export default function Login() {
 					name="description"
 					content="Logga in på ditt konto för att fortsätta designa dina brickor."
 				/>
-				<meta name="robots" content="noindex, follow" />
+				<meta name="robots" content="index, follow" />
 			</Head>
 			<main className="relative pb-16">
 				<section className="lg:min-h-[calc(100vh-153px)] min-h-[calc(100vh-111px)] flex lg:flex-row flex-col-reverse max-lg:gap-8">
@@ -93,8 +93,7 @@ export default function Login() {
 							</span>
 							<form
 								onSubmit={handleSubmit}
-								className="flex flex-col gap-4"
-							>
+								className="flex flex-col gap-4">
 								<div className="flex flex-col gap-1">
 									<label htmlFor="email">Email</label>
 									<input
@@ -134,8 +133,7 @@ export default function Login() {
 								<button
 									type="submit"
 									disabled={loading}
-									className="flex items-center gap-2 bg-primary text-white text-left w-fit text-lg font-semibold px-16 py-3 rounded-md disabled:bg-primary_dark transition-colors"
-								>
+									className="flex items-center gap-2 bg-primary text-white text-left w-fit text-lg font-semibold px-16 py-3 rounded-md disabled:bg-primary_dark transition-colors">
 									{loading && <Spinner />}
 									Logga in
 								</button>
@@ -144,8 +142,7 @@ export default function Login() {
 								Har du inget konto?{" "}
 								<Link
 									href="/signup"
-									className="text-primary font-semibold"
-								>
+									className="text-primary font-semibold">
 									Skapa konto
 								</Link>
 							</p>

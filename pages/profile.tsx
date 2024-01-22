@@ -5,10 +5,13 @@ import Image from "next/image";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { useContext } from "react";
+import { SiteContext } from "./_app";
 
 export default function Profile({ products }: { products: any[] }) {
 	const [user, loading, error] = useAuthState(auth);
 
+	const { setDesign } = useContext(SiteContext);
 	const router = useRouter();
 
 	return (
@@ -47,12 +50,12 @@ export default function Profile({ products }: { products: any[] }) {
 						<br />
 						<SavedDesigns
 							products={products}
-							onSelect={(design) =>
+							onSelect={(design) => {
+								setDesign(design);
 								router.push({
 									pathname: "/design",
-									query: { d: JSON.stringify(design) },
-								})
-							}
+								});
+							}}
 							canvasClassKey="profile-saved-template-canvas"
 						/>
 					</div>
