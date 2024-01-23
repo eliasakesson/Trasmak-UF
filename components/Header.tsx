@@ -11,13 +11,12 @@ import {
 	FaUser,
 	FaImage,
 } from "react-icons/fa";
-import { TbTemplate } from "react-icons/tb";
 import { FcGoogle } from "react-icons/fc";
 import { GoLaw } from "react-icons/go";
 import { BsChevronDown } from "react-icons/bs";
 import { AiFillLayout } from "react-icons/ai";
 import { motion, useAnimationControls } from "framer-motion";
-import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
+import { useShoppingCart } from "use-shopping-cart";
 import GetProducts from "@/utils/getProducts";
 import { useRouter } from "next/router";
 import { FaX } from "react-icons/fa6";
@@ -127,7 +126,7 @@ function HamburgerMenu() {
 			</button>
 			<motion.div
 				animate={controls}
-				className="absolute z-50 top-[73px] h-[calc(100vh-73px)] left-0 bg-white w-80 px-4 py-4 border-r-2 border-gray-300">
+				className="absolute z-40 top-[73px] h-[calc(100vh-73px)] left-0 bg-white w-80 px-4 py-4 border-r-2 border-gray-300">
 				<div className="flex flex-col space-y-4">
 					<Search setHamburgerMenuOpen={setIsMenuOpen} />
 				</div>
@@ -524,7 +523,7 @@ function Navigation() {
 			<motion.div
 				initial={{ scaleY: 0 }}
 				animate={controls}
-				className="absolute z-50 top-10 left-0 bg-gray-100 w-full border-b origin-top overflow-hidden">
+				className="absolute z-40 top-10 left-0 bg-gray-100 w-full border-b origin-top overflow-hidden">
 				<motion.div
 					initial={{ opacity: 0, translateX: -20 }}
 					animate={innerControls}

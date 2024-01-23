@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 import { ObjectProps } from "@/utils/design/Interfaces";
 import { logEvent } from "firebase/analytics";
-import { analytics } from "@/firebase";
+import { useAnalytics } from "@/firebase";
 
 export default function DesignerGuide({
 	currentTool,
@@ -89,6 +89,8 @@ function Welcome({
 }: {
 	setShow: (show: "tutorial" | "hide") => void;
 }) {
+	const { analytics } = useAnalytics();
+
 	function SetHasVisitedDesigner() {
 		localStorage.setItem("hasVisitedDesigner", "true");
 	}

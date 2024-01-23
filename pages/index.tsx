@@ -11,12 +11,13 @@ import Link from "next/link";
 import { useWindowSize } from "@/utils/hooks";
 import { FaArrowRight } from "react-icons/fa";
 import { logEvent } from "firebase/analytics";
-import { analytics } from "@/firebase";
+import { useAnalytics } from "@/firebase";
 import { useContext, useEffect } from "react";
 import { SiteContext } from "./_app";
 
 export default function Home({ products }: { products: any }) {
 	const router = useRouter();
+	const { analytics } = useAnalytics();
 	const { width } = useWindowSize();
 	const { setDesign } = useContext(SiteContext);
 

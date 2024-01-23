@@ -4,13 +4,15 @@ import { db } from "@/firebase";
 import { User } from "firebase/auth";
 import { uploadBlob } from "../firebase";
 import { logEvent } from "firebase/analytics";
-import { analytics } from "@/firebase";
+import { useAnalytics } from "@/firebase";
 
 export async function SaveDesign(design: DesignProps, user: User) {
-	analytics && logEvent(analytics, "save_design", {
-		user: user.uid,
-		design: design.id,
-	});
+	const { analytics } = useAnalytics();
+	analytics &&
+		logEvent(analytics, "save_design", {
+			user: user.uid,
+			design: design.id,
+		});
 	const newDesign = await GetDesignWithUploadedImages(design);
 
 	const designRef = ref(db, `users/${user.uid}/savedDesigns/${Date.now()}`);
@@ -39,31 +41,43 @@ export function DeleteDesign(designKey: string, user: User) {
 }
 
 async function GetDesignWithUploadedImages(design: DesignProps) {
-	const imageStrings = design.objects.filter((object) => object.type == "image").map((object) => object.content);
+	const imageStrings = design.objects
+		.filter((object) => object.type == "image")
+		.map((object) => object.content);
 	console.log(imageStrings);
 
 	const promises = imageStrings.map((imageString) => {
 		return new Promise((resolve, reject) => {
-			fetch(imageString).then(async (r) => {
-				console.log("Uploading")
-				try {
-					const blob = await r.blob();
-					console.log(blob);
-					const url = await uploadBlob(blob);
-					resolve(url);
-				} catch (error) {
+			fetch(imageString)
+				.then(async (r) => {
+					console.log("Uploading");
+					try {
+						const blob = await r.blob();
+						console.log(blob);
+						const url = await uploadBlob(blob);
+						resolve(url);
+					} catch (error) {
+						reject(error);
+					}
+				})
+				.catch((error) => {
 					reject(error);
-				}
-			}).catch((error) => {
-				reject(error);
-			})
-		})
+				});
+		});
 	});
 
 	try {
 		const urls = await Promise.all(promises);
 		console.log(urls);
-		return { ...design, objects: design.objects.map((object_2) => ({ ...object_2, content: object_2.type == "image" ? urls.shift() : object_2.content, image: null })) };
+		return {
+			...design,
+			objects: design.objects.map((object_2) => ({
+				...object_2,
+				content:
+					object_2.type == "image" ? urls.shift() : object_2.content,
+				image: null,
+			})),
+		};
 	} catch (error) {
 		console.log(error);
 		return await new Promise((resolve, reject) => {

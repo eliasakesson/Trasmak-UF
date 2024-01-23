@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { createContext, useState } from "react";
 import { DesignProps } from "@/utils/design/Interfaces";
+import CookieConsent from "@/components/CookieConsent";
 
 export const SiteContext = createContext<{
 	design: DesignProps | null;
@@ -25,6 +26,7 @@ export default function App({ Component, pageProps }: AppProps) {
 			shouldPersist>
 			<Toaster />
 			<Header />
+			<CookieConsent />
 			<SiteContext.Provider value={{ design, setDesign }}>
 				<Component {...pageProps} />
 			</SiteContext.Provider>

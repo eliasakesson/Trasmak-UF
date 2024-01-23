@@ -2,7 +2,7 @@ import { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { analytics, auth } from "@/firebase";
+import { useAnalytics, auth } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import Spinner from "@/components/Spinner";
 import toast from "react-hot-toast";
@@ -11,6 +11,7 @@ import { logEvent } from "firebase/analytics";
 
 export default function Login() {
 	const router = useRouter();
+	const { analytics } = useAnalytics();
 
 	const [input, setInput] = useState({
 		email: "",

@@ -36,17 +36,17 @@ import { ObjectProps, DesignProps } from "@/utils/design/Interfaces";
 import TemplateDesigns from "@/components/design/TemplateDesigns";
 import TrayBackgroundPopup from "@/components/design/TrayBackgroundPopup";
 
-import { analytics } from "@/firebase";
+import { useAnalytics } from "@/firebase";
 import { logEvent } from "firebase/analytics";
 import { SiteContext } from "./_app";
 
 export default function Design({ products }: { products: any }) {
-	const router = useRouter();
+	const { analytics } = useAnalytics();
 	const windowSize = useWindowSize();
 	const { cartDetails, addItem } = useShoppingCart();
 
 	const [user] = useAuthState(auth);
-	const { design, setDesign } = useContext(SiteContext);
+	const { design } = useContext(SiteContext);
 
 	const [currentDesign, setCurrentDesign] = useState<DesignProps>({
 		id: "",
@@ -351,7 +351,6 @@ export default function Design({ products }: { products: any }) {
 											AddToCart(
 												products,
 												currentDesign,
-												trayObject,
 												cartDetails,
 												addItem,
 												isAddingToCart,
