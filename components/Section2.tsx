@@ -4,7 +4,7 @@ import { FaBookmark, FaImage, FaPen } from "react-icons/fa";
 
 export default function Section2() {
 	return (
-		<div className="max-w-7xl mx-auto w-full lg:space-y-32 space-y-16 px-8">
+		<div className="max-w-7xl mx-auto w-full lg:space-y-16 space-y-8 px-8">
 			<div className="text-center flex flex-col items-center gap-4">
 				<h2 className="xl:text-5xl lg:text-4xl text-3xl font-bold leading-tight text-gray-900">
 					Hur designar jag en bricka?
@@ -52,35 +52,19 @@ export default function Section2() {
 					/>
 				</div>
 			</div>
-			<div className="flex lg:flex-row flex-col items-center justify-between lg:gap-16 gap-8">
+			<div className="flex lg:flex-row flex-col items-center justify-between lg:gap-16 gap-8 bg-slate-200 py-16 relative">
+				<div className="absolute top-0 bottom-0 left-full w-full bg-slate-200"></div>
+				<div className="absolute top-0 bottom-0 right-full w-full bg-slate-200"></div>
 				<div className="relative flex-1 aspect-video lg:w-auto w-full">
 					<Image
-						src="/images/templates.png"
+						src="/images/design-generator.png"
 						alt=""
 						fill
 						className="object-cover object-top border-2 border-gray-300 rounded-lg"
 					/>
+					d
 				</div>
 				<div className="flex flex-col lg:items-end lg:text-right space-y-4">
-					<h3 className="text-3xl font-bold flex items-center gap-4">
-						<FaBookmark />
-						Utgå från en mall
-					</h3>
-					<p className="text-muted text-lg max-w-prose">
-						Vi har massvis färdiga mallar som du kan utgå från, som
-						du enkelt kan anpassa med din egen text och bild. Du kan
-						alltid anpassa mallarna efter dina önskemål.
-					</p>
-					<br />
-					<Link
-						href="/templates"
-						className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
-						Visa mallar
-					</Link>
-				</div>
-			</div>
-			<div className="flex lg:flex-row flex-col-reverse items-center justify-between lg:gap-16 gap-8">
-				<div className="flex flex-col space-y-4">
 					<h3 className="text-3xl font-bold flex items-center gap-4">
 						<FaImage />
 						Utgå från en bild
@@ -92,14 +76,33 @@ export default function Section2() {
 					</p>
 					<br />
 					<Link
-						href="/design-generator"
+						href="/templates"
 						className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
 						Ta mig till bildverktyget
 					</Link>
 				</div>
+			</div>
+			<div className="flex lg:flex-row flex-col-reverse items-center justify-between lg:gap-16 gap-8">
+				<div className="flex flex-col space-y-4">
+					<h3 className="text-3xl font-bold flex items-center gap-4">
+						<FaBookmark />
+						Utgå från en mall
+					</h3>
+					<p className="text-muted text-lg max-w-prose">
+						Vi har massvis färdiga mallar som du kan utgå från, som
+						du enkelt kan anpassa med din egen text och bild. Du kan
+						alltid anpassa mallarna efter dina önskemål.
+					</p>
+					<br />
+					<Link
+						href="/design-generator"
+						className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
+						Visa mallar
+					</Link>
+				</div>
 				<div className="relative flex-1 aspect-video lg:w-auto w-full">
 					<Image
-						src="/images/design-generator.png"
+						src="/images/templates.png"
 						alt=""
 						fill
 						className="object-cover object-top border-2 border-gray-300 rounded-lg"

@@ -35,7 +35,7 @@ export default function Home({ products }: { products: any }) {
 				/>
 				<meta name="robots" content="index, follow" />
 			</Head>
-			<main className="relative pb-16">
+			<main className="relative pb-16 overflow-hidden">
 				<article className="flex flex-col lg:gap-32 gap-16">
 					<Hero />
 					<div className="flex lg:flex-col flex-col-reverse lg:gap-32 gap-16">

@@ -32,14 +32,34 @@ export default function Footer() {
 								<li>
 									<Link
 										href="/products"
-										className="underline"
-									>
+										className="underline">
 										Produkter
+									</Link>
+								</li>
+								<li>
+									<Link
+										href="/templates"
+										className="underline">
+										Mallar
 									</Link>
 								</li>
 								<li>
 									<Link href="/design" className="underline">
 										Designer
+									</Link>
+								</li>
+								<li>
+									<Link
+										href="/design-generator"
+										className="underline">
+										Design Generator
+									</Link>
+								</li>
+								<li>
+									<Link
+										href="/design-generator"
+										className="underline">
+										Köpvillkor
 									</Link>
 								</li>
 							</ul>
