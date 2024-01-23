@@ -10,11 +10,13 @@ import {
 	FaPencilRuler,
 	FaUser,
 	FaImage,
+	FaSignOutAlt,
 } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { GoLaw } from "react-icons/go";
 import { BsChevronDown } from "react-icons/bs";
 import { AiFillLayout } from "react-icons/ai";
+import { IoLogOut } from "react-icons/io5";
 import { motion, useAnimationControls } from "framer-motion";
 import { useShoppingCart } from "use-shopping-cart";
 import GetProducts from "@/utils/getProducts";
@@ -25,6 +27,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 import GetConfig from "@/utils/getConfig";
 import { useWindowSize } from "@/utils/hooks";
+import { User } from "firebase/auth";
 
 const Header = () => {
 	return (
@@ -101,6 +104,7 @@ function Navbar() {
 
 function HamburgerMenu() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [user] = useAuthState(auth);
 
 	const controls = useAnimationControls();
 
@@ -126,7 +130,7 @@ function HamburgerMenu() {
 			</button>
 			<motion.div
 				animate={controls}
-				className="absolute z-40 top-[73px] h-[calc(100vh-73px)] left-0 bg-white w-80 px-4 py-4 border-r-2 border-gray-300">
+				className="absolute z-40 top-[73px] h-[calc(100dvh-73px)] left-0 bg-white w-80 px-4 pt-4 pb-[52px] border-r-2 border-gray-300 flex flex-col">
 				<div className="flex flex-col space-y-4">
 					<Search setHamburgerMenuOpen={setIsMenuOpen} />
 				</div>
@@ -143,12 +147,32 @@ function HamburgerMenu() {
 					<li>
 						<Link
 							onClick={() => setIsMenuOpen(false)}
+							href="/design-generator"
+							className="text-xl flex gap-4 items-center py-2">
+							<FaImage className="text-xl" />
+							Designa från bild
+						</Link>
+					</li>
+					<li className="border-b"></li>
+					<li>
+						<Link
+							onClick={() => setIsMenuOpen(false)}
 							href="/products"
 							className="text-xl flex gap-4 items-center py-2">
 							<FaCrown className="text-xl" />
 							Våra produkter
 						</Link>
 					</li>
+					<li>
+						<Link
+							onClick={() => setIsMenuOpen(false)}
+							href="/templates"
+							className="text-xl flex gap-4 items-center py-2">
+							<AiFillLayout className="text-xl" />
+							Våra mallar
+						</Link>
+					</li>
+					<li className="border-b"></li>
 					<li>
 						<Link
 							onClick={() => setIsMenuOpen(false)}
@@ -159,6 +183,12 @@ function HamburgerMenu() {
 						</Link>
 					</li>
 				</ul>
+				<div className="flex flex-col gap-2 justify-end flex-1">
+					<UserButtons
+						user={user}
+						onClick={() => setIsMenuOpen(false)}
+					/>
+				</div>
 			</motion.div>
 		</>
 	);
@@ -260,7 +290,7 @@ function UserButton() {
 	const controls = useAnimationControls();
 	const innerControls = useAnimationControls();
 
-	const [user, loading, error] = useAuthState(auth);
+	const [user] = useAuthState(auth);
 
 	useEffect(() => {
 		if (isOpen) {
@@ -317,49 +347,62 @@ function UserButton() {
 						{user ? "Min profil" : "Du är inte inloggad"}
 					</span>
 					<div className="flex flex-col gap-2">
-						{user ? (
-							<>
-								<Link
-									href="/profile"
-									onClick={() => setIsOpen(false)}
-									className="w-full text-left border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
-									Min profil
-								</Link>
-								<button
-									onClick={() => auth.signOut()}
-									className="w-full text-left border-2 border-red-200 bg-red-50 px-8 py-2 rounded-lg font-semibold hover:bg-red-100 transition-colors whitespace-nowrap">
-									Logga ut
-								</button>
-							</>
-						) : (
-							<>
-								<button
-									onClick={signInWithGoogle}
-									className="flex gap-2 items-center justify-center w-full border-2 px-4 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
-									<FcGoogle className="text-red-500 text-xl" />
-									Fortsätt med Google
-								</button>
-								<span className="text-center text-muted">
-									eller
-								</span>
-								<Link
-									href="/signup"
-									onClick={() => setIsOpen(false)}
-									className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
-									Skapa konto
-								</Link>
-								<Link
-									href="/login"
-									onClick={() => setIsOpen(false)}
-									className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
-									Logga in
-								</Link>
-							</>
-						)}
+						<UserButtons
+							user={user}
+							onClick={() => setIsOpen(false)}
+						/>
 					</div>
 				</motion.div>
 			</motion.div>
 		</div>
+	);
+}
+
+function UserButtons({
+	user,
+	onClick,
+}: {
+	user: User | null | undefined;
+	onClick: () => void;
+}) {
+	return user ? (
+		<>
+			<Link
+				href="/profile"
+				onClick={onClick}
+				className="flex items-center gap-3  w-full text-left border-2 px-4 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
+				<FaUser size={16} />
+				Min profil
+			</Link>
+			<button
+				onClick={() => auth.signOut()}
+				className="flex items-center gap-3 w-full text-left border-2 border-red-200 bg-red-50 px-4 py-2 rounded-lg font-semibold hover:bg-red-100 transition-colors whitespace-nowrap">
+				<FaSignOutAlt size={16} />
+				Logga ut
+			</button>
+		</>
+	) : (
+		<>
+			<button
+				onClick={signInWithGoogle}
+				className="flex gap-2 items-center justify-center w-full border-2 px-4 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
+				<FcGoogle className="text-red-500 text-xl" />
+				Fortsätt med Google
+			</button>
+			<span className="text-center text-muted">eller</span>
+			<Link
+				href="/signup"
+				onClick={onClick}
+				className="bg-primary text-white w-full text-center px-4 py-[10px] font-semibold rounded-lg hover:bg-primary_light transition-colors">
+				Skapa konto
+			</Link>
+			<Link
+				href="/login"
+				onClick={onClick}
+				className="w-full text-center border-2 px-4 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
+				Logga in
+			</Link>
+		</>
 	);
 }
 

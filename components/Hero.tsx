@@ -2,16 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, useAnimationControls } from "framer-motion";
+import useSwipe from "@/utils/useSwipe";
 
 export default function Hero() {
 	const [scrollY, setScrollY] = useState(0);
 	const [currentSlide, setCurrentSlide] = useState(0);
+	const controls = useAnimationControls();
 
 	const slides = [
 		"/images/hero.jpg",
 		"/images/valnöt.jpg",
-		"/images/hero.jpg",
-		"/images/valnöt.jpg",
+		"/images/lemon.jpg",
+		"/images/black.jpg",
 	];
 
 	useEffect(() => {
@@ -34,10 +36,44 @@ export default function Hero() {
 			);
 		}, 5000);
 
-		return () => clearInterval(interval);
-	}, [currentSlide]);
+		controls.start({
+			x: `-${currentSlide * 25}%`,
+			transition: {
+				duration: 0.5,
+				ease: "easeInOut",
+			},
+		});
+		controls
+			.start({
+				filter: `blur(2px)`,
+				transition: {
+					duration: 0.25,
+					ease: "circIn",
+				},
+			})
+			.then(() => {
+				controls.start({
+					filter: `blur(0px)`,
+					transition: {
+						duration: 0.25,
+						ease: "circOut",
+					},
+				});
+			});
 
-	const controls = useAnimationControls();
+		return () => clearInterval(interval);
+	}, [currentSlide, controls]);
+
+	const swipeHandlers = useSwipe({
+		onSwipedLeft: () =>
+			setCurrentSlide((currentSlide) =>
+				currentSlide === slides.length - 1 ? 0 : currentSlide + 1
+			),
+		onSwipedRight: () =>
+			setCurrentSlide((currentSlide) =>
+				currentSlide === 0 ? slides.length - 1 : currentSlide - 1
+			),
+	});
 
 	return (
 		<section className="lg:min-h-[calc(100vh-153px)] min-h-[calc(100vh-111px)] flex lg:flex-row flex-col-reverse max-lg:gap-8">
@@ -71,14 +107,24 @@ export default function Hero() {
 			<div className="flex-1 flex max-lg:h-1/2">
 				<div
 					className="flex-1 bg-primary relative overflow-hidden"
-					style={{ borderBottomLeftRadius: scrollY }}>
-					<motion.div animate={controls}>
-						<Image
-							src={slides[currentSlide]}
-							layout="fill"
-							alt=""
-							className="object-cover"
-						/>
+					style={{ borderBottomLeftRadius: scrollY }}
+					{...swipeHandlers}>
+					<motion.div
+						animate={controls}
+						className="flex h-full"
+						style={{
+							width: `${slides.length * 100}%`,
+						}}>
+						{slides.map((slide, i) => (
+							<div key={i} className="w-full relative">
+								<Image
+									src={slide}
+									layout="fill"
+									alt=""
+									className="object-cover"
+								/>
+							</div>
+						))}
 					</motion.div>
 					<div className="absolute lg:bottom-8 bottom-4 left-1/2 -translate-x-1/2 p-1 bg-gray-50 flex gap-1 rounded-full">
 						{slides.map((_, i) => (
