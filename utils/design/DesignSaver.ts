@@ -3,21 +3,18 @@ import { DesignProps } from "./Interfaces";
 import { db } from "@/firebase";
 import { User } from "firebase/auth";
 import { uploadBlob } from "../firebase";
-import { logEvent } from "firebase/analytics";
-import { useAnalytics } from "@/firebase";
 
 export async function SaveDesign(design: DesignProps, user: User) {
-	const { analytics } = useAnalytics();
-	analytics &&
-		logEvent(analytics, "save_design", {
-			user: user.uid,
-			design: design.id,
-		});
 	const newDesign = await GetDesignWithUploadedImages(design);
-
+	
 	const designRef = ref(db, `users/${user.uid}/savedDesigns/${Date.now()}`);
 
-	return set(designRef, newDesign);
+	return set(designRef, newDesign).then(() => {
+		return newDesign;
+	}).catch((error) => {
+		console.log(error);
+		return null;
+	});
 }
 
 export async function UploadTemplate(design: DesignProps) {
@@ -41,6 +38,7 @@ export function DeleteDesign(designKey: string, user: User) {
 }
 
 async function GetDesignWithUploadedImages(design: DesignProps) {
+	console.log("Uploading images");
 	const imageStrings = design.objects
 		.filter((object) => object.type == "image")
 		.map((object) => object.content);

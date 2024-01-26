@@ -11,6 +11,7 @@ import {
 	FaUser,
 	FaImage,
 	FaSignOutAlt,
+	FaPlus,
 } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { GoLaw } from "react-icons/go";
@@ -91,11 +92,11 @@ function Navbar() {
 					</Link>
 				</div>
 				<div className="hidden md:flex items-center">
-					<Search />
 				</div>
 				<div className="flex items-center justify-end flex-1 gap-6">
-					<CartButton />
+					<SearchButton />
 					<UserButton />
+					<CartButton />
 				</div>
 			</div>
 		</div>
@@ -194,7 +195,23 @@ function HamburgerMenu() {
 	);
 }
 
-function Search({ setHamburgerMenuOpen }: { setHamburgerMenuOpen?: any }) {
+function SearchButton() {
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+	return (
+		<>
+			
+			{isSearchOpen ? <Search buttons={<button onClick={() => setIsSearchOpen(false)} className="h-5 w-5 text-gray-400"><FaPlus className="rotate-45 w-full h-full" /></button>} /> : <button
+				aria-label="Open search"
+				onClick={() => setIsSearchOpen((open) => !open)}
+				className="text-gray-600 hover:text-gray-800 focus:outline-none p-2">
+				<FaSearch className="h-6 w-6" />
+			</button>}
+		</>
+	);
+	}
+
+function Search({ setHamburgerMenuOpen, buttons }: { setHamburgerMenuOpen?: any, buttons?: React.ReactNode }) {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const [searchInput, setSearchInput] = useState("");
 	const [products, setProducts] = useState([]);
@@ -225,21 +242,23 @@ function Search({ setHamburgerMenuOpen }: { setHamburgerMenuOpen?: any }) {
 					className="w-full border border-gray-300 rounded-md py-2 pr-10 pl-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
 				/>
 			</form>
-			<Link
-				aria-label="Search"
-				href={`/products?serach_input=${searchInput}`}
-				onClick={() => {
-					setIsSearchOpen(false);
-					setHamburgerMenuOpen?.(false);
-				}}
-				className="absolute inset-y-0 right-0 flex items-center pr-3">
-				<FaSearch className="h-5 w-5 text-gray-400" />
-			</Link>
+			<div className="absolute inset-y-0 right-0 flex items-center pr-3 gap-4">
+				<Link
+					aria-label="Search"
+					href={`/products?serach_input=${searchInput}`}
+					onClick={() => {
+						setIsSearchOpen(false);
+						setHamburgerMenuOpen?.(false);
+					}}>
+					<FaSearch className="h-5 w-5 text-gray-400" />
+				</Link>
+				{buttons}
+			</div>
 			<div
 				onPointerDown={(e) => e.preventDefault()}
 				className={`${
 					isSearchOpen ? "" : "hidden"
-				} absolute z-10 w-full mt-2 bg-white rounded-md border p-4 space-y-2`}>
+				} absolute z-40 w-full mt-2 bg-white rounded-md border p-4 space-y-2`}>
 				<span className="text-muted_light font-semibold">
 					Andra har sökt efter
 				</span>
@@ -440,7 +459,7 @@ function CartButton() {
 					isCartOpen ? "" : "hidden"
 				} fixed top-0 left-0 right-0 bottom-0 z-20`}></div>
 			<button
-				className="p-2 text-gray-700 hover:text-gray-900 focus:outline-none"
+				className="p-2 text-gray-600 hover:text-gray-800 focus:outline-none"
 				onClick={() => setIsCartOpen((open) => !open)}>
 				<FaShoppingCart className="h-6 w-6" />
 				<span className="absolute top-2 right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-primary rounded-full">
@@ -534,7 +553,7 @@ function Navigation() {
 		<div
 			className="hidden md:block relative bg-gray-100 py-2 border-y border-border"
 			onPointerLeave={handleMouseLeave}>
-			<ul className="max-w-7xl mx-auto flex px-8 gap-16 md:justify-start justify-center">
+			<ul className="max-w-7xl mx-auto flex px-8 gap-16 md:justify-center justify-center">
 				<li
 					className="text-gray-600 hover:text-gray-800 cursor-pointer"
 					onPointerEnter={() => {
@@ -566,7 +585,7 @@ function Navigation() {
 			<motion.div
 				initial={{ scaleY: 0 }}
 				animate={controls}
-				className="absolute z-40 top-10 left-0 bg-gray-100 w-full border-b origin-top overflow-hidden">
+				className="absolute z-30 top-10 left-0 bg-gray-100 w-full border-b origin-top overflow-hidden">
 				<motion.div
 					initial={{ opacity: 0, translateX: -20 }}
 					animate={innerControls}
@@ -583,7 +602,7 @@ function Navigation() {
 function ProductsNav() {
 	return (
 		<motion.div
-			className="flex gap-4"
+			className="flex justify-center gap-4"
 			initial={{ opacity: 0, translateX: -20 }}
 			animate={{ opacity: 1, translateX: 0 }}>
 			<ul className="flex gap-4">
@@ -619,7 +638,7 @@ function ProductsNav() {
 function DesignNav() {
 	return (
 		<motion.ul
-			className="flex items-center gap-4"
+			className="flex items-center justify-center gap-4"
 			initial={{ opacity: 0, translateX: -20 }}
 			animate={{ opacity: 1, translateX: 0 }}>
 			<li>
@@ -653,7 +672,7 @@ function DesignNav() {
 function MoreNav() {
 	return (
 		<motion.ul
-			className="flex flex-col gap-2"
+			className="flex flex-col items-center gap-2"
 			initial={{ opacity: 0, translateX: -20 }}
 			animate={{ opacity: 1, translateX: 0 }}>
 			<li>

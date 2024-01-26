@@ -16,9 +16,9 @@ const config: Config = {
 				background: colors.gray[50],
 				border: colors.gray[200],
 				border_dark: colors.gray[300],
-				primary: colors.blue[900],
-				primary_light: colors.blue[700],
-				primary_dark: "#151C48",
+				primary: colors.green[800],
+				primary_light: colors.green[700],
+				primary_dark: colors.green[950],
 				secondary: "#FFDE59",
 			},
 			screens: {

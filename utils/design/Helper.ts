@@ -64,7 +64,7 @@ export function GetTrayObjFromCanvas(
 	bleed: number = 10,
 	edge: number = 20
 ): ObjectProps {
-	const aspectRatio = (width + bleed / 10) / (height + bleed / 10);
+	const aspectRatio = (width + (bleed / 5 * 2)) / (height + (bleed / 5 * 2));
 	const newWidth = canvas.height * heightProcentage * aspectRatio;
 	const newHeight = canvas.height * heightProcentage;
 	const newRadius =

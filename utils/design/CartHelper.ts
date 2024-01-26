@@ -2,10 +2,8 @@ import toast from "react-hot-toast";
 import { GetTrayObjFromCanvas } from "./Helper";
 import { uploadFromCanvas } from "../firebase";
 import { DrawRender } from "./Draw";
-import { DesignProps, ObjectProps } from "./Interfaces";
+import { DesignProps } from "./Interfaces";
 import { MutableRefObject } from "react";
-import { logEvent } from "firebase/analytics";
-import { useAnalytics } from "@/firebase";
 
 export default async function AddToCart(
 	products: any,
@@ -144,9 +142,6 @@ function AddProductToCart(
 	toastID: string,
 	{ image, cover }: { image: string; cover: string }
 ) {
-	const { analytics } = useAnalytics();
-	analytics && logEvent(analytics, "add_to_cart");
-
 	const products =
 		(cartDetails?.[product.id]?.product_data as any)?.products ?? [];
 

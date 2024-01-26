@@ -14,6 +14,7 @@ import { logEvent } from "firebase/analytics";
 import { useAnalytics } from "@/firebase";
 import { useContext, useEffect } from "react";
 import { SiteContext } from "./_app";
+import About from "@/components/About";
 
 export default function Home({ products }: { products: any }) {
 	const router = useRouter();
@@ -38,6 +39,7 @@ export default function Home({ products }: { products: any }) {
 			<main className="relative pb-16 overflow-hidden">
 				<article className="flex flex-col lg:gap-32 gap-16">
 					<Hero />
+					{/* <About /> */}
 					<div className="flex lg:flex-col flex-col-reverse lg:gap-32 gap-16">
 						<Section2 />
 						<Section1 />

@@ -10,10 +10,10 @@ export default function Hero() {
 	const controls = useAnimationControls();
 
 	const slides = [
-		"/images/hero.jpg",
 		"/images/valnöt.jpg",
 		"/images/lemon.jpg",
 		"/images/black.jpg",
+		"/images/hero.jpg",
 	];
 
 	useEffect(() => {
@@ -80,15 +80,14 @@ export default function Hero() {
 			<div className="lg:flex-1 flex max-lg:h-1/2">
 				<div className="lg:pl-[10vw] lg:pr-[5vw] px-8 lg:h-md:pb-[153px] lg:py-8 py-4 flex flex-col justify-center lg:gap-8 gap-2 h-full">
 					<h1 className="xl:text-7xl lg:text-6xl text-4xl font-bold leading-tight text-gray-900">
-						<span className="text-primary">Personlig</span> design
+						<span className="text-primary">Träbricka</span> med
 						<br />
-						till ditt hem
+						personligt motiv
 					</h1>
 					<p className="xl:text-xl text-base text-gray-600 max-w-full">
-						Designa din egen träbricka med vårt enkla verktyg. Utgå
-						från en av våra färdiga mallar eller skapa en helt egen
-						design. Välj mellan olika storlekar och få en
-						närproducerad bricka levererad till dörren.
+						Träbricka i björkfanér med personligt motiv. Tillverkad i Småland med hög kvalité.
+						Vi erbjuder moderna och stilrena brickor med eller utan personliga motiv. Välj en av våra
+						färdiga mallar eller designa din egen bricka från grunden.
 					</p>
 					<div className="flex lg:gap-4 gap-2 lg:flex-row flex-col pt-4 lg:pb-0 pb-16">
 						<Link
@@ -107,7 +106,7 @@ export default function Hero() {
 			<div className="flex-1 flex max-lg:h-1/2">
 				<div
 					className="flex-1 bg-primary relative overflow-hidden"
-					style={{ borderBottomLeftRadius: scrollY }}
+					style={{ borderBottomLeftRadius: scrollY / 2 }}
 					{...swipeHandlers}>
 					<motion.div
 						animate={controls}

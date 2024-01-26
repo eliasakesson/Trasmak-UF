@@ -3,7 +3,7 @@ import { getAnalytics } from "firebase/analytics";
 import { app, useAnalytics } from "@/firebase";
 
 export default function CookieConsent() {
-	const { analytics, activateAnalytics, deActivateAnalytics } =
+	const { activateAnalytics, deActivateAnalytics } =
 		useAnalytics();
 
 	const [showMenu, setShowMenu] = useState<"none" | "popup" | "settings">(

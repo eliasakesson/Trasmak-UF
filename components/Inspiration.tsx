@@ -18,13 +18,7 @@ export default function Inspiration() {
 				{images.map((image, index) => (
 					<div
 						key={index}
-						className={`relative aspect-video lg:rounded-2xl rounded-xl overflow-hidden lg:hover:scale-150 lg:hover:-translate-y-8 hover:z-10 hover:shadow-xl transition-all ease-in-out duration-300 ${
-							index % 3 === 0
-								? "origin-top-left"
-								: index % 3 === 1
-								? "origin-top"
-								: "origin-top-right"
-						}`}>
+						className={`relative aspect-video lg:rounded-2xl rounded-xl overflow-hidden`}>
 						<Image
 							src={image}
 							alt=""
