@@ -47,7 +47,7 @@ export default function DesignsGrid({
 		return () => {
 			clearTimeout(timer);
 		};
-	}, [designs]);
+	}, [designs, products, canvasClassKey]);
 
 	return (
 		<ul className="grid grid-cols-1 gap-4 lg:grid-cols-3">

@@ -1,10 +1,4 @@
-import {
-	RefObject,
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-} from "react";
+import { RefObject, createContext, useCallback, useContext } from "react";
 import { DesignProps, ObjectProps } from "../../utils/design/Interfaces";
 import debounce from "lodash.debounce";
 
@@ -36,8 +30,9 @@ export default function DesignEditor({
 	return (
 		<SelectedObjectContext.Provider value={{ object, setObject }}>
 			<div
-				className="flex flex-col gap-2 bg-white border rounded-md p-4"
-				id="editor">
+				className="flex flex-col gap-2 rounded-md border bg-white p-4"
+				id="editor"
+			>
 				<div className="flex items-center gap-2">
 					{object?.type === "image" && (
 						<Input label="Bildkälla" objKey="content" type="file" />
@@ -57,7 +52,7 @@ export default function DesignEditor({
 							className="h-16"
 						/>
 					)}
-					<div className="border border-gray-300 rounded-md flex items-center gap-4 h-16 px-4">
+					<div className="flex h-16 items-center gap-4 rounded-md border border-gray-300 px-4">
 						{object?.type !== "text" && (
 							<button
 								onClick={() =>
@@ -68,12 +63,13 @@ export default function DesignEditor({
 										width: 1,
 										height: 1,
 									})
-								}>
+								}
+							>
 								<FaExpand />
 							</button>
 						)}
 						<div className="flex flex-col items-center">
-							<span className="text-sm leading-none -mt-5 mb-1 px-2 bg-white text-muted_light font-semibold">
+							<span className="-mt-5 mb-1 bg-white px-2 text-sm font-semibold leading-none text-muted_light">
 								Lager
 							</span>
 							<div className="flex gap-4">
@@ -83,9 +79,10 @@ export default function DesignEditor({
 											design,
 											setDesign,
 											object,
-											1
+											1,
 										)
-									}>
+									}
+								>
 									<FaChevronUp />
 								</button>
 								<button
@@ -94,9 +91,10 @@ export default function DesignEditor({
 											design,
 											setDesign,
 											object,
-											-1
+											-1,
 										)
-									}>
+									}
+								>
 									<FaChevronDown />
 								</button>
 							</div>
@@ -106,7 +104,7 @@ export default function DesignEditor({
 						</button>
 					</div>
 				</div>
-				<div className="h-12 flex gap-2">
+				<div className="flex h-12 gap-2">
 					{object?.type === "text" && (
 						<Input label="Färg" objKey="color" type="color" />
 					)}
@@ -162,7 +160,7 @@ function ChangeOrder(
 	design: DesignProps,
 	setDesign: (design: any) => void,
 	object: ObjectProps,
-	order: number
+	order: number,
 ) {
 	const maxOrder = Math.max(...design.objects.map((o) => o.order));
 	const minOrder = Math.min(...design.objects.map((o) => o.order));
@@ -213,14 +211,14 @@ function TextArea({
 	if (!object || !(objKey in object)) return null;
 
 	return (
-		<div className={`flex flex-col gap-1 grow  ${className}`}>
+		<div className={`flex grow flex-col gap-1  ${className}`}>
 			<label className="sr-only" htmlFor={label}>
 				{label}
 			</label>
 			<textarea
 				name={label}
 				id={label}
-				className="border border-gray-300 rounded-md p-2 h-full resize-none"
+				className="h-full resize-none rounded-md border border-gray-300 p-2"
 				rows={1}
 				placeholder={label}
 				value={object[objKey]}
@@ -256,32 +254,35 @@ function Input({
 }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
 
-	const onDrop = useCallback((acceptedFiles: any) => {
-		if (acceptedFiles && acceptedFiles.length > 0) {
-			const reader = new FileReader();
+	const onDrop = useCallback(
+		(acceptedFiles: any) => {
+			if (acceptedFiles && acceptedFiles.length > 0) {
+				const reader = new FileReader();
 
-			reader.onloadend = () => {
-				const img = new Image();
-				img.src = reader.result as string;
+				reader.onloadend = () => {
+					const img = new Image();
+					img.src = reader.result as string;
 
-				img.onload = () => {
-					const resolution = img.width * img.height;
-					if (resolution < 250000) {
-						toast.error(
-							"Bilden är för lågupplöst. Välj en bild med högre upplösning."
-						);
-					} else {
-						setObject({
-							...(object as ObjectProps),
-							[objKey]: reader.result as string,
-						});
-					}
+					img.onload = () => {
+						const resolution = img.width * img.height;
+						if (resolution < 250000) {
+							toast.error(
+								"Bilden är för lågupplöst. Välj en bild med högre upplösning.",
+							);
+						} else {
+							setObject({
+								...(object as ObjectProps),
+								[objKey]: reader.result as string,
+							});
+						}
+					};
 				};
-			};
 
-			reader.readAsDataURL(acceptedFiles[0]);
-		}
-	}, []);
+				reader.readAsDataURL(acceptedFiles[0]);
+			}
+		},
+		[objKey, object, setObject],
+	);
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop,
@@ -296,16 +297,16 @@ function Input({
 
 	if (type === "color")
 		return (
-			<div className={`flex flex-col gap-1 aspect-square ${className}`}>
+			<div className={`flex aspect-square flex-col gap-1 ${className}`}>
 				<label className="sr-only" htmlFor={label}>
 					{label}
 				</label>
-				<div className="relative rounded-md border border-gray-300 h-full w-full">
+				<div className="relative h-full w-full rounded-md border border-gray-300">
 					<input
 						type="color"
 						name={label}
 						id={label}
-						className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+						className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
 						value={object[objKey]}
 						onChange={(e) =>
 							debouncedSetObject({
@@ -315,28 +316,31 @@ function Input({
 						}
 					/>
 					<div
-						className="absolute inset-0 pointer-events-none rounded-[4px]"
+						className="pointer-events-none absolute inset-0 rounded-[4px]"
 						style={{
 							backgroundColor: object[objKey] as string,
-						}}></div>
+						}}
+					></div>
 				</div>
 			</div>
 		);
 
 	if (type === "file")
 		return (
-			<div className="flex flex-col gap-1 grow">
+			<div className="flex grow flex-col gap-1">
 				<label
 					{...getRootProps()}
-					className="cursor-pointer border border-gray-300 rounded-md px-4 h-16 hover:border-gray-200"
-					htmlFor={label}>
-					<div className="flex items-center justify-center gap-2 h-full">
+					className="h-16 cursor-pointer rounded-md border border-gray-300 px-4 hover:border-gray-200"
+					htmlFor={label}
+				>
+					<div className="flex h-full items-center justify-center gap-2">
 						<svg
-							className="w-6 h-6 text-muted_light"
+							className="h-6 w-6 text-muted_light"
 							aria-hidden="true"
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
-							viewBox="0 0 20 16">
+							viewBox="0 0 20 16"
+						>
 							<path
 								stroke="currentColor"
 								strokeLinecap="round"
@@ -346,10 +350,10 @@ function Input({
 							/>
 						</svg>
 						<div>
-							<p className="text-sm text-muted_light font-semibold whitespace-nowrap">
+							<p className="whitespace-nowrap text-sm font-semibold text-muted_light">
 								Klicka för att ladda upp bild
 							</p>
-							<p className="text-sm text-muted_light whitespace-nowrap">
+							<p className="whitespace-nowrap text-sm text-muted_light">
 								eller dra och släpp en bild här
 							</p>
 						</div>
@@ -366,7 +370,7 @@ function Input({
 
 	if (type === "number")
 		return (
-			<div className="flex gap-2 grow border border-gray-300 rounded-md px-2">
+			<div className="flex grow gap-2 rounded-md border border-gray-300 px-2">
 				<label className="sr-only" htmlFor={label}>
 					{label}
 				</label>
@@ -388,7 +392,7 @@ function Input({
 					type="number"
 					name={label}
 					id={label}
-					className="py-2 h-full w-[6ch] outline-none"
+					className="h-full w-[6ch] py-2 outline-none"
 					value={objKey in object ? object[objKey] : ""}
 					onChange={(e) =>
 						setObject({
@@ -401,7 +405,7 @@ function Input({
 		);
 
 	return (
-		<div className="flex flex-col gap-1 grow">
+		<div className="flex grow flex-col gap-1">
 			<label className="sr-only" htmlFor={label}>
 				{label}
 			</label>
@@ -409,7 +413,7 @@ function Input({
 				type={type}
 				name={label}
 				id={label}
-				className="border border-gray-300 rounded-md p-2 h-full"
+				className="h-full rounded-md border border-gray-300 p-2"
 				value={objKey in object ? object[objKey] : ""}
 				onChange={(e) =>
 					setObject({
@@ -436,14 +440,14 @@ function Select({
 	if (!object || !(objKey in object)) return null;
 
 	return (
-		<div className="flex flex-col gap-1 grow">
+		<div className="flex grow flex-col gap-1">
 			<label className="sr-only" htmlFor={label}>
 				{label}
 			</label>
 			<select
 				name={label}
 				id={label}
-				className="border border-gray-300 rounded-md p-2 h-full"
+				className="h-full rounded-md border border-gray-300 p-2"
 				style={objKey === "font" ? { fontFamily: object[objKey] } : {}}
 				value={object[objKey]}
 				onChange={(e) =>
@@ -451,7 +455,8 @@ function Select({
 						...(object as ObjectProps),
 						[objKey]: e.target.value,
 					})
-				}>
+				}
+			>
 				{options?.map((option, i) => (
 					<option
 						key={i}
@@ -460,7 +465,8 @@ function Select({
 							objKey === "font"
 								? { fontFamily: option.value }
 								: {}
-						}>
+						}
+					>
 						{option.text}
 					</option>
 				))}
@@ -473,7 +479,7 @@ export function MoveDesignEditor(
 	designEditorRef: RefObject<HTMLDivElement>,
 	canvas: HTMLCanvasElement,
 	trayObject: ObjectProps,
-	selectedObject: ObjectProps | undefined
+	selectedObject: ObjectProps | undefined,
 ) {
 	if (!designEditorRef.current || !selectedObject) return;
 
@@ -484,7 +490,7 @@ export function MoveDesignEditor(
 	const { x, y, height } = GetObjectDimensions(
 		ctx,
 		trayObject,
-		selectedObject
+		selectedObject,
 	);
 
 	const left = x * (rect.width / canvas.width) - 8;

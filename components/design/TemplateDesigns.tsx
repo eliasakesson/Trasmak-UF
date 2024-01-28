@@ -50,12 +50,12 @@ export default function TemplateDesigns({
 			}
 
 			const sortedDesigns = dataArray.map(
-				(data) => data[1]
+				(data) => data[1],
 			) as DesignProps[];
 
 			setDesigns(sortedDesigns);
 		});
-	}, []);
+	}, [sort]);
 
 	function removeDesign(design: DesignProps) {
 		if (!user) {
@@ -65,7 +65,7 @@ export default function TemplateDesigns({
 
 		const object = designsObject.current;
 		const key = Object.keys(object).find(
-			(key: string) => object[key] === design
+			(key: string) => object[key] === design,
 		);
 		if (!key) {
 			toast.error("Borttagning misslyckades");

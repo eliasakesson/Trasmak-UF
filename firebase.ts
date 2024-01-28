@@ -31,13 +31,12 @@ export const auth = getAuth(app);
 
 export const useAnalytics = () => {
 	const [analytics, setAnalytics] = useState<Analytics | undefined>(
-		undefined
+		undefined,
 	);
 
 	function activateAnalytics() {
 		if (app.name && typeof window !== "undefined") {
 			setAnalytics(getAnalytics(app));
-			console.log("analytics enabled");
 		}
 	}
 

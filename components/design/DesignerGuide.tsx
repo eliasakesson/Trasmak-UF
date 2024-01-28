@@ -31,13 +31,14 @@ export default function DesignerGuide({
 			setTimeout(() => setShow("starttutorial"), 500);
 			router.replace("/design");
 		}
-	}, [router.query.t]);
+	}, [router, router.query.t]);
 
 	return (
 		<>
 			<button
-				className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold"
-				onClick={() => setShow("tutorial")}>
+				className="flex items-center gap-2 rounded-md bg-primary px-8 py-3 font-semibold text-white transition-colors hover:bg-primary_light"
+				onClick={() => setShow("tutorial")}
+			>
 				Starta guide
 			</button>
 			{show === "welcome" && (
@@ -47,8 +48,9 @@ export default function DesignerGuide({
 						backdropFilter: "blur(2px)",
 						opacity: 1,
 					}}
-					className="z-50 fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center backdrop-blur-[2px]">
-					<div className="bg-white rounded-xl p-16 max-w-3xl w-full relative">
+					className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-[2px]"
+				>
+					<div className="relative w-full max-w-3xl rounded-xl bg-white p-16">
 						<Welcome setShow={setShow} />
 					</div>
 				</motion.div>
@@ -60,8 +62,9 @@ export default function DesignerGuide({
 						backdropFilter: "blur(2px)",
 						opacity: 1,
 					}}
-					className="z-50 fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center backdrop-blur-[2px]">
-					<div className="bg-white rounded-xl p-16 max-w-3xl w-full relative">
+					className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-[2px]"
+				>
+					<div className="relative w-full max-w-3xl rounded-xl bg-white p-16">
 						<StartTutorial setShow={setShow} />
 					</div>
 				</motion.div>
@@ -75,7 +78,8 @@ export default function DesignerGuide({
 					/>
 					<button
 						onClick={() => setShow("hide")}
-						className="fixed right-4 bottom-4 flex gap-2 items-center font-semibold border-gray-300 border-2 hover:border-red-300 hover:bg-red-100 rounded-md px-4 py-2 transition-colors">
+						className="fixed bottom-4 right-4 flex items-center gap-2 rounded-md border-2 border-gray-300 px-4 py-2 font-semibold transition-colors hover:border-red-300 hover:bg-red-100"
+					>
 						<FaTimes /> Avbryt guide
 					</button>
 				</>
@@ -96,15 +100,15 @@ function Welcome({
 	}
 
 	return (
-		<div className="flex flex-col gap-8 items-center">
-			<h1 className="xl:text-4xl lg:text-3xl text-2xl font-bold leading-tight text-gray-900 text-center">
+		<div className="flex flex-col items-center gap-8">
+			<h1 className="text-center text-2xl font-bold leading-tight text-gray-900 lg:text-3xl xl:text-4xl">
 				Hej!
 			</h1>
-			<p className="xl:text-xl text-base text-gray-600 1x-w-prose">
+			<p className="1x-w-prose text-base text-gray-600 xl:text-xl">
 				Ser ut som att du är ny till designverktyget. Hur vill du
 				fortsätta?
 			</p>
-			<div className="flex gap-4 lg:flex-row flex-col md:pt-4">
+			<div className="flex flex-col gap-4 md:pt-4 lg:flex-row">
 				<button
 					onClick={() => {
 						setShow("tutorial");
@@ -114,7 +118,8 @@ function Welcome({
 								action: "start_tutorial",
 							});
 					}}
-					className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
+					className="w-full rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:w-fit 2xl:px-16"
+				>
 					Visa mig hur det funkar
 				</button>
 				<button
@@ -126,7 +131,8 @@ function Welcome({
 								action: "hide_guide",
 							});
 					}}
-					className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
+					className="w-full rounded-lg border-2 px-8 py-4 font-semibold transition-colors hover:bg-slate-100 lg:w-fit 2xl:px-16"
+				>
 					Jag vet vad jag gör
 				</button>
 			</div>
@@ -144,21 +150,22 @@ function StartTutorial({
 	}
 
 	return (
-		<div className="flex flex-col gap-8 items-center">
-			<h1 className="xl:text-4xl lg:text-3xl text-2xl font-bold leading-tight text-gray-900 text-center">
+		<div className="flex flex-col items-center gap-8">
+			<h1 className="text-center text-2xl font-bold leading-tight text-gray-900 lg:text-3xl xl:text-4xl">
 				Hej!
 			</h1>
-			<p className="xl:text-xl text-base text-gray-600 1x-w-prose text-center">
+			<p className="1x-w-prose text-center text-base text-gray-600 xl:text-xl">
 				Välkommen till designverktyget!
 				<br /> Vill du starta guiden för att lära dig hur det funkar?
 			</p>
-			<div className="flex gap-4 lg:flex-row flex-col md:pt-4">
+			<div className="flex flex-col gap-4 md:pt-4 lg:flex-row">
 				<button
 					onClick={() => {
 						setShow("tutorial");
 						SetHasVisitedDesigner();
 					}}
-					className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
+					className="w-full rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:w-fit 2xl:px-16"
+				>
 					Visa mig hur det funkar
 				</button>
 				<button
@@ -166,7 +173,8 @@ function StartTutorial({
 						setShow("hide");
 						SetHasVisitedDesigner();
 					}}
-					className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
+					className="w-full rounded-lg border-2 px-8 py-4 font-semibold transition-colors hover:bg-slate-100 lg:w-fit 2xl:px-16"
+				>
 					Jag vet vad jag gör
 				</button>
 			</div>
@@ -394,7 +402,7 @@ function Step({
 			ref.current?.style.setProperty("top", "50%");
 			ref.current?.style.setProperty(
 				"transform",
-				"translate(-50%, -50%)"
+				"translate(-50%, -50%)",
 			);
 			return;
 		}
@@ -413,8 +421,8 @@ function Step({
 				position === "left"
 					? rectLeft - (ref.current?.offsetWidth || 0) - gap + "px"
 					: position === "right"
-					? rectLeft + rect.width + gap + "px"
-					: rectLeft + "px"
+						? rectLeft + rect.width + gap + "px"
+						: rectLeft + "px",
 			);
 
 			ref.current?.style.setProperty(
@@ -422,8 +430,8 @@ function Step({
 				position === "top"
 					? rectTop - (ref.current?.offsetHeight || 0) - gap + "px"
 					: position === "bottom"
-					? rectTop + rect.height + gap + "px"
-					: rectTop + gap + "px"
+						? rectTop + rect.height + gap + "px"
+						: rectTop + gap + "px",
 			);
 
 			window.scrollTo({
@@ -441,22 +449,23 @@ function Step({
 		if (nextOnToolSelect && currentTool === nextOnToolSelect) {
 			nextStep();
 		}
-	}, [currentTool, nextOnToolSelect]);
+	}, [currentTool, nextOnToolSelect, nextStep]);
 
 	useEffect(() => {
 		if (nextOnSelectType && selectedObject?.type === nextOnSelectType) {
 			nextStep();
 		}
-	}, [selectedObject, nextOnSelectType]);
+	}, [selectedObject, nextOnSelectType, nextStep]);
 
 	return (
 		<div
 			ref={ref}
 			key={title}
-			className="absolute bg-white rounded-xl p-8 flex flex-col gap-4 z-40 shadow-md">
+			className="absolute z-40 flex flex-col gap-4 rounded-xl bg-white p-8 shadow-md"
+		>
 			<div>
 				<span className="font-semibold text-muted">Steg {step}</span>
-				<h2 className="xl:text-2xl lg:text-xl text-lg font-semibold leading-tight text-gray-900">
+				<h2 className="text-lg font-semibold leading-tight text-gray-900 lg:text-xl xl:text-2xl">
 					{title}
 				</h2>
 			</div>
@@ -464,7 +473,8 @@ function Step({
 			{!nextOnSelectType && !nextOnToolSelect && (
 				<button
 					onClick={nextStep}
-					className="flex gap-2 items-center text-muted font-medium">
+					className="flex items-center gap-2 font-medium text-muted"
+				>
 					{isLastStep ? "Avsluta guide" : "Nästa steg"}{" "}
 					<FaArrowRight />
 				</button>

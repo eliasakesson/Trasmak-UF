@@ -8,8 +8,8 @@ export default function About() {
 					src="/images/production.jpg"
 					alt="Bild på produktion"
 					fill
-					objectFit="cover"
-					objectPosition="center"
+					sizes="100%"
+					className="object-cover"
 					quality={100}
 					priority
 				/>

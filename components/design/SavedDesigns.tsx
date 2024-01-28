@@ -41,12 +41,12 @@ export default function SavedDesigns({
 			dataArray.sort((a: any, b: any) => b[0] - a[0]);
 
 			const sortedDesigns = dataArray.map(
-				(data) => data[1]
+				(data) => data[1],
 			) as DesignProps[];
 
 			setDesigns(sortedDesigns);
 		});
-	}, [user]);
+	}, [user, loading, error]);
 
 	function removeDesign(design: DesignProps) {
 		if (!user) {
@@ -56,7 +56,7 @@ export default function SavedDesigns({
 
 		const object = designsObject.current;
 		const key = Object.keys(object).find(
-			(key: string) => object[key] === design
+			(key: string) => object[key] === design,
 		);
 		if (!key) {
 			toast.error("Borttagning misslyckades");

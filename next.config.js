@@ -7,6 +7,7 @@ const nextConfig = {
 			"secure.webtoolhub.com",
 			"firebasestorage.googleapis.com",
 			"lh3.googleusercontent.com",
+			"images.asos-media.com",
 		],
 	},
 };
