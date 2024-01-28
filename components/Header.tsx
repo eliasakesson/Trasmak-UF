@@ -136,7 +136,7 @@ function HamburgerMenu() {
 		} else {
 			controls.start({ translateX: "-100%", opacity: 0 });
 		}
-	}, [isMenuOpen]);
+	}, [isMenuOpen, controls]);
 
 	return (
 		<HamburgerContext.Provider value={{ isMenuOpen, setIsMenuOpen }}>

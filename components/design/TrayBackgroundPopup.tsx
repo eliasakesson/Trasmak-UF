@@ -59,15 +59,6 @@ export default function TrayBackgroundPopup({
 					onClick={() => setIsOpen(!isOpen)}
 					className="relative h-12 w-12 rounded-md border-2"
 				>
-					{/* {currentDesign?.image ? (
-						<img src={currentDesign.image} alt="" />
-					) : (
-						<div
-							className="w-full h-full rounded-sm"
-							style={{
-								backgroundColor: currentDesign?.color,
-							}}></div>
-					)} */}
 					<MdFormatColorFill
 						size={20}
 						className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"

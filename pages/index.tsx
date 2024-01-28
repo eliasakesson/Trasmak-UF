@@ -14,7 +14,6 @@ import { useAnalytics } from "@/firebase";
 import { useContext, useEffect } from "react";
 import { SiteContext } from "./_app";
 import About from "@/components/About";
-import Testimonials from "@/components/Testimonials";
 import HowToDesign from "@/components/HowToDesign";
 
 export default function Home({ products }: { products: any }) {
@@ -25,7 +24,7 @@ export default function Home({ products }: { products: any }) {
 
 	useEffect(() => {
 		analytics && logEvent(analytics, "homepage_view");
-	}, []);
+	}, [analytics]);
 
 	return (
 		<>

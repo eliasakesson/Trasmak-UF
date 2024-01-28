@@ -73,11 +73,13 @@ export default function Design({ products }: { products: any }) {
 
 	useEffect(() => {
 		analytics && logEvent(analytics, "design_view");
+	}, [analytics]);
 
+	useEffect(() => {
 		if (design) {
 			setCurrentDesign(design);
 		}
-	}, []);
+	}, [design]);
 
 	useEffect(() => {
 		if (products.length > 0 && !currentDesign.id && !design) {
