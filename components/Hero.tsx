@@ -13,9 +13,9 @@ export default function Hero() {
 					<Image
 						src="/images/valnöt.jpg"
 						alt="TRÄSMAK"
-						layout="fill"
-						objectFit="cover"
-						objectPosition="center"
+						fill
+						sizes="100%"
+						className="object-cover"
 						quality={100}
 						priority
 					/>
@@ -24,9 +24,9 @@ export default function Hero() {
 					<Image
 						src="/images/black.jpg"
 						alt="TRÄSMAK"
-						layout="fill"
-						objectFit="cover"
-						objectPosition="center"
+						fill
+						sizes="100%"
+						className="object-cover"
 						quality={100}
 						priority
 					/>
@@ -77,9 +77,9 @@ export default function Hero() {
 					<Image
 						src="/images/section1.jpg"
 						alt="TRÄSMAK"
-						layout="fill"
-						objectFit="cover"
-						objectPosition="center"
+						fill
+						sizes="100%"
+						className="object-cover"
 						quality={100}
 						priority
 					/>

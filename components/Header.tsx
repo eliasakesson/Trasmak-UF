@@ -722,6 +722,10 @@ const MoreNav = forwardRef<HTMLUListElement>((props, ref) => {
 	);
 });
 
+ProductsNav.displayName = "ProductsNav";
+DesignNav.displayName = "DesignNav";
+MoreNav.displayName = "MoreNav";
+
 function NavItem({
 	title,
 	description,

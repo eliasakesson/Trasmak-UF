@@ -41,21 +41,24 @@ export default function TrayBackgroundPopup({
 				transition: { duration: 0 },
 			});
 		}
-	}, [isOpen]);
+	}, [isOpen, controls, innerControls]);
 
 	return (
 		<TrayBackgroundPopupContext.Provider
-			value={{ currentDesign, setCurrentDesign }}>
+			value={{ currentDesign, setCurrentDesign }}
+		>
 			<div className="relative h-full">
 				<div
 					onClick={() => setIsOpen(false)}
 					className={`${
 						isOpen ? "" : "hidden"
-					} fixed top-0 left-0 right-0 bottom-0 z-20`}></div>
+					} fixed bottom-0 left-0 right-0 top-0 z-20`}
+				></div>
 				<button
 					aria-label="Select tray background color"
 					onClick={() => setIsOpen(!isOpen)}
-					className="h-12 w-12 border-2 rounded-md relative">
+					className="relative h-12 w-12 rounded-md border-2"
+				>
 					{/* {currentDesign?.image ? (
 						<img src={currentDesign.image} alt="" />
 					) : (
@@ -67,17 +70,19 @@ export default function TrayBackgroundPopup({
 					)} */}
 					<MdFormatColorFill
 						size={20}
-						className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+						className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
 					/>
 				</button>
 				<motion.div
 					initial={{ scaleY: 0 }}
 					animate={controls}
-					className="origin-top absolute top-10 left-0 bg-white border rounded-xl z-30">
+					className="absolute left-0 top-10 z-30 origin-top rounded-xl border bg-white"
+				>
 					<motion.div
 						initial={{ opacity: 0, translateY: -20 }}
 						animate={innerControls}
-						className="p-4 space-y-4">
+						className="space-y-4 p-4"
+					>
 						<Colorful
 							color={currentDesign?.color || "#000"}
 							onChange={(color) =>
@@ -120,7 +125,7 @@ export default function TrayBackgroundPopup({
 
 function ColorSwatch({ color }: { color: string }) {
 	const { currentDesign, setCurrentDesign } = useContext(
-		TrayBackgroundPopupContext
+		TrayBackgroundPopupContext,
 	);
 
 	return (
@@ -133,14 +138,15 @@ function ColorSwatch({ color }: { color: string }) {
 					image: "",
 				} as DesignProps)
 			}
-			className="w-8 h-8 rounded-lg border border-gray-300"
-			style={{ backgroundColor: color }}></button>
+			className="h-8 w-8 rounded-lg border border-gray-300"
+			style={{ backgroundColor: color }}
+		></button>
 	);
 }
 
 function ImageSwatch({ image }: { image: string }) {
 	const { currentDesign, setCurrentDesign } = useContext(
-		TrayBackgroundPopupContext
+		TrayBackgroundPopupContext,
 	);
 
 	async function onClick() {
@@ -163,8 +169,9 @@ function ImageSwatch({ image }: { image: string }) {
 		<button
 			aria-label="Select birch image as tray background"
 			onClick={onClick}
-			className="border w-full h-8 rounded-lg">
-			<img src={image} alt="" className="object-cover h-full w-full" />
+			className="h-8 w-full rounded-lg border"
+		>
+			<img src={image} alt="" className="h-full w-full object-cover" />
 		</button>
 	);
 }

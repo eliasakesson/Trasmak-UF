@@ -91,7 +91,6 @@ export function ProductCard({
 	toProductPage?: boolean;
 	h2?: boolean;
 }) {
-	const router = useRouter();
 	const { width } = useWindowSize();
 
 	return (
@@ -123,7 +122,7 @@ export function ProductCard({
 								{name}
 							</h3>
 						)}
-						<Stars productID={id} small />
+						<Stars productID={id} size="sm" />
 					</div>
 					<div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
 						<div className="flex items-center gap-2">

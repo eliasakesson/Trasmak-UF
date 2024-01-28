@@ -6,45 +6,57 @@ export default function Footer() {
 		<footer className="mt-16 bg-gray-100">
 			<div className="w-full border-y border-gray-300 bg-white py-2">
 				<ul className="flex h-8 justify-center gap-2 sm:gap-8">
-					<li>
-						<img
+					<li className="relative aspect-video">
+						<Image
 							src="https://images.asos-media.com/navigation/klarna-gb-png"
 							alt="Klarna"
+							fill
+							sizes="100%"
 							className="h-full rounded object-contain"
 						/>
 					</li>
-					<li>
-						<img
+					<li className="relative aspect-video">
+						<Image
 							src="https://images.asos-media.com/navigation/mastercard-png"
 							alt="Mastercard"
+							fill
+							sizes="100%"
 							className="h-full rounded object-contain"
 						/>
 					</li>
-					<li>
-						<img
+					<li className="relative aspect-video">
+						<Image
 							src="https://images.asos-media.com/navigation/visa-png"
 							alt="VISA"
+							fill
+							sizes="100%"
 							className="h-full rounded object-contain"
 						/>
 					</li>
-					<li>
-						<img
+					<li className="relative aspect-video">
+						<Image
 							src="https://images.asos-media.com/navigation/american-express-png"
 							alt="American Express"
+							fill
+							sizes="100%"
 							className="h-full rounded object-contain"
 						/>
 					</li>
-					<li>
-						<img
+					<li className="relative aspect-video">
+						<Image
 							src="https://images.asos-media.com/navigation/apple-pay-png"
 							alt="Apple Pay"
+							fill
+							sizes="100%"
 							className="h-full rounded object-contain"
 						/>
 					</li>
-					<li>
-						<img
+					<li className="relative aspect-video">
+						<Image
 							src="https://lh3.googleusercontent.com/2Bq7R5oLDG5tYVUPRnsLv7gitw9HRnqwnRC0baVxPM9rYRtNx6dv6_05YdMlCEtu-uTsk_R1mDOSkLcMZheILddlnDy1Z5LumphRoVE"
 							alt="Google Pay"
+							fill
+							sizes="100%"
 							className="h-full rounded border-2 border-gray-300 object-contain"
 						/>
 					</li>
