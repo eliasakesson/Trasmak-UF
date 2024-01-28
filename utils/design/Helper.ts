@@ -4,11 +4,11 @@ export function GetObjectDimensions(
 	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
 	obj: ObjectProps,
-	absolute: boolean = false
+	absolute: boolean = false,
 ) {
 	function MeasureTextWidth(
 		ctx: CanvasRenderingContext2D,
-		text: ObjectProps
+		text: ObjectProps,
 	) {
 		ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
 		const lines = text.content.split("\n");
@@ -17,7 +17,7 @@ export function GetObjectDimensions(
 
 	function MeasureTextHeight(
 		ctx: CanvasRenderingContext2D,
-		text: ObjectProps
+		text: ObjectProps,
 	) {
 		ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
 		const lines = text.content.split("\n");
@@ -62,9 +62,11 @@ export function GetTrayObjFromCanvas(
 	height: number = 33,
 	radius: number = 20,
 	bleed: number = 10,
-	edge: number = 20
+	edge: number = 20,
 ): ObjectProps {
-	const aspectRatio = (width + (bleed / 5 * 2)) / (height + (bleed / 5 * 2));
+	const widthWithBleed = Number(width) + Number(bleed / 5);
+	const heightWithBleed = Number(height) + Number(bleed / 5);
+	const aspectRatio = widthWithBleed / heightWithBleed;
 	const newWidth = canvas.height * heightProcentage * aspectRatio;
 	const newHeight = canvas.height * heightProcentage;
 	const newRadius =
@@ -90,7 +92,7 @@ export function GetTrayObjFromCanvas(
 
 export function LoadImages(
 	design: DesignProps,
-	Draw: (design: DesignProps) => void
+	Draw: (design: DesignProps) => void,
 ) {
 	if (design.image && !design.imageElement) {
 		const img = new Image();
@@ -121,14 +123,14 @@ export function LoadImages(
 export function SetTrayObject(
 	products: any,
 	currentDesignID: string,
-	setTrayObject: (tray: ObjectProps) => void
+	setTrayObject: (tray: ObjectProps) => void,
 ) {
 	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 	if (!canvas) return;
 
 	const metadata = products.find(
 		(product: any) =>
-			product.id.substring(6, product.id.length) === currentDesignID
+			product.id.substring(6, product.id.length) === currentDesignID,
 	)?.metadata;
 
 	const tray = GetTrayObjFromCanvas(
@@ -138,7 +140,7 @@ export function SetTrayObject(
 		metadata?.height,
 		metadata?.radius,
 		metadata?.bleed,
-		metadata?.edge
+		metadata?.edge,
 	);
 
 	if (tray) {
@@ -150,13 +152,13 @@ export function LoopUntilSetTrayObject(
 	products: any,
 	currentDesignID: string,
 	trayObject: ObjectProps | null,
-	setTrayObject: (tray: ObjectProps) => void
+	setTrayObject: (tray: ObjectProps) => void,
 ) {
 	function GetLoop() {
 		if (!trayObject) {
 			return setInterval(
 				() => SetTrayObject(products, currentDesignID, setTrayObject),
-				100
+				100,
 			);
 		}
 

@@ -11,7 +11,7 @@ export default async function AddToCart(
 	cartDetails: any,
 	addItem: any,
 	isAddingToCart: MutableRefObject<boolean>,
-	lastAddedImageURL: MutableRefObject<string | null>
+	lastAddedImageURL: MutableRefObject<string | null>,
 ) {
 	const toastID = toast.loading("Laddar upp bilder...");
 
@@ -24,7 +24,7 @@ export default async function AddToCart(
 
 	const metadata = products.find(
 		(product: any) =>
-			product.id.substring(6, product.id.length) === currentDesign.id
+			product.id.substring(6, product.id.length) === currentDesign.id,
 	)?.metadata;
 
 	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -44,7 +44,7 @@ export default async function AddToCart(
 		metadata?.height,
 		metadata?.radius,
 		metadata?.bleed,
-		metadata?.edge
+		metadata?.edge,
 	);
 
 	if (!renderTray) {
@@ -55,7 +55,7 @@ export default async function AddToCart(
 
 	try {
 		const product = products.find(
-			(product: any) => product.id == "price_" + currentDesign.id
+			(product: any) => product.id == "price_" + currentDesign.id,
 		);
 
 		if (!product) {
@@ -68,7 +68,7 @@ export default async function AddToCart(
 				cartDetails,
 				addItem,
 				lastAddedImageURL,
-				toastID
+				toastID,
 			);
 			isAddingToCart.current = false;
 			return;
@@ -97,7 +97,7 @@ export default async function AddToCart(
 					{
 						image: values[0],
 						cover: values[1],
-					}
+					},
 				);
 			})
 			.finally(() => {
@@ -115,7 +115,7 @@ function IncrementProduct(
 	cartDetails: any,
 	addItem: any,
 	lastAddedImageURL: MutableRefObject<string | null>,
-	toastID: string
+	toastID: string,
 ) {
 	const products = (cartDetails?.[product.id]?.product_data as any)?.products;
 
@@ -140,7 +140,7 @@ function AddProductToCart(
 	addItem: any,
 	lastAddedImageURL: MutableRefObject<string | null>,
 	toastID: string,
-	{ image, cover }: { image: string; cover: string }
+	{ image, cover }: { image: string; cover: string },
 ) {
 	const products =
 		(cartDetails?.[product.id]?.product_data as any)?.products ?? [];

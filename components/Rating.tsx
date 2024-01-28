@@ -1,14 +1,14 @@
 import { db } from "@/firebase";
 import { get, ref } from "firebase/database";
 import { useEffect, useState } from "react";
-import { FaStar, FaStarHalf, FaStarHalfAlt } from "react-icons/fa";
+import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 
-export default function Stars({
+export default function Rating({
 	productID,
-	small,
+	size = "md",
 }: {
 	productID: string;
-	small?: boolean;
+	size?: "sm" | "md" | "xl";
 }) {
 	const [rating, setRating] = useState<number>(0);
 	const [amount, setAmount] = useState<number>(0);
@@ -26,7 +26,7 @@ export default function Stars({
 
 			const total: any = ratings.reduce(
 				(acc: any, current: any) => acc + current.rating,
-				0
+				0,
 			);
 			console.log(total / amount);
 
@@ -36,32 +36,46 @@ export default function Stars({
 	}, [productID]);
 
 	return (
-		<div className={`flex items-center ${small ? "gap-0" : "gap-1"}`}>
+		<Stars rating={rating} size={size}>
+			<p className="text-md ml-1 text-muted">({amount})</p>
+		</Stars>
+	);
+}
+
+export function Stars({
+	rating,
+	size = "md",
+	children,
+	className,
+}: {
+	rating: number;
+	size?: "sm" | "md" | "xl";
+	children?: React.ReactNode;
+	className?: string;
+}) {
+	return (
+		<div
+			className={`flex items-center ${size == "sm" ? "gap-0" : size == "md" ? "gap-1" : "gap-2"} ${className}`}
+		>
 			{[...Array(5)].map((_, index) =>
 				rating > index && rating < index + 1 ? (
 					<FaStarHalfAlt
 						key={index}
-						className={`text-yellow-500 ${
-							small ? "text-xs" : "text-xl"
-						}}`}
+						className={`text-yellow-500 ${size == "sm" ? "text-sm" : size == "md" ? "text-md" : "text-xl"}`}
 					/>
 				) : rating > index ? (
 					<FaStar
 						key={index}
-						className={`text-yellow-500 ${
-							small ? "text-xs" : "text-xl"
-						}}`}
+						className={`text-yellow-500 ${size == "sm" ? "text-sm" : size == "md" ? "text-md" : "text-xl"}`}
 					/>
 				) : (
 					<FaStar
 						key={index}
-						className={`text-gray-400 ${
-							small ? "text-xs" : "text-xl"
-						}}`}
+						className={`text-gray-400 ${size == "sm" ? "text-sm" : size == "md" ? "text-md" : "text-xl"}`}
 					/>
-				)
+				),
 			)}
-			<p className="ml-1 text-muted text-md">({amount})</p>
+			{children}
 		</div>
 	);
 }

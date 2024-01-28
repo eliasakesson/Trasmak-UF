@@ -1,6 +1,6 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductRow from "@/components/ProductRow";
-import Stars from "@/components/Stars";
+import Stars from "@/components/Rating";
 import GetProducts, { GetProduct } from "@/utils/getProducts";
 import { useWindowSize } from "@/utils/hooks";
 import { stripe } from "@/utils/stripe";
@@ -32,9 +32,9 @@ export default function Product({
 				/>
 				<meta name="robots" content="index, follow" />
 			</Head>
-			<main className="max-w-7xl mx-auto px-8 py-8 space-y-4">
+			<main className="mx-auto max-w-7xl space-y-4 px-8 py-8">
 				<Breadcrumbs productName={product.name} />
-				<article className="grid lg:grid-cols-2 grid-cols-1 lg:gap-16 md:gap-8 gap-4">
+				<article className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-2 lg:gap-16">
 					<Images image={product.image} />
 					<ProductInfo product={product} />
 				</article>
@@ -56,7 +56,7 @@ export default function Product({
 function Images({ image }: { image: string }) {
 	return (
 		<div className="row-end-1 flex gap-8">
-			<div className="relative -z-10 aspect-square bg-gray-100 flex-1 rounded-xl overflow-hidden">
+			<div className="relative -z-10 aspect-square flex-1 overflow-hidden rounded-xl bg-gray-100">
 				<Image
 					src={image}
 					alt="Product"
@@ -80,7 +80,7 @@ function ProductInfo({ product }: { product: any }) {
 					<Stars productID={product.id} />
 				</div>
 			</div>
-			<p className="text-muted lg:text-lg text-base max-w-prose">
+			<p className="max-w-prose text-base text-muted lg:text-lg">
 				{product.description ?? ""} Brickan är perfekt för dig som vill
 				servera fika eller mat. Med designverktyget kan du sätta en
 				personlig prägel på brickan och det är din fantasi som sätter
@@ -101,9 +101,9 @@ function ProductInfo({ product }: { product: any }) {
 					<Link
 						href={`/design?d=${product.id.substring(
 							6,
-							product.id.length
+							product.id.length,
 						)}`}
-						className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold"
+						className="rounded-lg bg-primary px-12 py-4 font-semibold text-white transition-colors hover:bg-primary_light"
 					>
 						Designa nu
 					</Link>
@@ -111,11 +111,11 @@ function ProductInfo({ product }: { product: any }) {
 					<button
 						onClick={() =>
 							toast.error(
-								"Designern fungerar bäst på större skärmar. Vänligen byt enhet för att börja designa."
+								"Designern fungerar bäst på större skärmar. Vänligen byt enhet för att börja designa.",
 							)
 						}
 						type="button"
-						className="bg-primary hover:bg-primary_light transition-colors text-white px-12 py-4 rounded-lg font-semibold"
+						className="rounded-lg bg-primary px-12 py-4 font-semibold text-white transition-colors hover:bg-primary_light"
 					>
 						Designa nu
 					</button>
@@ -123,17 +123,17 @@ function ProductInfo({ product }: { product: any }) {
 			</div>
 
 			<ul className="space-y-2 text-muted">
-				<li className="flex gap-4 items-center">
+				<li className="flex items-center gap-4">
 					<MdLocalShipping />
 					Gratis frakt över 500 kr (Sverige)
 				</li>
 
-				<li className="flex gap-4 items-center">
+				<li className="flex items-center gap-4">
 					<FaCreditCard />
 					100% säker betalning
 				</li>
 
-				<li className="flex gap-4 items-center">
+				<li className="flex items-center gap-4">
 					<FaEarthAmericas />
 					Tillverkad i Sverige
 				</li>
@@ -144,7 +144,7 @@ function ProductInfo({ product }: { product: any }) {
 
 function MoreInfo({ product }: { product: any }) {
 	return (
-		<div className="py-8 col-span-2 grid lg:grid-cols-2 lg:gap-16 md:gap-8 gap-4">
+		<div className="col-span-2 grid gap-4 py-8 md:gap-8 lg:grid-cols-2 lg:gap-16">
 			<div className="space-y-4">
 				<h2 className="text-2xl font-semibold">Beskrivning</h2>
 				<p className="text-muted">
@@ -163,7 +163,7 @@ function MoreInfo({ product }: { product: any }) {
 				<table className="text-muted">
 					<tbody>
 						<tr>
-							<td className="font-semibold pr-4">Vikt</td>
+							<td className="pr-4 font-semibold">Vikt</td>
 							<td>{product?.metadata?.weight} g</td>
 						</tr>
 						<tr>

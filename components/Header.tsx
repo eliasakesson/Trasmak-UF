@@ -1,23 +1,34 @@
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import {
+	useEffect,
+	useState,
+	forwardRef,
+	useRef,
+	createContext,
+	useContext,
+} from "react";
 import {
 	FaShoppingCart,
 	FaSearch,
 	FaBars,
-	FaCrown,
-	FaStar,
-	FaPencilRuler,
 	FaUser,
-	FaImage,
 	FaSignOutAlt,
 	FaPlus,
+	FaExclamation,
 } from "react-icons/fa";
+import {
+	RiFunctionFill,
+	RiGuideFill,
+	RiImageFill,
+	RiPencilFill,
+	RiStackFill,
+	RiStarFill,
+	RiVipCrownFill,
+} from "react-icons/ri";
 import { FcGoogle } from "react-icons/fc";
 import { GoLaw } from "react-icons/go";
 import { BsChevronDown } from "react-icons/bs";
-import { AiFillLayout } from "react-icons/ai";
-import { IoLogOut } from "react-icons/io5";
 import { motion, useAnimationControls } from "framer-motion";
 import { useShoppingCart } from "use-shopping-cart";
 import GetProducts from "@/utils/getProducts";
@@ -29,6 +40,7 @@ import { auth } from "@/firebase";
 import GetConfig from "@/utils/getConfig";
 import { useWindowSize } from "@/utils/hooks";
 import { User } from "firebase/auth";
+import SlideWrapper from "./SlideWrapper";
 
 const Header = () => {
 	return (
@@ -36,7 +48,6 @@ const Header = () => {
 			<Announcement />
 			<div className="sticky top-0 z-50">
 				<Navbar />
-				<Navigation />
 			</div>
 		</>
 	);
@@ -58,10 +69,10 @@ function Announcement() {
 	}, []);
 
 	return (
-		<div className="bg-primary_dark text-white py-2">
-			<div className="container mx-auto flex justify-center items-center">
+		<div className="bg-primary_dark py-2 text-white">
+			<div className="container mx-auto flex items-center justify-center">
 				{freeShippingThreshold > 0 ? (
-					<p className="text-sm font-semibold text-center">
+					<p className="text-center text-sm font-semibold">
 						FRI FRAKT VID KÖP ÖVER {freeShippingThreshold / 100} KR
 					</p>
 				) : (
@@ -74,15 +85,16 @@ function Announcement() {
 
 function Navbar() {
 	return (
-		<div className="bg-white z-20 border-b">
-			<div className="max-w-7xl mx-auto flex justify-between items-center py-4 px-8">
-				<div className="flex gap-4 md:hidden flex-1">
+		<div className="z-20 border-b bg-white">
+			<div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
+				<div className="flex flex-1 gap-4 md:hidden">
 					<HamburgerMenu />
 				</div>
-				<div className="md:flex-1 flex-[2]">
+				<div className="flex-[2] md:flex-1">
 					<Link
 						href="/"
-						className="flex items-center gap-4 md:justify-start justify-center md:w-fit">
+						className="flex items-center justify-center gap-4 md:w-fit md:justify-start"
+					>
 						<Image
 							src="/images/logo.png"
 							alt="TRÄSMAK"
@@ -91,9 +103,10 @@ function Navbar() {
 						/>
 					</Link>
 				</div>
-				<div className="hidden md:flex items-center">
+				<div className="hidden items-center md:flex">
+					<Navigation />
 				</div>
-				<div className="flex items-center justify-end flex-1 gap-6">
+				<div className="flex flex-1 items-center justify-end gap-6">
 					<SearchButton />
 					<UserButton />
 					<CartButton />
@@ -102,6 +115,14 @@ function Navbar() {
 		</div>
 	);
 }
+
+const HamburgerContext = createContext<{
+	isMenuOpen: boolean;
+	setIsMenuOpen: (open: boolean) => void;
+}>({
+	isMenuOpen: false,
+	setIsMenuOpen: () => {},
+});
 
 function HamburgerMenu() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -118,11 +139,12 @@ function HamburgerMenu() {
 	}, [isMenuOpen]);
 
 	return (
-		<>
+		<HamburgerContext.Provider value={{ isMenuOpen, setIsMenuOpen }}>
 			<button
 				aria-label="Open menu"
 				onClick={() => setIsMenuOpen((open) => !open)}
-				className="text-gray-700 hover:text-gray-900 focus:outline-none">
+				className="text-gray-700 hover:text-gray-900 focus:outline-none"
+			>
 				{isMenuOpen ? (
 					<FaX className="h-6 w-6" />
 				) : (
@@ -131,67 +153,24 @@ function HamburgerMenu() {
 			</button>
 			<motion.div
 				animate={controls}
-				className="absolute z-40 top-[73px] h-[calc(100dvh-73px)] left-0 bg-white w-80 px-4 pt-4 pb-[52px] border-r-2 border-gray-300 flex flex-col">
+				className="absolute left-0 top-[73px] z-40 flex h-[calc(100dvh-73px)] w-80 flex-col space-y-2 border-r-2 border-gray-300 bg-white px-4 pb-[52px] pt-4"
+			>
 				<div className="flex flex-col space-y-4">
 					<Search setHamburgerMenuOpen={setIsMenuOpen} />
 				</div>
-				<ul className="flex flex-col gap-2 py-8 px-2">
-					<li>
-						<Link
-							onClick={() => setIsMenuOpen(false)}
-							href="/design"
-							className="text-xl flex gap-4 items-center py-2">
-							<FaPencilRuler className="text-xl" />
-							Designa din bricka
-						</Link>
-					</li>
-					<li>
-						<Link
-							onClick={() => setIsMenuOpen(false)}
-							href="/design-generator"
-							className="text-xl flex gap-4 items-center py-2">
-							<FaImage className="text-xl" />
-							Designa från bild
-						</Link>
-					</li>
-					<li className="border-b"></li>
-					<li>
-						<Link
-							onClick={() => setIsMenuOpen(false)}
-							href="/products"
-							className="text-xl flex gap-4 items-center py-2">
-							<FaCrown className="text-xl" />
-							Våra produkter
-						</Link>
-					</li>
-					<li>
-						<Link
-							onClick={() => setIsMenuOpen(false)}
-							href="/templates"
-							className="text-xl flex gap-4 items-center py-2">
-							<AiFillLayout className="text-xl" />
-							Våra mallar
-						</Link>
-					</li>
-					<li className="border-b"></li>
-					<li>
-						<Link
-							onClick={() => setIsMenuOpen(false)}
-							href="/terms"
-							className="text-xl flex gap-4 items-center py-2">
-							<GoLaw className="text-xl" />
-							Våra köpvillkor
-						</Link>
-					</li>
-				</ul>
-				<div className="flex flex-col gap-2 justify-end flex-1">
+				<DesignNav />
+				<div className="border-b"></div>
+				<ProductsNav />
+				<div className="border-b"></div>
+				<MoreNav />
+				<div className="flex flex-1 flex-col justify-end gap-2">
 					<UserButtons
 						user={user}
 						onClick={() => setIsMenuOpen(false)}
 					/>
 				</div>
 			</motion.div>
-		</>
+		</HamburgerContext.Provider>
 	);
 }
 
@@ -200,18 +179,37 @@ function SearchButton() {
 
 	return (
 		<>
-			
-			{isSearchOpen ? <Search buttons={<button onClick={() => setIsSearchOpen(false)} className="h-5 w-5 text-gray-400"><FaPlus className="rotate-45 w-full h-full" /></button>} /> : <button
-				aria-label="Open search"
-				onClick={() => setIsSearchOpen((open) => !open)}
-				className="text-gray-600 hover:text-gray-800 focus:outline-none p-2">
-				<FaSearch className="h-6 w-6" />
-			</button>}
+			{isSearchOpen ? (
+				<Search
+					buttons={
+						<button
+							onClick={() => setIsSearchOpen(false)}
+							className="h-5 w-5 text-gray-400"
+						>
+							<FaPlus className="h-full w-full rotate-45" />
+						</button>
+					}
+				/>
+			) : (
+				<button
+					aria-label="Open search"
+					onClick={() => setIsSearchOpen((open) => !open)}
+					className="hidden p-2 text-gray-600 hover:text-gray-800 focus:outline-none md:block"
+				>
+					<FaSearch className="h-6 w-6" />
+				</button>
+			)}
 		</>
 	);
-	}
+}
 
-function Search({ setHamburgerMenuOpen, buttons }: { setHamburgerMenuOpen?: any, buttons?: React.ReactNode }) {
+function Search({
+	setHamburgerMenuOpen,
+	buttons,
+}: {
+	setHamburgerMenuOpen?: any;
+	buttons?: React.ReactNode;
+}) {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const [searchInput, setSearchInput] = useState("");
 	const [products, setProducts] = useState([]);
@@ -231,7 +229,8 @@ function Search({ setHamburgerMenuOpen, buttons }: { setHamburgerMenuOpen?: any,
 					setIsSearchOpen(false);
 					setHamburgerMenuOpen?.(false);
 					router.push(`/products?search_input=${searchInput}`);
-				}}>
+				}}
+			>
 				<input
 					type="text"
 					placeholder="Sök"
@@ -239,17 +238,18 @@ function Search({ setHamburgerMenuOpen, buttons }: { setHamburgerMenuOpen?: any,
 					onBlur={() => setIsSearchOpen(false)}
 					value={searchInput}
 					onChange={(e) => setSearchInput(e.target.value)}
-					className="w-full border border-gray-300 rounded-md py-2 pr-10 pl-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+					className="w-full rounded-md border border-gray-300 py-2 pl-4 pr-10 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
 				/>
 			</form>
-			<div className="absolute inset-y-0 right-0 flex items-center pr-3 gap-4">
+			<div className="absolute inset-y-0 right-0 flex items-center gap-4 pr-3">
 				<Link
 					aria-label="Search"
 					href={`/products?serach_input=${searchInput}`}
 					onClick={() => {
 						setIsSearchOpen(false);
 						setHamburgerMenuOpen?.(false);
-					}}>
+					}}
+				>
 					<FaSearch className="h-5 w-5 text-gray-400" />
 				</Link>
 				{buttons}
@@ -258,8 +258,9 @@ function Search({ setHamburgerMenuOpen, buttons }: { setHamburgerMenuOpen?: any,
 				onPointerDown={(e) => e.preventDefault()}
 				className={`${
 					isSearchOpen ? "" : "hidden"
-				} absolute z-40 w-full mt-2 bg-white rounded-md border p-4 space-y-2`}>
-				<span className="text-muted_light font-semibold">
+				} absolute z-40 mt-2 w-full space-y-2 rounded-md border bg-white p-4`}
+			>
+				<span className="font-semibold text-muted_light">
 					Andra har sökt efter
 				</span>
 				<ul className="flex flex-col">
@@ -269,7 +270,7 @@ function Search({ setHamburgerMenuOpen, buttons }: { setHamburgerMenuOpen?: any,
 								!searchInput ||
 								product.name
 									.toLowerCase()
-									.includes(searchInput.toLowerCase())
+									.includes(searchInput.toLowerCase()),
 						)
 						.slice(0, 3)
 						.map((product: any) => (
@@ -280,17 +281,18 @@ function Search({ setHamburgerMenuOpen, buttons }: { setHamburgerMenuOpen?: any,
 										width >= 768 ? "design?d=" : "products/"
 									}${product.id.substring(
 										6,
-										product.id.length
+										product.id.length,
 									)}`}
 									onClick={() => {
 										setIsSearchOpen(false);
 										setHamburgerMenuOpen?.(false);
-									}}>
-									<div className="w-full py-2 flex gap-4 items-center">
+									}}
+								>
+									<div className="flex w-full items-center gap-4 py-2">
 										<img
 											src={product.image}
 											alt={product.name}
-											className="w-8 h-8 object-contain hue-rotate-[50deg] saturate-150 rounded-sm"
+											className="h-8 w-8 rounded-sm object-contain hue-rotate-[50deg] saturate-150"
 										/>
 										<span>{product.name}</span>
 									</div>
@@ -330,18 +332,20 @@ function UserButton() {
 	}, [isOpen]);
 
 	return (
-		<div className="relative md:block hidden">
+		<div className="relative hidden md:block">
 			<div
 				onClick={() => setIsOpen(false)}
 				className={`${
 					isOpen ? "" : "hidden"
-				} fixed top-0 left-0 right-0 bottom-0 z-20`}></div>
+				} fixed bottom-0 left-0 right-0 top-0 z-20`}
+			></div>
 			<button
 				aria-label="User menu"
 				className={`${
 					user?.photoURL ? "" : "p-2"
 				} text-gray-700 hover:text-gray-900 focus:outline-none`}
-				onClick={() => setIsOpen((open) => !open)}>
+				onClick={() => setIsOpen((open) => !open)}
+			>
 				{user?.photoURL ? (
 					<Image
 						src={user.photoURL}
@@ -357,12 +361,14 @@ function UserButton() {
 			<motion.div
 				initial={{ scaleY: 0 }}
 				animate={controls}
-				className="origin-top absolute top-8 right-0 min-w-[256px] bg-white border rounded-xl z-30">
+				className="absolute right-0 top-8 z-30 min-w-[256px] origin-top rounded-xl border bg-white"
+			>
 				<motion.div
 					initial={{ opacity: 0, translateY: -20 }}
 					animate={innerControls}
-					className="p-4 space-y-4">
-					<span className="font-semibold whitespace-nowrap text-xl">
+					className="space-y-4 p-4"
+				>
+					<span className="whitespace-nowrap text-xl font-semibold">
 						{user ? "Min profil" : "Du är inte inloggad"}
 					</span>
 					<div className="flex flex-col gap-2">
@@ -389,13 +395,15 @@ function UserButtons({
 			<Link
 				href="/profile"
 				onClick={onClick}
-				className="flex items-center gap-3  w-full text-left border-2 px-4 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
+				className="flex w-full items-center  gap-3 whitespace-nowrap rounded-lg border-2 px-4 py-2 text-left font-semibold transition-colors hover:bg-slate-100"
+			>
 				<FaUser size={16} />
 				Min profil
 			</Link>
 			<button
 				onClick={() => auth.signOut()}
-				className="flex items-center gap-3 w-full text-left border-2 border-red-200 bg-red-50 px-4 py-2 rounded-lg font-semibold hover:bg-red-100 transition-colors whitespace-nowrap">
+				className="flex w-full items-center gap-3 whitespace-nowrap rounded-lg border-2 border-red-200 bg-red-50 px-4 py-2 text-left font-semibold transition-colors hover:bg-red-100"
+			>
 				<FaSignOutAlt size={16} />
 				Logga ut
 			</button>
@@ -404,21 +412,24 @@ function UserButtons({
 		<>
 			<button
 				onClick={signInWithGoogle}
-				className="flex gap-2 items-center justify-center w-full border-2 px-4 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
-				<FcGoogle className="text-red-500 text-xl" />
+				className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-lg border-2 px-4 py-2 font-semibold transition-colors hover:bg-slate-100"
+			>
+				<FcGoogle className="text-xl text-red-500" />
 				Fortsätt med Google
 			</button>
 			<span className="text-center text-muted">eller</span>
 			<Link
 				href="/signup"
 				onClick={onClick}
-				className="bg-primary text-white w-full text-center px-4 py-[10px] font-semibold rounded-lg hover:bg-primary_light transition-colors">
+				className="w-full rounded-lg bg-primary px-4 py-[10px] text-center font-semibold text-white transition-colors hover:bg-primary_light"
+			>
 				Skapa konto
 			</Link>
 			<Link
 				href="/login"
 				onClick={onClick}
-				className="w-full text-center border-2 px-4 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors whitespace-nowrap">
+				className="w-full whitespace-nowrap rounded-lg border-2 px-4 py-2 text-center font-semibold transition-colors hover:bg-slate-100"
+			>
 				Logga in
 			</Link>
 		</>
@@ -457,24 +468,28 @@ function CartButton() {
 				onClick={() => setIsCartOpen(false)}
 				className={`${
 					isCartOpen ? "" : "hidden"
-				} fixed top-0 left-0 right-0 bottom-0 z-20`}></div>
+				} fixed bottom-0 left-0 right-0 top-0 z-20`}
+			></div>
 			<button
 				className="p-2 text-gray-600 hover:text-gray-800 focus:outline-none"
-				onClick={() => setIsCartOpen((open) => !open)}>
+				onClick={() => setIsCartOpen((open) => !open)}
+			>
 				<FaShoppingCart className="h-6 w-6" />
-				<span className="absolute top-2 right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-primary rounded-full">
+				<span className="absolute right-2 top-2 inline-flex -translate-y-1/2 translate-x-1/2 transform items-center justify-center rounded-full bg-primary px-2 py-1 text-xs font-bold leading-none text-red-100">
 					{cartCount}
 				</span>
 			</button>
 			<motion.div
 				initial={{ scaleY: 0 }}
 				animate={controls}
-				className="origin-top absolute top-8 right-0 min-w-[256px] bg-white border rounded-xl z-30">
+				className="absolute right-0 top-8 z-30 min-w-[256px] origin-top rounded-xl border bg-white"
+			>
 				<motion.div
 					initial={{ opacity: 0, translateY: -20 }}
 					animate={innerControls}
-					className="p-4 space-y-4">
-					<span className="font-semibold whitespace-nowrap text-xl">
+					className="space-y-4 p-4"
+				>
+					<span className="whitespace-nowrap text-xl font-semibold">
 						Min varukorg
 						<span className="font-normal"> ({cartCount})</span>
 					</span>
@@ -483,18 +498,19 @@ function CartButton() {
 							([key, item]) => (
 								<li
 									key={key}
-									className="flex items-center gap-4 py-2 border-b">
-									<div className="bg-gray-100 h-fit rounded-lg border overflow-hidden">
+									className="flex items-center gap-4 border-b py-2"
+								>
+									<div className="h-fit overflow-hidden rounded-lg border bg-gray-100">
 										<Image
 											src={item.image ?? ""}
 											alt={item.name}
 											width={56}
 											height={56}
-											className="object-contain aspect-square hue-rotate-[50deg] saturate-150"
+											className="aspect-square object-contain hue-rotate-[50deg] saturate-150"
 										/>
 									</div>
 									<div className="flex flex-col justify-center">
-										<span className="font-semibold max-w-[16ch]">
+										<span className="max-w-[16ch] font-semibold">
 											{item.name}
 										</span>
 										<span className="text-sm text-gray-600">
@@ -503,7 +519,7 @@ function CartButton() {
 										</span>
 									</div>
 								</li>
-							)
+							),
 						)}
 					</ul>
 					<div className="flex gap-2">
@@ -514,7 +530,8 @@ function CartButton() {
 						<Link
 							href="/cart"
 							onClick={() => setIsCartOpen(false)}
-							className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+							className="w-full rounded-lg border-2 px-8 py-2 text-center font-semibold transition-colors hover:bg-slate-100"
+						>
 							Gå till varukorgen
 						</Link>
 					</div>
@@ -525,165 +542,215 @@ function CartButton() {
 }
 
 function Navigation() {
-	const [whichNavOpen, setWhichNavOpen] = useState("");
+	const [hovering, setHovering] = useState<number | null>(null);
+	const [left, setLeft] = useState<number | null>(null);
+	const [size, setSize] = useState<{ width: number; height: number } | null>(
+		null,
+	);
 
-	const controls = useAnimationControls();
-	const innerControls = useAnimationControls();
+	const refs = useRef<(HTMLUListElement | null)[]>([]);
 
-	function handleMouseEnter() {
-		controls.start({ scaleY: 1 });
-		innerControls.start({
-			opacity: 1,
-			translateX: 0,
-			transition: { delay: 0.1 },
-		});
+	function onMouseEnter(index: number, e: any) {
+		setHovering(index);
+		setLeft(e.currentTarget.offsetLeft - 64);
+
+		const ref = refs.current[index];
+		if (ref) {
+			setTimeout(() => {
+				setSize({
+					width: ref.offsetWidth + 32,
+					height: ref.offsetHeight + 32,
+				});
+			}, 0);
+		}
 	}
 
-	function handleMouseLeave() {
-		setWhichNavOpen("");
-		controls.start({ scaleY: 0 });
-		innerControls.start({
-			opacity: 0,
-			translateX: -20,
-			transition: { duration: 0 },
-		});
+	function onMouseLeave() {
+		setHovering(null);
+		setSize(null);
 	}
 
 	return (
-		<div
-			className="hidden md:block relative bg-gray-100 py-2 border-y border-border"
-			onPointerLeave={handleMouseLeave}>
-			<ul className="max-w-7xl mx-auto flex px-8 gap-16 md:justify-center justify-center">
+		<nav className="relative" onMouseLeave={onMouseLeave}>
+			<ul className="mx-auto flex max-w-7xl justify-center gap-8 px-8 md:justify-center lg:gap-12">
 				<li
-					className="text-gray-600 hover:text-gray-800 cursor-pointer"
-					onPointerEnter={() => {
-						handleMouseEnter();
-						setWhichNavOpen("products");
-					}}>
-					Våra produkter
-					<BsChevronDown className="inline-block ml-1" />
+					className="cursor-pointer text-sm text-gray-600 hover:text-gray-800 lg:text-base"
+					onMouseEnter={(e) => onMouseEnter(0, e)}
+				>
+					<Link href="/design">
+						Designa din bricka
+						<BsChevronDown className="ml-1 inline-block" />
+					</Link>
 				</li>
 				<li
-					className="text-gray-600 hover:text-gray-800 cursor-pointer"
-					onPointerEnter={() => {
-						handleMouseEnter();
-						setWhichNavOpen("design");
-					}}>
-					Designa din bricka
-					<BsChevronDown className="inline-block ml-1" />
+					className="cursor-pointer text-sm text-gray-600 hover:text-gray-800 lg:text-base"
+					onMouseEnter={(e) => onMouseEnter(1, e)}
+				>
+					<Link href="/products">
+						Våra produkter
+						<BsChevronDown className="ml-1 inline-block" />
+					</Link>
 				</li>
 				<li
-					className="text-gray-600 hover:text-gray-800 cursor-pointer"
-					onPointerEnter={() => {
-						handleMouseEnter();
-						setWhichNavOpen("more");
-					}}>
+					className="cursor-pointer text-sm text-gray-600 hover:text-gray-800 lg:text-base"
+					onMouseEnter={(e) => onMouseEnter(2, e)}
+				>
 					Fler tjänster
-					<BsChevronDown className="inline-block ml-1" />
+					<BsChevronDown className="ml-1 inline-block" />
 				</li>
 			</ul>
-			<motion.div
-				initial={{ scaleY: 0 }}
-				animate={controls}
-				className="absolute z-30 top-10 left-0 bg-gray-100 w-full border-b origin-top overflow-hidden">
-				<motion.div
-					initial={{ opacity: 0, translateX: -20 }}
-					animate={innerControls}
-					className="max-w-7xl mx-auto relative px-8 py-8 origin-top">
-					{whichNavOpen === "products" && <ProductsNav />}{" "}
-					{whichNavOpen === "design" && <DesignNav />}{" "}
-					{whichNavOpen === "more" && <MoreNav />}
-				</motion.div>
-			</motion.div>
-		</div>
+			<div
+				style={{
+					left: left || 0,
+					height: size?.height || 0,
+					width: size?.width || 0,
+				}}
+				className={`absolute top-6 overflow-hidden rounded-md bg-white p-4 shadow-lg duration-300 ${hovering !== null ? "transition-all" : "pointer-events-none hidden"}`}
+			>
+				<SlideWrapper index={0} hovering={hovering}>
+					<DesignNav ref={(element) => (refs.current[0] = element)} />
+				</SlideWrapper>
+				<SlideWrapper index={1} hovering={hovering}>
+					<ProductsNav
+						ref={(element) => (refs.current[1] = element)}
+					/>
+				</SlideWrapper>
+				<SlideWrapper index={2} hovering={hovering}>
+					<MoreNav ref={(element) => (refs.current[2] = element)} />
+				</SlideWrapper>
+			</div>
+		</nav>
 	);
 }
 
-function ProductsNav() {
+const ProductsNav = forwardRef<HTMLUListElement>((props, ref) => {
 	return (
-		<motion.div
-			className="flex justify-center gap-4"
-			initial={{ opacity: 0, translateX: -20 }}
-			animate={{ opacity: 1, translateX: 0 }}>
-			<ul className="flex gap-4">
-				<li>
-					<Link
-						href="/products"
-						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
-						<FaCrown className="text-4xl" />
-						<span className="text-lg">Bästsäljare</span>
-					</Link>
-				</li>
-				<li>
-					<Link
-						href="/products"
-						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
-						<FaStar className="text-4xl" />
-						<span className="text-lg">Produkter</span>
-					</Link>
-				</li>
-				<li>
-					<Link
-						href="/templates"
-						className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
-						<AiFillLayout className="text-4xl" />
-						<span className="text-lg">Mallar</span>
-					</Link>
-				</li>
-			</ul>
-		</motion.div>
-	);
-}
-
-function DesignNav() {
-	return (
-		<motion.ul
-			className="flex items-center justify-center gap-4"
-			initial={{ opacity: 0, translateX: -20 }}
-			animate={{ opacity: 1, translateX: 0 }}>
+		<ul
+			ref={ref}
+			className="grid w-full gap-1 md:w-max md:grid-cols-2 md:gap-4"
+		>
 			<li>
-				<Link
+				<NavItem
+					title="Bästsäljare"
+					description="Se våra mest sålda produkter"
+					Icon={RiVipCrownFill}
+					href="/products"
+				/>
+			</li>
+			<li>
+				<NavItem
+					title="Populära"
+					description="Missa inte våra populäraste produkter"
+					Icon={RiStarFill}
+					href="/products"
+				/>
+			</li>
+			<li>
+				<NavItem
+					title="Nyheter"
+					description="Se våra senaste produkter"
+					Icon={FaExclamation}
+					href="/products"
+				/>
+			</li>
+			<li>
+				<NavItem
+					title="Alla produkter"
+					description="Se alla våra produkter"
+					Icon={RiStackFill}
+					href="/products"
+				/>
+			</li>
+		</ul>
+	);
+});
+
+const DesignNav = forwardRef<HTMLUListElement>((props, ref) => {
+	return (
+		<ul
+			ref={ref}
+			className="grid w-full gap-1 md:w-max md:grid-cols-2 md:gap-4"
+		>
+			<li>
+				<NavItem
+					title="Designa fritt"
+					description="Designa din bricka från grunden"
+					Icon={RiPencilFill}
 					href="/design"
-					className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
-					<FaPencilRuler className="text-4xl" />
-					<span className="text-lg">Designa fritt</span>
-				</Link>
+				/>
 			</li>
 			<li>
-				<Link
-					href="/design-generator"
-					className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
-					<FaImage className="text-4xl" />
-					<span className="text-lg">Starta från bild</span>
-				</Link>
-			</li>
-			<li>
-				<Link
+				<NavItem
+					title="Designa från mall"
+					description="Välj en av våra färdiga mallar och designa din bricka"
+					Icon={RiFunctionFill}
 					href="/templates"
-					className="h-32 aspect-video border border-muted_light flex flex-col gap-2 items-center justify-center rounded-xl">
-					<AiFillLayout className="text-4xl" />
-					<span className="text-lg">Starta från mall</span>
-				</Link>
+				/>
 			</li>
-		</motion.ul>
-	);
-}
-
-function MoreNav() {
-	return (
-		<motion.ul
-			className="flex flex-col items-center gap-2"
-			initial={{ opacity: 0, translateX: -20 }}
-			animate={{ opacity: 1, translateX: 0 }}>
 			<li>
-				<Link
-					href="/terms"
-					className="flex gap-2 items-center w-fit border-l-2 border-gray-300 pl-2">
-					<GoLaw className="text-2xl" />
-					<span className="text-lg">Våra köpvillkor</span>
-				</Link>
+				<NavItem
+					title="Lär dig designern"
+					description="Lär dig hur du använder vårt designverktyg"
+					Icon={RiGuideFill}
+					href="/design?t=guide"
+				/>
 			</li>
-		</motion.ul>
+			<li>
+				<NavItem
+					title="Designa från bild"
+					description="Ladda upp en bild och designa din bricka"
+					Icon={RiImageFill}
+					href="/design-generator"
+				/>
+			</li>
+		</ul>
+	);
+});
+
+const MoreNav = forwardRef<HTMLUListElement>((props, ref) => {
+	return (
+		<ul ref={ref} className="grid w-full gap-1 md:w-max md:gap-4">
+			<li>
+				<NavItem
+					title="Våra köpvillkor"
+					description="Köpvillkor för att handla på Träsmak.se"
+					Icon={GoLaw}
+					href="/terms"
+				/>
+			</li>
+		</ul>
+	);
+});
+
+function NavItem({
+	title,
+	description,
+	Icon,
+	href,
+}: {
+	title: string;
+	description: string;
+	Icon: any;
+	href: string;
+}) {
+	const { setIsMenuOpen } = useContext(HamburgerContext);
+
+	return (
+		<Link
+			href={href}
+			onClick={() => setIsMenuOpen && setIsMenuOpen(false)}
+			className="flex h-full items-center gap-4 rounded-md p-2 transition-colors hover:bg-gray-50 md:p-4"
+		>
+			<Icon className="text-3xl text-primary md:text-5xl" />
+			<div>
+				<span className="text-lg font-semibold md:text-xl">
+					{title}
+				</span>
+				<p className="hidden max-w-[30ch] text-sm text-gray-600 md:block">
+					{description}
+				</p>
+			</div>
+		</Link>
 	);
 }
 

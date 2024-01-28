@@ -3,10 +3,56 @@ import Link from "next/link";
 
 export default function Footer() {
 	return (
-		<footer className="bg-gray-100">
-			<div className="max-w-7xl mx-auto px-8 ">
-				<div className="grid lg:grid-cols-4 sm:grid-cols-2 md:gap-16 gap-8 py-16">
-					<div className="sm:col-span-2 space-y-8">
+		<footer className="mt-16 bg-gray-100">
+			<div className="w-full border-y border-gray-300 bg-white py-2">
+				<ul className="flex h-8 justify-center gap-2 sm:gap-8">
+					<li>
+						<img
+							src="https://images.asos-media.com/navigation/klarna-gb-png"
+							alt="Klarna"
+							className="h-full rounded object-contain"
+						/>
+					</li>
+					<li>
+						<img
+							src="https://images.asos-media.com/navigation/mastercard-png"
+							alt="Mastercard"
+							className="h-full rounded object-contain"
+						/>
+					</li>
+					<li>
+						<img
+							src="https://images.asos-media.com/navigation/visa-png"
+							alt="VISA"
+							className="h-full rounded object-contain"
+						/>
+					</li>
+					<li>
+						<img
+							src="https://images.asos-media.com/navigation/american-express-png"
+							alt="American Express"
+							className="h-full rounded object-contain"
+						/>
+					</li>
+					<li>
+						<img
+							src="https://images.asos-media.com/navigation/apple-pay-png"
+							alt="Apple Pay"
+							className="h-full rounded object-contain"
+						/>
+					</li>
+					<li>
+						<img
+							src="https://lh3.googleusercontent.com/2Bq7R5oLDG5tYVUPRnsLv7gitw9HRnqwnRC0baVxPM9rYRtNx6dv6_05YdMlCEtu-uTsk_R1mDOSkLcMZheILddlnDy1Z5LumphRoVE"
+							alt="Google Pay"
+							className="h-full rounded border-2 border-gray-300 object-contain"
+						/>
+					</li>
+				</ul>
+			</div>
+			<div className="mx-auto max-w-7xl px-8 ">
+				<div className="grid gap-8 py-16 sm:grid-cols-2 md:gap-16 lg:grid-cols-4">
+					<div className="space-y-8 sm:col-span-2">
 						<Image
 							src="/images/logo.png"
 							alt="TRÄSMAK"
@@ -32,14 +78,16 @@ export default function Footer() {
 								<li>
 									<Link
 										href="/products"
-										className="underline">
+										className="underline"
+									>
 										Produkter
 									</Link>
 								</li>
 								<li>
 									<Link
 										href="/templates"
-										className="underline">
+										className="underline"
+									>
 										Mallar
 									</Link>
 								</li>
@@ -51,14 +99,16 @@ export default function Footer() {
 								<li>
 									<Link
 										href="/design-generator"
-										className="underline">
+										className="underline"
+									>
 										Design Generator
 									</Link>
 								</li>
 								<li>
 									<Link
 										href="/design-generator"
-										className="underline">
+										className="underline"
+									>
 										Köpvillkor
 									</Link>
 								</li>
@@ -81,7 +131,7 @@ export default function Footer() {
 						</div>
 					</div>
 				</div>
-				<div className="py-4 border-t flex sm:flex-row flex-col-reverse gap-2 justify-between items-center">
+				<div className="flex flex-col-reverse items-center justify-between gap-2 border-t py-4 sm:flex-row">
 					<p className="text-muted">
 						© 2024 Träsmak UF. All rights reserved.
 					</p>

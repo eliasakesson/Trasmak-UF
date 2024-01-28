@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, useContext } from "react";
-import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -60,10 +59,10 @@ export default function Design({ products }: { products: any }) {
 	>("select");
 
 	const [selectedObjectID, setSelectedObjectID] = useState<number | null>(
-		null
+		null,
 	);
 	const inputSelection = useRef<{ start: number | null; end: number | null }>(
-		{ start: null, end: null }
+		{ start: null, end: null },
 	);
 
 	const [showCanvasSupport, setShowCanvasSupport] = useState(false);
@@ -103,7 +102,7 @@ export default function Design({ products }: { products: any }) {
 			products,
 			currentDesign.id,
 			trayObject,
-			setTrayObject
+			setTrayObject,
 		);
 
 		return unsub;
@@ -111,7 +110,7 @@ export default function Design({ products }: { products: any }) {
 
 	useEffect(
 		() => SetTrayObject(products, currentDesign.id, setTrayObject),
-		[currentDesign.id, products]
+		[currentDesign.id, products],
 	);
 
 	useEffect(() => {
@@ -120,7 +119,7 @@ export default function Design({ products }: { products: any }) {
 		const ctx = canvas.getContext("2d");
 		const rect = canvas.getBoundingClientRect();
 		const selectedObject = currentDesign.objects?.find(
-			(obj) => obj.id === selectedObjectID
+			(obj) => obj.id === selectedObjectID,
 		);
 
 		if (!trayObject || !ctx || !rect) return;
@@ -133,18 +132,20 @@ export default function Design({ products }: { products: any }) {
 				trayObject,
 				currentDesign,
 				selectedObjectID,
-				showCanvasSupport
+				showCanvasSupport,
 			);
-		}, 1);
+		}, 10);
 
 		LoadImages(currentDesign, (design) =>
-			Draw(
-				canvas,
-				trayObject,
-				design,
-				selectedObjectID,
-				showCanvasSupport
-			)
+			setTimeout(() => {
+				Draw(
+					canvas,
+					trayObject,
+					currentDesign,
+					selectedObjectID,
+					showCanvasSupport,
+				);
+			}, 10),
 		);
 
 		MoveDesignEditor(designEditorRef, canvas, trayObject, selectedObject);
@@ -164,9 +165,9 @@ export default function Design({ products }: { products: any }) {
 					setCurrentDesign((current) => ({
 						...current,
 						objects: current.objects.map((obj) =>
-							obj.id === selectedObjectID ? design : obj
+							obj.id === selectedObjectID ? design : obj,
 						),
-					}))
+					})),
 			) as HTMLTextAreaElement;
 		}
 
@@ -186,8 +187,8 @@ export default function Design({ products }: { products: any }) {
 					trayObject,
 					design,
 					selectedObjectID,
-					showCanvasSupport
-				)
+					showCanvasSupport,
+				),
 		);
 
 		return () => {
@@ -221,9 +222,9 @@ export default function Design({ products }: { products: any }) {
 						content="Designa din egen träbricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
 					/>
 				</Head>
-				<main className="min-h-[90vh] flex flex-col gap-4 items-center justify-center px-8 pb-32">
+				<main className="flex min-h-[90vh] flex-col items-center justify-center gap-4 px-8 pb-32">
 					<FaCircleXmark size={64} className="text-gray-400" />
-					<h1 className="xl:text-7xl lg:text-6xl text-4xl font-bold leading-tight text-gray-900 text-center">
+					<h1 className="text-center text-4xl font-bold leading-tight text-gray-900 lg:text-6xl xl:text-7xl">
 						För liten skärm
 					</h1>
 					<p className="text-center">
@@ -232,7 +233,8 @@ export default function Design({ products }: { products: any }) {
 					</p>
 					<Link
 						href="/"
-						className="w-full text-center border-2 px-8 py-2 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
+						className="w-full rounded-lg border-2 px-8 py-2 text-center font-semibold transition-colors hover:bg-slate-100"
+					>
 						Gå tillbaka
 					</Link>
 				</main>
@@ -250,18 +252,20 @@ export default function Design({ products }: { products: any }) {
 				/>
 				<meta name="robots" content="index, follow" />
 			</Head>
-			<main className="max-w-7xl mx-auto px-8 py-16 space-y-8">
-				<div className="grid lg:grid-cols-4 gap-8">
+			<main className="mx-auto max-w-7xl space-y-8 px-8 py-16">
+				<div className="grid gap-8 lg:grid-cols-4">
 					<div className="col-span-3 space-y-4">
 						<div className="relative" id="canvasparent">
 							<canvas
 								id="canvas"
-								className="bg-gray-100 rounded-xl w-full"
+								className="w-full rounded-xl bg-gray-100"
 								width={1280}
-								height={720}></canvas>
+								height={720}
+							></canvas>
 							<div
 								className="absolute z-50"
-								ref={designEditorRef}>
+								ref={designEditorRef}
+							>
 								{selectedObjectID && (
 									<DesignEditor
 										design={currentDesign}
@@ -269,7 +273,7 @@ export default function Design({ products }: { products: any }) {
 										object={
 											currentDesign?.objects?.find(
 												(obj) =>
-													obj.id === selectedObjectID
+													obj.id === selectedObjectID,
 											) ?? null
 										}
 										setObject={(obj: ObjectProps) =>
@@ -291,7 +295,7 @@ export default function Design({ products }: { products: any }) {
 													design.objects.filter(
 														(o) =>
 															o.id !==
-															selectedObjectID
+															selectedObjectID,
 													);
 												return { ...design, objects };
 											});
@@ -306,31 +310,36 @@ export default function Design({ products }: { products: any }) {
 								Verktyg och bakgrundsfärg
 							</h3>
 							<div
-								className="flex justify-between max-sm:flex-col gap-4"
-								id="tools">
-								<div className="flex items-center gap-2 h-12">
+								className="max-sm:flex-col flex justify-between gap-4"
+								id="tools"
+							>
+								<div className="flex h-12 items-center gap-2">
 									<Tool
 										tool="select"
 										selectedTool={selectedTool}
-										setSelectedTool={setSelectedTool}>
+										setSelectedTool={setSelectedTool}
+									>
 										<FaMousePointer />
 									</Tool>
 									<Tool
 										tool="text"
 										selectedTool={selectedTool}
-										setSelectedTool={setSelectedTool}>
+										setSelectedTool={setSelectedTool}
+									>
 										T
 									</Tool>
 									<Tool
 										tool="image"
 										selectedTool={selectedTool}
-										setSelectedTool={setSelectedTool}>
+										setSelectedTool={setSelectedTool}
+									>
 										<FaImage />
 									</Tool>
 									<Tool
 										tool="rectangle"
 										selectedTool={selectedTool}
-										setSelectedTool={setSelectedTool}>
+										setSelectedTool={setSelectedTool}
+									>
 										<FaSquare />
 									</Tool>
 									<br />
@@ -343,7 +352,8 @@ export default function Design({ products }: { products: any }) {
 								<div className="flex gap-4">
 									<Link
 										href={`/products/${currentDesign.id}`}
-										className="border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
+										className="rounded-lg border-2 px-8 py-3 font-semibold transition-colors hover:bg-slate-100"
+									>
 										Gå till produktsidan
 									</Link>
 									<button
@@ -354,10 +364,11 @@ export default function Design({ products }: { products: any }) {
 												cartDetails,
 												addItem,
 												isAddingToCart,
-												lastAddedImageURL
+												lastAddedImageURL,
 											)
 										}
-										className="bg-primary text-white hover:bg-primary_light transition-colors rounded-md px-8 py-3 flex gap-2 items-center font-semibold">
+										className="flex items-center gap-2 rounded-md bg-primary px-8 py-3 font-semibold text-white transition-colors hover:bg-primary_light"
+									>
 										Lägg till i kundvagn
 									</button>
 								</div>
@@ -372,7 +383,8 @@ export default function Design({ products }: { products: any }) {
 									currentTool={selectedTool}
 									selectedObject={
 										currentDesign.objects.find(
-											(obj) => obj.id === selectedObjectID
+											(obj) =>
+												obj.id === selectedObjectID,
 										) || null
 									}
 								/>
@@ -380,7 +392,8 @@ export default function Design({ products }: { products: any }) {
 									onClick={() =>
 										setShowCanvasSupport((s) => !s)
 									}
-									className="border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
+									className="rounded-lg border-2 px-8 py-3 font-semibold transition-colors hover:bg-slate-100"
+								>
 									{showCanvasSupport ? "Dölj" : "Visa"}{" "}
 									stödlinjer
 								</button>
@@ -395,10 +408,11 @@ export default function Design({ products }: { products: any }) {
 												loading: "Sparar design...",
 												success: "Design sparad",
 												error: "Fel vid sparning",
-											}
+											},
 										)
 									}
-									className="ml-auto flex gap-2 items-center border-2 px-8 py-3 font-semibold rounded-lg hover:bg-slate-100 transition-colors disabled:bg-gray-100">
+									className="ml-auto flex items-center gap-2 rounded-lg border-2 px-8 py-3 font-semibold transition-colors hover:bg-slate-100 disabled:bg-gray-100"
+								>
 									<FaSave />{" "}
 									{user
 										? "Spara design"
@@ -406,13 +420,13 @@ export default function Design({ products }: { products: any }) {
 								</button>
 							</div>
 						</div>
-						<div className="flex gap-4 h-6">
-							<div className="h-full flex gap-2">
-								<div className="bg-red-300 border aspect-square h-full rounded"></div>
+						<div className="flex h-6 gap-4">
+							<div className="flex h-full gap-2">
+								<div className="aspect-square h-full rounded border bg-red-300"></div>
 								<p>Säkerhetsmarginal</p>
 							</div>
-							<div className="h-full flex gap-2">
-								<div className="bg-white border aspect-square h-full rounded"></div>
+							<div className="flex h-full gap-2">
+								<div className="aspect-square h-full rounded border bg-white"></div>
 								<p className="whitespace-nowrap">
 									Kanter{" "}
 									<span className="text-muted">
@@ -429,41 +443,44 @@ export default function Design({ products }: { products: any }) {
 							brickan.
 						</p>
 					</div>
-					<div className="row-span-2 lg:col-span-1 col-span-3">
-						<h2 className="text-xl font-bold border-b pb-2 mb-4">
+					<div className="col-span-3 row-span-2 lg:col-span-1">
+						<h2 className="mb-4 border-b pb-2 text-xl font-bold">
 							Produkter
 						</h2>
 						<ul
-							className="lg:flex flex-col grid grid-cols-2 gap-2"
-							id="products">
+							className="grid grid-cols-2 flex-col gap-2 lg:flex"
+							id="products"
+						>
 							{products.map((product: Product) => (
 								<li
 									key={product.id}
-									className={`border-2 rounded-lg overflow-hidden ${
+									className={`overflow-hidden rounded-lg border-2 ${
 										currentDesign.id ===
 										product.id.substring(
 											6,
-											product.id.length
+											product.id.length,
 										)
 											? "border-muted_light"
 											: ""
-									}`}>
+									}`}
+								>
 									<button
 										onClick={() =>
 											setCurrentDesign((design) => ({
 												...design,
 												id: product.id.substring(
 													6,
-													product.id.length
+													product.id.length,
 												),
 											}))
 										}
-										className="w-full flex gap-4 items-center max-sm:flex-col sm:text-left max-sm:pb-2">
+										className="max-sm:flex-col max-sm:pb-2 flex w-full items-center gap-4 sm:text-left"
+									>
 										<div className="flex-shrink-0">
 											<img
 												src={product.image ?? ""}
 												alt={product.name}
-												className="w-24 h-24 object-contain hue-rotate-[50deg] saturate-150"
+												className="h-24 w-24 object-contain hue-rotate-[50deg] saturate-150"
 												width={96}
 												height={96}
 											/>
@@ -486,7 +503,7 @@ export default function Design({ products }: { products: any }) {
 					</div>
 					<div className="col-span-3 flex flex-col gap-8">
 						<div>
-							<h2 className="text-xl font-bold border-b pb-2 mb-4">
+							<h2 className="mb-4 border-b pb-2 text-xl font-bold">
 								Mina designs
 							</h2>
 							<SavedDesigns
@@ -499,7 +516,7 @@ export default function Design({ products }: { products: any }) {
 							/>
 						</div>
 						<div id="templates">
-							<h2 className="text-xl font-bold border-b pb-2 mb-4">
+							<h2 className="mb-4 border-b pb-2 text-xl font-bold">
 								Mallar
 							</h2>
 							<TemplateDesigns
@@ -532,11 +549,12 @@ function Tool({
 	return (
 		<button
 			aria-label={`Select tool ${tool}`}
-			className={`flex items-center justify-center h-full aspect-square font-bold rounded-lg border-2 ${
+			className={`flex aspect-square h-full items-center justify-center rounded-lg border-2 font-bold ${
 				selectedTool === tool ? "bg-primary_light bg-opacity-20" : ""
 			}`}
 			onClick={() => setSelectedTool(tool)}
-			id={`${tool}-tool`}>
+			id={`${tool}-tool`}
+		>
 			{children}
 		</button>
 	);

@@ -2,7 +2,6 @@ import ProductRow from "@/components/ProductRow";
 import Hero from "@/components/Hero";
 import GetProducts from "@/utils/getProducts";
 import Section1 from "@/components/Section1";
-import Section2 from "@/components/Section2";
 import Head from "next/head";
 import Inspiration from "@/components/Inspiration";
 import TemplateDesigns from "@/components/design/TemplateDesigns";
@@ -15,6 +14,8 @@ import { useAnalytics } from "@/firebase";
 import { useContext, useEffect } from "react";
 import { SiteContext } from "./_app";
 import About from "@/components/About";
+import Testimonials from "@/components/Testimonials";
+import HowToDesign from "@/components/HowToDesign";
 
 export default function Home({ products }: { products: any }) {
 	const router = useRouter();
@@ -36,30 +37,31 @@ export default function Home({ products }: { products: any }) {
 				/>
 				<meta name="robots" content="index, follow" />
 			</Head>
-			<main className="relative pb-16 overflow-hidden">
-				<article className="flex flex-col lg:gap-32 gap-16">
+			<main className="relative overflow-hidden pb-16">
+				<article className="flex flex-col gap-16 lg:gap-32">
 					<Hero />
-					{/* <About /> */}
-					<div className="flex lg:flex-col flex-col-reverse lg:gap-32 gap-16">
-						<Section2 />
+					<About />
+					<div className="flex flex-col-reverse gap-16 lg:flex-col lg:gap-32">
+						<HowToDesign />
+						<div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4">
+							<ProductRow
+								title="Bästsäljare"
+								description="Detta är de brickor som säljs som bäst. Passa på innan de tar
+							slut!"
+								products={products}
+								rows={width >= 1024 ? 1 : 2}
+							/>
+							<Link
+								href="/products"
+								className="flex items-center gap-2 text-xl font-semibold text-primary_light"
+							>
+								Se fler produkter
+								<FaArrowRight />
+							</Link>
+						</div>
 						<Section1 />
 					</div>
-					<div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
-						<ProductRow
-							title="Bästsäljare"
-							description="Detta är de brickor som säljs som bäst. Passa på innan de tar
-							slut!"
-							products={products}
-							rows={width >= 1024 ? 1 : 2}
-						/>
-						<Link
-							href="/products"
-							className="flex items-center gap-2 font-semibold text-xl text-primary_light">
-							Se fler produkter
-							<FaArrowRight />
-						</Link>
-					</div>
-					<div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
+					<div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4">
 						<ProductRow
 							title="Våra favoritmallar"
 							description="Skapa personliga brickor baserat på våra bästa mallar!"
@@ -81,12 +83,13 @@ export default function Home({ products }: { products: any }) {
 						/>
 						<Link
 							href="/templates"
-							className="flex items-center gap-2 font-semibold text-xl text-primary_light">
+							className="flex items-center gap-2 text-xl font-semibold text-primary_light"
+						>
 							Se fler mallar
 							<FaArrowRight />
 						</Link>
 					</div>
-					<div className="max-w-7xl mx-auto px-4 w-full">
+					<div className="mx-auto w-full max-w-7xl px-4">
 						<Inspiration />
 					</div>
 				</article>

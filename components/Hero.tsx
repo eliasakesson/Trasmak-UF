@@ -3,141 +3,86 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, useAnimationControls } from "framer-motion";
 import useSwipe from "@/utils/useSwipe";
+import { Stars } from "./Rating";
 
 export default function Hero() {
-	const [scrollY, setScrollY] = useState(0);
-	const [currentSlide, setCurrentSlide] = useState(0);
-	const controls = useAnimationControls();
-
-	const slides = [
-		"/images/valnöt.jpg",
-		"/images/lemon.jpg",
-		"/images/black.jpg",
-		"/images/hero.jpg",
-	];
-
-	useEffect(() => {
-		function handleScroll() {
-			if (window.innerWidth < 1024) {
-				setScrollY(0);
-				return;
-			}
-			setScrollY(window.scrollY);
-		}
-
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setCurrentSlide((currentSlide) =>
-				currentSlide === slides.length - 1 ? 0 : currentSlide + 1
-			);
-		}, 5000);
-
-		controls.start({
-			x: `-${currentSlide * 25}%`,
-			transition: {
-				duration: 0.5,
-				ease: "easeInOut",
-			},
-		});
-		controls
-			.start({
-				filter: `blur(2px)`,
-				transition: {
-					duration: 0.25,
-					ease: "circIn",
-				},
-			})
-			.then(() => {
-				controls.start({
-					filter: `blur(0px)`,
-					transition: {
-						duration: 0.25,
-						ease: "circOut",
-					},
-				});
-			});
-
-		return () => clearInterval(interval);
-	}, [currentSlide, controls]);
-
-	const swipeHandlers = useSwipe({
-		onSwipedLeft: () =>
-			setCurrentSlide((currentSlide) =>
-				currentSlide === slides.length - 1 ? 0 : currentSlide + 1
-			),
-		onSwipedRight: () =>
-			setCurrentSlide((currentSlide) =>
-				currentSlide === 0 ? slides.length - 1 : currentSlide - 1
-			),
-	});
-
 	return (
-		<section className="lg:min-h-[calc(100vh-153px)] min-h-[calc(100vh-111px)] flex lg:flex-row flex-col-reverse max-lg:gap-8">
-			<div className="lg:flex-1 flex max-lg:h-1/2">
-				<div className="lg:pl-[10vw] lg:pr-[5vw] px-8 lg:h-md:pb-[153px] lg:py-8 py-4 flex flex-col justify-center lg:gap-8 gap-2 h-full">
-					<h1 className="xl:text-7xl lg:text-6xl text-4xl font-bold leading-tight text-gray-900">
-						<span className="text-primary">Träbricka</span> med
-						<br />
-						personligt motiv
-					</h1>
-					<p className="xl:text-xl text-base text-gray-600 max-w-full">
-						Träbricka i björkfanér med personligt motiv. Tillverkad i Småland med hög kvalité.
-						Vi erbjuder moderna och stilrena brickor med eller utan personliga motiv. Välj en av våra
-						färdiga mallar eller designa din egen bricka från grunden.
-					</p>
-					<div className="flex lg:gap-4 gap-2 lg:flex-row flex-col pt-4 lg:pb-0 pb-16">
-						<Link
-							href="/design"
-							className="bg-primary text-white lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-primary_light transition-colors">
-							Designa din bricka
-						</Link>
-						<Link
-							href="/design-generator"
-							className="border-2 lg:w-fit w-full 2xl:px-16 px-8 py-4 font-semibold rounded-lg hover:bg-slate-100 transition-colors">
-							Skapa design från bild
-						</Link>
-					</div>
+		<section className="flex min-h-[calc(100vh-111px)] flex-col">
+			<div className="relative grid flex-[4] gap-8 md:grid-cols-3">
+				<div className="relative md:col-span-2">
+					<Image
+						src="/images/valnöt.jpg"
+						alt="TRÄSMAK"
+						layout="fill"
+						objectFit="cover"
+						objectPosition="center"
+						quality={100}
+						priority
+					/>
+				</div>
+				<div className="relative hidden md:block">
+					<Image
+						src="/images/black.jpg"
+						alt="TRÄSMAK"
+						layout="fill"
+						objectFit="cover"
+						objectPosition="center"
+						quality={100}
+						priority
+					/>
 				</div>
 			</div>
-			<div className="flex-1 flex max-lg:h-1/2">
-				<div
-					className="flex-1 bg-primary relative overflow-hidden"
-					style={{ borderBottomLeftRadius: scrollY / 2 }}
-					{...swipeHandlers}>
-					<motion.div
-						animate={controls}
-						className="flex h-full"
-						style={{
-							width: `${slides.length * 100}%`,
-						}}>
-						{slides.map((slide, i) => (
-							<div key={i} className="w-full relative">
-								<Image
-									src={slide}
-									layout="fill"
-									alt=""
-									className="object-cover"
-								/>
-							</div>
-						))}
-					</motion.div>
-					<div className="absolute lg:bottom-8 bottom-4 left-1/2 -translate-x-1/2 p-1 bg-gray-50 flex gap-1 rounded-full">
-						{slides.map((_, i) => (
-							<button
-								aria-label={`Button slide ${i + 1}`}
-								key={i}
-								className={`h-4 rounded-full transition-all ${
-									currentSlide === i
-										? "bg-primary_light opacity-50 w-16"
-										: "bg-gray-300 w-4"
-								}`}
-								onClick={() => setCurrentSlide(i)}></button>
-						))}
+			<div className="flex flex-col justify-between gap-8 p-8 md:flex-row md:items-end md:px-[8vw] md:py-16">
+				<h1 className="whitespace-nowrap text-4xl font-bold leading-tight text-gray-900 md:text-5xl lg:text-6xl xl:text-7xl">
+					<span className="text-primary">Träbricka</span> med
+					<br />
+					personligt motiv
+				</h1>
+				<p className="max-w-prose text-base text-gray-600 lg:text-lg xl:text-xl 2xl:text-2xl">
+					Träbricka i björkfanér med personligt motiv. Tillverkad i
+					Småland med hög kvalité. Vi erbjuder moderna och stilrena
+					brickor med eller utan personliga motiv. Välj en av våra
+					färdiga mallar eller designa din egen bricka från grunden.
+				</p>
+			</div>
+			<div className="grid gap-8 md:flex-[2] md:grid-cols-2">
+				<div className="flex flex-col gap-4 px-8 pb-8 md:px-[8vw] md:pr-0">
+					<Link
+						href="/design"
+						className="flex w-full items-center justify-between rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light 2xl:px-16"
+					>
+						Designa din bricka
+						<span className="hidden text-sm font-normal text-gray-200 md:block">
+							“För dig som söker något unikt”
+						</span>
+					</Link>
+					<div className="flex items-center gap-4">
+						<Link
+							href="/products"
+							className="w-fit rounded-lg border-2 px-8 py-4 font-semibold transition-colors hover:bg-slate-100 2xl:px-16"
+						>
+							Se våra produkter
+						</Link>
+						<p className="hidden text-sm font-normal text-muted md:block">
+							20+ olika storlekar och former
+						</p>
 					</div>
+					<Stars rating={5} size="xl" className="mt-4">
+						<p className="text-sm text-muted md:text-base">
+							10+ 5-stjärniga recensioner
+						</p>
+					</Stars>
+				</div>
+				<div className="relative hidden md:block">
+					<Image
+						src="/images/section1.jpg"
+						alt="TRÄSMAK"
+						layout="fill"
+						objectFit="cover"
+						objectPosition="center"
+						quality={100}
+						priority
+					/>
 				</div>
 			</div>
 		</section>
