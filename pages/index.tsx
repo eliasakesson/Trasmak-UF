@@ -15,6 +15,7 @@ import { useContext, useEffect } from "react";
 import { SiteContext } from "./_app";
 import About from "@/components/About";
 import HowToDesign from "@/components/HowToDesign";
+import TellYourStory from "@/components/TellYourStory";
 
 export default function Home({ products }: { products: any }) {
 	const router = useRouter();
@@ -39,27 +40,26 @@ export default function Home({ products }: { products: any }) {
 			<main className="relative overflow-hidden pb-16">
 				<article className="flex flex-col gap-16 lg:gap-32">
 					<Hero />
+					<TellYourStory />
 					<About />
-					<div className="flex flex-col-reverse gap-16 lg:flex-col lg:gap-32">
-						<HowToDesign />
-						<div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4">
-							<ProductRow
-								title="Bästsäljare"
-								description="Detta är de brickor som säljs som bäst. Passa på innan de tar
+					<HowToDesign />
+					<div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4">
+						<ProductRow
+							title="Bästsäljare"
+							description="Detta är de brickor som säljs som bäst. Passa på innan de tar
 							slut!"
-								products={products}
-								rows={width >= 1024 ? 1 : 2}
-							/>
-							<Link
-								href="/products"
-								className="flex items-center gap-2 text-xl font-semibold text-primary_light"
-							>
-								Se fler produkter
-								<FaArrowRight />
-							</Link>
-						</div>
-						<Section1 />
+							products={products}
+							rows={width >= 1024 ? 1 : 2}
+						/>
+						<Link
+							href="/products"
+							className="flex items-center gap-2 text-xl font-semibold text-primary_light"
+						>
+							Se fler produkter
+							<FaArrowRight />
+						</Link>
 					</div>
+					<Section1 />
 					<div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4">
 						<ProductRow
 							title="Våra favoritmallar"

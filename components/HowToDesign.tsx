@@ -50,7 +50,7 @@ export default function HowToDesign() {
 						src="/images/designer.png"
 						alt=""
 						fill
-						className="rounded-lg border-2 border-gray-300 object-cover object-top"
+						className="border-2 border-gray-300 object-cover object-top"
 					/>
 				</div>
 			</div>
@@ -62,7 +62,7 @@ export default function HowToDesign() {
 						src="/images/design-generator.png"
 						alt=""
 						fill
-						className="rounded-lg border-2 border-gray-300 object-cover object-top"
+						className="border-2 border-gray-300 object-cover object-top"
 					/>
 					d
 				</div>
@@ -109,7 +109,7 @@ export default function HowToDesign() {
 						src="/images/templates.png"
 						alt=""
 						fill
-						className="rounded-lg border-2 border-gray-300 object-cover object-top"
+						className="border-2 border-gray-300 object-cover object-top"
 					/>
 				</div>
 			</div>

@@ -15,7 +15,7 @@ export default function CookieConsent() {
 		} else if (localStorage.getItem("cookieConsent") === "true") {
 			activateAnalytics();
 		}
-	}, [activateAnalytics]);
+	}, []);
 
 	function handleAccept() {
 		setShowMenu("none");

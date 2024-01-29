@@ -69,7 +69,7 @@ function Announcement() {
 	}, []);
 
 	return (
-		<div className="bg-primary_dark py-2 text-white">
+		<div className="bg-primary py-2 text-white">
 			<div className="container mx-auto flex items-center justify-center">
 				{freeShippingThreshold > 0 ? (
 					<p className="text-center text-sm font-semibold">

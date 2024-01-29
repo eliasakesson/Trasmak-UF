@@ -45,7 +45,7 @@ export default function Hero() {
 					färdiga mallar eller designa din egen bricka från grunden.
 				</p>
 			</div>
-			<div className="grid gap-8 md:flex-[2] md:grid-cols-2">
+			<div className="grid gap-8 md:flex-1 md:grid-cols-2">
 				<div className="flex flex-col gap-4 px-8 pb-8 md:px-[8vw] md:pr-0">
 					<Link
 						href="/design"
