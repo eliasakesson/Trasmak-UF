@@ -574,7 +574,7 @@ function Navigation() {
 		<nav className="relative" onMouseLeave={onMouseLeave}>
 			<ul className="mx-auto flex max-w-7xl justify-center gap-8 px-8 md:justify-center lg:gap-12">
 				<li
-					className="cursor-pointer text-sm text-gray-600 hover:text-gray-800 lg:text-base"
+					className="cursor-pointer py-2 text-sm text-gray-600 hover:text-gray-800 lg:text-base"
 					onMouseEnter={(e) => onMouseEnter(0, e)}
 				>
 					<Link href="/design">
@@ -583,7 +583,7 @@ function Navigation() {
 					</Link>
 				</li>
 				<li
-					className="cursor-pointer text-sm text-gray-600 hover:text-gray-800 lg:text-base"
+					className="cursor-pointer py-2 text-sm text-gray-600 hover:text-gray-800 lg:text-base"
 					onMouseEnter={(e) => onMouseEnter(1, e)}
 				>
 					<Link href="/products">
@@ -592,7 +592,7 @@ function Navigation() {
 					</Link>
 				</li>
 				<li
-					className="cursor-pointer text-sm text-gray-600 hover:text-gray-800 lg:text-base"
+					className="cursor-pointer py-2 text-sm text-gray-600 hover:text-gray-800 lg:text-base"
 					onMouseEnter={(e) => onMouseEnter(2, e)}
 				>
 					Fler tjänster
@@ -605,7 +605,7 @@ function Navigation() {
 					height: size?.height || 0,
 					width: size?.width || 0,
 				}}
-				className={`absolute top-6 overflow-hidden rounded-md bg-white p-4 shadow-lg duration-300 ${hovering !== null ? "transition-all" : "pointer-events-none hidden"}`}
+				className={`absolute top-8 overflow-hidden rounded-md bg-white p-4 shadow-lg duration-300 ${hovering !== null ? "transition-all" : "pointer-events-none hidden"}`}
 			>
 				<SlideWrapper index={0} hovering={hovering}>
 					<DesignNav ref={(element) => (refs.current[0] = element)} />
