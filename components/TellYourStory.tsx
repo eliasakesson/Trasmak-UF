@@ -4,7 +4,7 @@ import { FaUserGroup } from "react-icons/fa6";
 
 export default function TellYourStory() {
 	return (
-		<div className="mx-auto flex w-full max-w-7xl flex-col-reverse items-center justify-between gap-8 px-8 md:flex-row md:gap-16">
+		<div className="mx-auto flex w-full max-w-7xl flex-col-reverse items-center justify-between gap-8 px-8 md:flex-row md:gap-16 md:py-16">
 			<div className="flex flex-1 flex-col gap-4">
 				<h2 className="text-3xl font-bold leading-tight text-gray-900 md:text-4xl xl:text-5xl">
 					Berätta din historia

@@ -152,12 +152,10 @@ function HamburgerMenu() {
 				)}
 			</button>
 			<motion.div
+				initial={{ translateX: "-100%", opacity: 0 }}
 				animate={controls}
 				className="absolute left-0 top-[73px] z-40 flex h-[calc(100vh-73px)] w-80 flex-col space-y-2 border-r-2 border-gray-300 bg-white px-4 pb-[52px] pt-4"
 			>
-				<div className="flex flex-col space-y-4">
-					<Search setHamburgerMenuOpen={setIsMenuOpen} />
-				</div>
 				<DesignNav />
 				<div className="border-b"></div>
 				<NavItem
@@ -168,11 +166,14 @@ function HamburgerMenu() {
 				/>
 				<div className="border-b"></div>
 				<MoreNav />
-				<div className="flex flex-1 flex-col justify-end gap-2">
-					<UserButtons
-						user={user}
-						onClick={() => setIsMenuOpen(false)}
-					/>
+
+				<div className="relative flex flex-1 flex-col justify-end">
+					<div className="sticky bottom-4 flex flex-col gap-2">
+						<UserButtons
+							user={user}
+							onClick={() => setIsMenuOpen(false)}
+						/>
+					</div>
 				</div>
 			</motion.div>
 		</HamburgerContext.Provider>
@@ -577,24 +578,20 @@ function Navigation() {
 
 	return (
 		<nav className="relative" onMouseLeave={onMouseLeave}>
-			<ul className="mx-auto flex max-w-7xl justify-center gap-8 px-8 md:justify-center lg:gap-12">
+			<ul className="mx-auto flex max-w-7xl justify-center gap-8 px-4 md:justify-center lg:gap-12">
 				<li
 					className="cursor-pointer py-2 text-sm text-gray-600 hover:text-gray-800 lg:text-base"
 					onMouseEnter={(e) => onMouseEnter(0, e)}
 				>
-					<Link href="/design">
-						Designa din bricka
-						<BsChevronDown className="ml-1 inline-block" />
-					</Link>
+					Designa din bricka
+					<BsChevronDown className="ml-1 inline-block" />
 				</li>
 				<li
 					className="cursor-pointer py-2 text-sm text-gray-600 hover:text-gray-800 lg:text-base"
 					onMouseEnter={(e) => onMouseEnter(1, e)}
 				>
-					<Link href="/products">
-						Våra produkter
-						<BsChevronDown className="ml-1 inline-block" />
-					</Link>
+					Våra produkter
+					<BsChevronDown className="ml-1 inline-block" />
 				</li>
 				<li
 					className="cursor-pointer py-2 text-sm text-gray-600 hover:text-gray-800 lg:text-base"

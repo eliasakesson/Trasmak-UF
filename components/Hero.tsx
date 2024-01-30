@@ -5,8 +5,8 @@ import { Stars } from "./Rating";
 export default function Hero() {
 	return (
 		<section className="flex min-h-[calc(100vh-111px)] flex-col">
-			<div className="relative grid flex-1 gap-8 md:flex-[4] md:grid-cols-3">
-				<div className="relative bg-primary md:col-span-2">
+			<div className="relative grid flex-1 gap-8 md:flex-grow md:grid-cols-3">
+				<div className="relative bg-primary py-8 md:col-span-2">
 					<Image
 						src="/images/valnöt.jpg"
 						alt="TRÄSMAK"
@@ -17,7 +17,7 @@ export default function Hero() {
 						priority
 					/>
 				</div>
-				<div className="relative hidden bg-primary md:block">
+				<div className="relative hidden bg-primary py-8 md:block">
 					<Image
 						src="/images/black.jpg"
 						alt="TRÄSMAK"
@@ -42,7 +42,7 @@ export default function Hero() {
 					färdiga mallar eller designa din egen bricka från grunden.
 				</p>
 			</div>
-			<div className="grid gap-8 md:flex-1 md:grid-cols-2">
+			<div className="grid gap-8 md:flex-grow md:grid-cols-2">
 				<div className="flex flex-col gap-4 px-8 pb-8 md:px-[8vw] md:pr-0">
 					<Link
 						href="/design"
