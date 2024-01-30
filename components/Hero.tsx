@@ -63,7 +63,6 @@ export default function Hero() {
 						</p>
 					</div>
 					<Stars rating={5} size="xl" className="md:mt-4">
-					<Stars rating={5} size="xl" className="md:mt-4">
 						<p className="text-sm text-muted md:text-base">
 							10+ 5-stjärniga recensioner
 						</p>
