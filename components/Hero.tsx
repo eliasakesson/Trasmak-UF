@@ -5,8 +5,8 @@ import { Stars } from "./Rating";
 export default function Hero() {
 	return (
 		<section className="flex min-h-[calc(100vh-111px)] flex-col">
-			<div className="relative grid flex-grow gap-8 md:grid-cols-3">
-				<div className="relative bg-primary py-8 md:col-span-2">
+			<div className="relative grid max-h-[50vh] min-h-[25vh] gap-8 md:flex-grow md:grid-cols-3">
+				<div className="relative bg-primary md:col-span-2">
 					<Image
 						src="/images/valnöt.jpg"
 						alt="TRÄSMAK"
