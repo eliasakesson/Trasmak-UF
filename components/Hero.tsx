@@ -11,7 +11,6 @@ export default function Hero() {
 						src="/images/valnöt.jpg"
 						alt="TRÄSMAK"
 						fill
-						sizes="100%"
 						className="object-cover"
 						quality={100}
 						priority
@@ -22,7 +21,6 @@ export default function Hero() {
 						src="/images/black.jpg"
 						alt="TRÄSMAK"
 						fill
-						sizes="100%"
 						className="object-cover"
 						quality={100}
 						priority
