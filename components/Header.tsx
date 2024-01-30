@@ -153,14 +153,19 @@ function HamburgerMenu() {
 			</button>
 			<motion.div
 				animate={controls}
-				className="absolute left-0 top-[73px] z-40 flex h-[calc(100dvh-73px)] w-80 flex-col space-y-2 border-r-2 border-gray-300 bg-white px-4 pb-[52px] pt-4"
+				className="absolute left-0 top-[73px] z-40 flex h-[calc(100vh-73px)] w-80 flex-col space-y-2 border-r-2 border-gray-300 bg-white px-4 pb-[52px] pt-4"
 			>
 				<div className="flex flex-col space-y-4">
 					<Search setHamburgerMenuOpen={setIsMenuOpen} />
 				</div>
 				<DesignNav />
 				<div className="border-b"></div>
-				<ProductsNav />
+				<NavItem
+					title="Alla produkter"
+					description="Se alla våra produkter"
+					Icon={RiStackFill}
+					href="/products"
+				/>
 				<div className="border-b"></div>
 				<MoreNav />
 				<div className="flex flex-1 flex-col justify-end gap-2">
@@ -671,7 +676,7 @@ const DesignNav = forwardRef<HTMLUListElement>((props, ref) => {
 			ref={ref}
 			className="grid w-full gap-1 md:w-max md:grid-cols-2 md:gap-4"
 		>
-			<li>
+			<li className="order-2 md:order-3">
 				<NavItem
 					title="Designa fritt"
 					description="Designa din bricka från grunden"
@@ -679,7 +684,7 @@ const DesignNav = forwardRef<HTMLUListElement>((props, ref) => {
 					href="/design"
 				/>
 			</li>
-			<li>
+			<li className="order-3 md:order-2">
 				<NavItem
 					title="Designa från mall"
 					description="Välj en av våra färdiga mallar och designa din bricka"
@@ -687,7 +692,7 @@ const DesignNav = forwardRef<HTMLUListElement>((props, ref) => {
 					href="/templates"
 				/>
 			</li>
-			<li>
+			<li className="order-1 md:order-1">
 				<NavItem
 					title="Lär dig designern"
 					description="Lär dig hur du använder vårt designverktyg"
@@ -695,7 +700,7 @@ const DesignNav = forwardRef<HTMLUListElement>((props, ref) => {
 					href="/design?t=guide"
 				/>
 			</li>
-			<li>
+			<li className="order-4">
 				<NavItem
 					title="Designa från bild"
 					description="Ladda upp en bild och designa din bricka"
@@ -743,7 +748,7 @@ function NavItem({
 		<Link
 			href={href}
 			onClick={() => setIsMenuOpen && setIsMenuOpen(false)}
-			className="flex h-full items-center gap-4 rounded-md p-2 transition-colors hover:bg-gray-50 md:p-4"
+			className="flex items-center gap-4 rounded-md p-2 transition-colors hover:bg-gray-50 md:h-full md:p-4"
 		>
 			<Icon className="text-3xl text-primary md:text-5xl" />
 			<div>

@@ -1,15 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { motion, useAnimationControls } from "framer-motion";
-import useSwipe from "@/utils/useSwipe";
 import { Stars } from "./Rating";
 
 export default function Hero() {
 	return (
 		<section className="flex min-h-[calc(100vh-111px)] flex-col">
-			<div className="relative grid flex-[4] gap-8 md:grid-cols-3">
-				<div className="relative md:col-span-2">
+			<div className="relative grid flex-1 gap-8 md:flex-[4] md:grid-cols-3">
+				<div className="relative bg-primary md:col-span-2">
 					<Image
 						src="/images/valnöt.jpg"
 						alt="TRÄSMAK"
@@ -20,7 +17,7 @@ export default function Hero() {
 						priority
 					/>
 				</div>
-				<div className="relative hidden md:block">
+				<div className="relative hidden bg-primary md:block">
 					<Image
 						src="/images/black.jpg"
 						alt="TRÄSMAK"
