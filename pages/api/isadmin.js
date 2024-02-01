@@ -1,10 +1,10 @@
 import { auth } from "./firebase";
 
-export default async (req, res) => {
-	const { uid, token } = req.body;
-
+export default async function handler(req, res) {
 	try {
-		if (!uid || !token) {
+		const { token } = req.body;
+
+		if (!token) {
 			return res.status(400).json({ error: "Missing params" });
 		}
 
@@ -14,11 +14,9 @@ export default async (req, res) => {
 			return res.status(403).json({ error: "Not authorized" });
 		}
 
-		await auth.setCustomUserClaims(uid, { admin: true });
-
-		res.status(200).json({ success: true });
+		return res.status(200).json({ success: true });
 	} catch (error) {
-		console.error("Error setting custom claims:", error);
+		console.error(error);
 		res.status(500).json({ error: error.message });
 	}
-};
+}

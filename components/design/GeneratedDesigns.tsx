@@ -32,7 +32,7 @@ export default function GeneratedDesigns({
 			const dataArray = Object.entries(data);
 
 			const sortedDesigns = dataArray.map(
-				(data) => data[1]
+				(data) => data[1],
 			) as DesignProps[];
 
 			setTemplates(sortedDesigns);
@@ -46,23 +46,23 @@ export default function GeneratedDesigns({
 
 		templates.forEach((template) => {
 			const images = template.objects.filter(
-				(obj) => obj.type === "image"
+				(obj) => obj.type === "image",
 			);
-			const largestImage = images.reduce(
+			const smallestImage = images.reduce(
 				(prev: ObjectProps | undefined, current: ObjectProps) => {
 					if (!prev) return current;
 					if (
-						(prev?.width ?? 0) * (prev?.height ?? 0) >
+						(prev?.width ?? 0) * (prev?.height ?? 0) <
 						(current.width ?? 0) * (current.height ?? 0)
 					)
 						return prev;
 
 					return current;
 				},
-				undefined
+				undefined,
 			);
 
-			if (!largestImage) {
+			if (!smallestImage) {
 				console.error("No image found in template");
 				return;
 			}
@@ -70,7 +70,7 @@ export default function GeneratedDesigns({
 			const newDesign: DesignProps = {
 				...template,
 				objects: template.objects.map((obj) => {
-					if (obj.id === largestImage.id) {
+					if (obj.id === smallestImage.id) {
 						return {
 							...obj,
 							content: image,

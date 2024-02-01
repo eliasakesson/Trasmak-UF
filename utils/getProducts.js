@@ -5,15 +5,20 @@ export default async function GetProducts(randomize = false) {
 		expand: ["data.product"],
 	});
 
-	const products = inventory.data.filter((product) => product.product.active).map((product) => ({
-		id: product.id,
-		price: product.unit_amount,
-		currency: product.currency,
-		name: product.product.name,
-		description: product.product.description,
-		image: product.product.images[0],
-		metadata: product.product.metadata,
-	}));
+	const products = inventory.data
+		.filter((product) => product.product.active)
+		.map((product) => {
+			return {
+				id: product.id,
+				price: product.unit_amount,
+				currency: product.currency,
+				name: product.product.name,
+				description: product.product.description,
+				image: product.product.images[0],
+				metadata: product.product.metadata,
+			};
+		})
+		.filter((product) => product !== null);
 
 	if (randomize) {
 		products.sort((a, b) => {
