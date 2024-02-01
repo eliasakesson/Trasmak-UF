@@ -36,7 +36,7 @@ export default function DesignerGuide({
 	return (
 		<>
 			<button
-				className="flex items-center gap-2 rounded-md bg-primary px-8 py-3 font-semibold text-white transition-colors hover:bg-primary_light"
+				className="flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary_light md:px-8"
 				onClick={() => setShow("tutorial")}
 			>
 				Starta guide

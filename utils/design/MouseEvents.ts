@@ -12,13 +12,12 @@ export default function SetupMouseEvents(
 	selectedTool: "select" | "text" | "image" | "rectangle",
 	setSelectedTool: (tool: "select" | "text" | "image" | "rectangle") => void,
 	designEditorElement: HTMLDivElement | null,
-	Draw: (design: DesignProps) => void
+	Draw: (design: DesignProps) => void,
 ) {
 	const ctx = canvas.getContext("2d");
-	const rect = canvas.getBoundingClientRect();
 
 	const selectedObject = currentDesign.objects.find(
-		(obj) => obj.id === selectedObjectID
+		(obj) => obj.id === selectedObjectID,
 	);
 
 	let dragObject: ObjectProps | undefined = undefined;
@@ -37,8 +36,7 @@ export default function SetupMouseEvents(
 	let mouseDownPosition: { x: number; y: number } = { x: 0, y: 0 };
 
 	function onMouseDown(e: any) {
-		const clickX = e.offsetX * (canvas.width / rect.width);
-		const clickY = e.offsetY * (canvas.height / rect.height);
+		const { clickX, clickY } = GetCoordsFromEvent(e, canvas);
 		mouseDownPosition = { x: clickX, y: clickY };
 
 		dragObject = GetObjectFromPointer(e, canvas, trayObject, currentDesign);
@@ -47,7 +45,7 @@ export default function SetupMouseEvents(
 			const { x, y, width, height } = GetObjectDimensions(
 				ctx,
 				trayObject,
-				dragObject
+				dragObject,
 			);
 
 			dragObjectOffset = {
@@ -99,7 +97,7 @@ export default function SetupMouseEvents(
 			setCurrentDesign({
 				...currentDesign,
 				objects: currentDesign.objects.map((obj) =>
-					dragObject && obj.id === dragObject.id ? dragObject : obj
+					dragObject && obj.id === dragObject.id ? dragObject : obj,
 				),
 			});
 			dragObject = undefined;
@@ -116,11 +114,10 @@ export default function SetupMouseEvents(
 			e,
 			canvas,
 			trayObject,
-			currentDesign
+			currentDesign,
 		);
 
-		const clickX = e.offsetX * (canvas.width / rect.width);
-		const clickY = e.offsetY * (canvas.height / rect.height);
+		const { clickX, clickY } = GetCoordsFromEvent(e, canvas);
 
 		const distanceX = clickX - mouseDownPosition.x;
 		const distanceY = clickY - mouseDownPosition.y;
@@ -141,7 +138,7 @@ export default function SetupMouseEvents(
 					distanceX > 0 ? mouseDownPosition.x : clickX,
 					distanceY > 0 ? mouseDownPosition.y : clickY,
 					distanceX > 0 ? clickX : mouseDownPosition.x,
-					distanceY > 0 ? clickY : mouseDownPosition.y
+					distanceY > 0 ? clickY : mouseDownPosition.y,
 				);
 			} else {
 				addObject("image", clickX, clickY);
@@ -156,7 +153,7 @@ export default function SetupMouseEvents(
 					distanceX > 0 ? mouseDownPosition.x : clickX,
 					distanceY > 0 ? mouseDownPosition.y : clickY,
 					distanceX > 0 ? clickX : mouseDownPosition.x,
-					distanceY > 0 ? clickY : mouseDownPosition.y
+					distanceY > 0 ? clickY : mouseDownPosition.y,
 				);
 			} else {
 				addObject("rectangle", clickX, clickY);
@@ -167,11 +164,12 @@ export default function SetupMouseEvents(
 	}
 
 	function onMouseMove(e: any) {
+		e.preventDefault();
 		const object = GetObjectFromPointer(
 			e,
 			canvas,
 			trayObject,
-			currentDesign
+			currentDesign,
 		);
 		canvas.style.cursor =
 			selectedTool === "text" ? "text" : object ? "pointer" : "default";
@@ -181,31 +179,30 @@ export default function SetupMouseEvents(
 			const { x, y, width, height } = GetObjectDimensions(
 				ctx,
 				trayObject,
-				selectedObject
+				selectedObject,
 			);
 
-			const mouseX = e.offsetX * (canvas.width / rect.width);
-			const mouseY = e.offsetY * (canvas.height / rect.height);
+			const { clickX, clickY } = GetCoordsFromEvent(e, canvas);
 
 			if (
 				selectedObject.type === "image" ||
 				selectedObject.type === "rectangle"
 			) {
-				if (mouseX >= x + width - 8 && mouseY >= y + height - 8) {
+				if (clickX >= x + width - 8 && clickY >= y + height - 8) {
 					canvas.style.cursor = "nwse-resize";
-				} else if (mouseX >= x + width - 8 && mouseY <= y + 8) {
+				} else if (clickX >= x + width - 8 && clickY <= y + 8) {
 					canvas.style.cursor = "nesw-resize";
-				} else if (mouseX <= x + 8 && mouseY >= y + height - 8) {
+				} else if (clickX <= x + 8 && clickY >= y + height - 8) {
 					canvas.style.cursor = "nesw-resize";
-				} else if (mouseX <= x + 8 && mouseY <= y + 8) {
+				} else if (clickX <= x + 8 && clickY <= y + 8) {
 					canvas.style.cursor = "nwse-resize";
-				} else if (mouseX >= x + width - 8) {
+				} else if (clickX >= x + width - 8) {
 					canvas.style.cursor = "ew-resize";
-				} else if (mouseX <= x + 8) {
+				} else if (clickX <= x + 8) {
 					canvas.style.cursor = "ew-resize";
-				} else if (mouseY >= y + height - 8) {
+				} else if (clickY >= y + height - 8) {
 					canvas.style.cursor = "ns-resize";
-				} else if (mouseY <= y + 8) {
+				} else if (clickY <= y + 8) {
 					canvas.style.cursor = "ns-resize";
 				} else {
 					canvas.style.cursor = "move";
@@ -214,10 +211,7 @@ export default function SetupMouseEvents(
 		}
 
 		if (dragObject && ctx) {
-			const rect = canvas.getBoundingClientRect();
-
-			const clickX = e.offsetX * (canvas.width / rect.width);
-			const clickY = e.offsetY * (canvas.height / rect.height);
+			const { clickX, clickY } = GetCoordsFromEvent(e, canvas);
 
 			if (designEditorElement) {
 				designEditorElement.style.pointerEvents = "none";
@@ -242,7 +236,7 @@ export default function SetupMouseEvents(
 					dragObject.width = Math.max(
 						0.001,
 						(clickX - trayObject.x) / (trayObject.width || 1) -
-							dragObject.x
+							dragObject.x,
 					);
 				} else if (
 					resizeDirection === "top-left" ||
@@ -257,7 +251,7 @@ export default function SetupMouseEvents(
 
 					dragObject.width = Math.max(
 						0.001,
-						oldX - dragObject.x + (dragObject.width ?? 0)
+						oldX - dragObject.x + (dragObject.width ?? 0),
 					);
 				}
 
@@ -273,7 +267,7 @@ export default function SetupMouseEvents(
 						newY < newY + (dragObject.height ?? 0) ? newY : oldY;
 					dragObject.height = Math.max(
 						0.001,
-						oldY - dragObject.y + (dragObject.height ?? 0)
+						oldY - dragObject.y + (dragObject.height ?? 0),
 					);
 				} else if (
 					resizeDirection === "bottom-left" ||
@@ -283,7 +277,7 @@ export default function SetupMouseEvents(
 					dragObject.height = Math.max(
 						0.001,
 						(clickY - trayObject.y) / (trayObject.height || 1) -
-							dragObject.y
+							dragObject.y,
 					);
 				}
 			}
@@ -291,7 +285,7 @@ export default function SetupMouseEvents(
 			Draw({
 				...currentDesign,
 				objects: currentDesign.objects.map((obj) =>
-					dragObject && obj.id === dragObject.id ? dragObject : obj
+					dragObject && obj.id === dragObject.id ? dragObject : obj,
 				),
 			});
 		}
@@ -302,7 +296,7 @@ export default function SetupMouseEvents(
 		pointerX: number = 0,
 		pointerY: number = 0,
 		pointerEndX?: number,
-		pointerEndY?: number
+		pointerEndY?: number,
 	) {
 		const x = (pointerX - trayObject.x) / (trayObject.width || 1);
 		const y = (pointerY - trayObject.y) / (trayObject.height || 1);
@@ -333,7 +327,7 @@ export default function SetupMouseEvents(
 					order:
 						Math.max(
 							...currentDesign.objects.map((obj) => obj.order),
-							0
+							0,
 						) + 1,
 				},
 			],
@@ -351,18 +345,28 @@ export default function SetupMouseEvents(
 	canvas.addEventListener("mousemove", onMouseMove);
 	canvas.addEventListener("click", onClick);
 
+	canvas.addEventListener("touchstart", onMouseDown);
+	canvas.addEventListener("touchend", onMouseUp);
+	canvas.addEventListener("touchmove", onMouseMove);
+	canvas.addEventListener("touchcancel", onMouseUp);
+
 	return () => {
 		canvas.removeEventListener("mousedown", onMouseDown);
 		canvas.removeEventListener("mouseup", onMouseUp);
 		canvas.removeEventListener("mousemove", onMouseMove);
 		canvas.removeEventListener("click", onClick);
+
+		canvas.removeEventListener("touchstart", onMouseDown);
+		canvas.removeEventListener("touchend", onMouseUp);
+		canvas.removeEventListener("touchmove", onMouseMove);
+		canvas.removeEventListener("touchcancel", onMouseUp);
 	};
 }
 
 function SnapObject(
 	object: ObjectProps,
 	ctx: CanvasRenderingContext2D,
-	trayObject: ObjectProps
+	trayObject: ObjectProps,
 ) {
 	const snapDistance = 0.01;
 
@@ -370,7 +374,7 @@ function SnapObject(
 		ctx,
 		trayObject,
 		object,
-		true
+		true,
 	);
 
 	if (Math.abs(x) < snapDistance) {
@@ -393,20 +397,34 @@ function SnapObject(
 	}
 }
 
+function GetCoordsFromEvent(e: any, canvas: HTMLCanvasElement) {
+	const rect = canvas.getBoundingClientRect();
+
+	if (e.touches) {
+		const touch = e.touches[0];
+		const clickX = (touch.clientX - rect.x) * (canvas.width / rect.width);
+		const clickY = (touch.clientY - rect.y) * (canvas.height / rect.height);
+
+		return { clickX, clickY };
+	}
+
+	const clickX = e.offsetX * (canvas.width / rect.width);
+	const clickY = e.offsetY * (canvas.height / rect.height);
+
+	return { clickX, clickY };
+}
+
 function GetObjectFromPointer(
 	e: any,
 	canvas: HTMLCanvasElement,
 	tray: ObjectProps,
 	currentDesign: DesignProps,
-	padding: number = 8
+	padding: number = 8,
 ) {
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
 
-	const rect = canvas.getBoundingClientRect();
-
-	const clickX = e.offsetX * (canvas.width / rect.width);
-	const clickY = e.offsetY * (canvas.height / rect.height);
+	const { clickX, clickY } = GetCoordsFromEvent(e, canvas);
 
 	return currentDesign.objects
 		.sort((a, b) => b.order - a.order)

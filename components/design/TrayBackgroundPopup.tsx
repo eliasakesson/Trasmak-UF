@@ -20,7 +20,8 @@ export default function TrayBackgroundPopup({
 	setCurrentDesign: (currentDesign: DesignProps) => void;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
-	const ref = useRef<HTMLDivElement>(null);
+	const buttonRef = useRef<HTMLButtonElement>(null);
+	const popupRef = useRef<HTMLDivElement>(null);
 
 	const controls = useAnimation();
 	const innerControls = useAnimation();
@@ -41,13 +42,20 @@ export default function TrayBackgroundPopup({
 				transition: { duration: 0 },
 			});
 		}
+
+		if (buttonRef.current && popupRef.current) {
+			popupRef.current.setAttribute(
+				"style",
+				`top: ${buttonRef.current.offsetTop + 40}px;`,
+			);
+		}
 	}, [isOpen, controls, innerControls]);
 
 	return (
 		<TrayBackgroundPopupContext.Provider
 			value={{ currentDesign, setCurrentDesign }}
 		>
-			<div className="relative h-full">
+			<div className="h-full md:relative">
 				<div
 					onClick={() => setIsOpen(false)}
 					className={`${
@@ -55,6 +63,7 @@ export default function TrayBackgroundPopup({
 					} fixed bottom-0 left-0 right-0 top-0 z-20`}
 				></div>
 				<button
+					ref={buttonRef}
 					aria-label="Select tray background color"
 					onClick={() => setIsOpen(!isOpen)}
 					className="relative h-12 w-12 rounded-md border-2"
@@ -65,9 +74,10 @@ export default function TrayBackgroundPopup({
 					/>
 				</button>
 				<motion.div
+					ref={popupRef}
 					initial={{ scaleY: 0 }}
 					animate={controls}
-					className="absolute left-0 top-10 z-30 origin-top rounded-xl border bg-white"
+					className="absolute left-4 z-30 origin-top rounded-xl border bg-white md:left-0 md:top-10"
 				>
 					<motion.div
 						initial={{ opacity: 0, translateY: -20 }}

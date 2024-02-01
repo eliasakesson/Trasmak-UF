@@ -30,10 +30,10 @@ export default function DesignEditor({
 	return (
 		<SelectedObjectContext.Provider value={{ object, setObject }}>
 			<div
-				className="flex flex-col gap-2 rounded-md border bg-white p-4"
+				className="flex max-w-full flex-col gap-2 rounded-md border bg-white p-4"
 				id="editor"
 			>
-				<div className="flex items-center gap-2">
+				<div className="flex flex-wrap items-center gap-2">
 					{object?.type === "image" && (
 						<Input label="Bildkälla" objKey="content" type="file" />
 					)}
@@ -52,7 +52,7 @@ export default function DesignEditor({
 							className="h-16"
 						/>
 					)}
-					<div className="flex h-16 items-center gap-4 rounded-md border border-gray-300 px-4">
+					<div className="flex h-16 flex-grow flex-wrap items-center justify-center gap-4 rounded-md border border-gray-300 px-4">
 						{object?.type !== "text" && (
 							<button
 								onClick={() =>
@@ -104,7 +104,7 @@ export default function DesignEditor({
 						</button>
 					</div>
 				</div>
-				<div className="flex h-12 gap-2">
+				<div className="flex flex-wrap gap-2">
 					{object?.type === "text" && (
 						<Input label="Färg" objKey="color" type="color" />
 					)}
@@ -493,18 +493,26 @@ export function MoveDesignEditor(
 		selectedObject,
 	);
 
-	const left = x * (rect.width / canvas.width) - 8;
-	const top = (y + height) * (rect.height / canvas.height) + 16;
+	let left = x * (rect.width / canvas.width) - 8;
+	let top = (y + height) * (rect.height / canvas.height) + 16;
 
 	if (left > rect.width) {
-		designEditorRef.current.style.left = `${rect.width}px`;
-	} else {
-		designEditorRef.current.style.left = `${left}px`;
+		left = rect.width;
+	} else if (
+		rect.left + left + designEditorRef.current.offsetWidth >
+		window.innerWidth
+	) {
+		left =
+			window.innerWidth -
+			rect.left -
+			designEditorRef.current.offsetWidth -
+			16;
 	}
 
 	if (top > rect.height) {
-		designEditorRef.current.style.top = `${rect.height}px`;
-	} else {
-		designEditorRef.current.style.top = `${top}px`;
+		top = rect.height;
 	}
+
+	designEditorRef.current.style.left = `${left}px`;
+	designEditorRef.current.style.top = `${top}px`;
 }

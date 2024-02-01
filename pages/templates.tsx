@@ -20,8 +20,8 @@ export default function Templates({ products }: { products: Product[] }) {
 				/>
 				<meta name="robots" content="index, follow" />
 			</Head>
-			<main className="max-w-7xl mx-auto px-8 flex flex-col items-center gap-16 py-16">
-				<div className="text-center flex flex-col gap-4">
+			<main className="mx-auto flex max-w-7xl flex-col items-center gap-16 px-8 py-16">
+				<div className="flex flex-col gap-4 text-center">
 					<h1 className="text-4xl font-bold text-gray-900">
 						Våra favoritmallar
 					</h1>
@@ -40,7 +40,6 @@ export default function Templates({ products }: { products: Product[] }) {
 						});
 					}}
 					canvasClassKey="homepage-template-canvas"
-					maxDesigns={6}
 					sort={false}
 					hideDelete
 				/>

@@ -17,7 +17,6 @@ import GetProducts from "@/utils/getProducts";
 import { SaveDesign } from "@/utils/design/DesignSaver";
 
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
-import { useWindowSize } from "@/utils/hooks";
 import {
 	LoadImages,
 	LoopUntilSetTrayObject,
@@ -28,7 +27,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 
 import { FaMousePointer, FaImage, FaSquare, FaSave } from "react-icons/fa";
-import { FaCircleXmark } from "react-icons/fa6";
 
 import { Product } from "use-shopping-cart/core";
 import { ObjectProps, DesignProps } from "@/utils/design/Interfaces";
@@ -41,7 +39,6 @@ import { SiteContext } from "./_app";
 
 export default function Design({ products }: { products: any }) {
 	const { analytics } = useAnalytics();
-	const windowSize = useWindowSize();
 	const { cartDetails, addItem } = useShoppingCart();
 
 	const [user] = useAuthState(auth);
@@ -214,36 +211,6 @@ export default function Design({ products }: { products: any }) {
 		}
 	}, [selectedObjectID]);
 
-	if (windowSize.width < 768) {
-		return (
-			<>
-				<Head>
-					<title>Designer - Träsmak UF</title>
-					<meta
-						name="description"
-						content="Designa din egen träbricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
-					/>
-				</Head>
-				<main className="flex min-h-[90vh] flex-col items-center justify-center gap-4 px-8 pb-32">
-					<FaCircleXmark size={64} className="text-gray-400" />
-					<h1 className="text-center text-4xl font-bold leading-tight text-gray-900 lg:text-6xl xl:text-7xl">
-						För liten skärm
-					</h1>
-					<p className="text-center">
-						Designern är inte tillgänglig på mindre skärmar. Var god
-						använd en enhet med större skärm.
-					</p>
-					<Link
-						href="/"
-						className="w-full rounded-lg border-2 px-8 py-2 text-center font-semibold transition-colors hover:bg-slate-100"
-					>
-						Gå tillbaka
-					</Link>
-				</main>
-			</>
-		);
-	}
-
 	return (
 		<>
 			<Head>
@@ -254,7 +221,7 @@ export default function Design({ products }: { products: any }) {
 				/>
 				<meta name="robots" content="index, follow" />
 			</Head>
-			<main className="mx-auto max-w-7xl space-y-8 px-8 py-16">
+			<main className="mx-auto max-w-7xl space-y-8 px-4 py-16 md:px-8">
 				<div className="grid gap-8 lg:grid-cols-4">
 					<div className="col-span-3 space-y-4">
 						<div className="relative" id="canvasparent">
@@ -265,7 +232,8 @@ export default function Design({ products }: { products: any }) {
 								height={720}
 							></canvas>
 							<div
-								className="absolute z-50"
+								style={{ left: 0 }}
+								className="absolute z-50 max-w-full"
 								ref={designEditorRef}
 							>
 								{selectedObjectID && (
@@ -312,7 +280,7 @@ export default function Design({ products }: { products: any }) {
 								Verktyg och bakgrundsfärg
 							</h3>
 							<div
-								className="max-sm:flex-col flex justify-between gap-4"
+								className="flex flex-wrap justify-between gap-4"
 								id="tools"
 							>
 								<div className="flex h-12 items-center gap-2">
@@ -351,12 +319,12 @@ export default function Design({ products }: { products: any }) {
 									/>
 									{/* <DesignerGuide currentTool={selectedTool} /> */}
 								</div>
-								<div className="flex gap-4">
+								<div className="flex flex-wrap gap-4">
 									<Link
 										href={`/products/${currentDesign.id}`}
-										className="rounded-lg border-2 px-8 py-3 font-semibold transition-colors hover:bg-slate-100"
+										className="order-2 rounded-lg border-2 px-6 py-3 font-semibold transition-colors hover:bg-slate-100 md:order-1 md:px-8"
 									>
-										Gå till produktsidan
+										Till produkt
 									</Link>
 									<button
 										onClick={() =>
@@ -369,7 +337,7 @@ export default function Design({ products }: { products: any }) {
 												lastAddedImageURL,
 											)
 										}
-										className="flex items-center gap-2 rounded-md bg-primary px-8 py-3 font-semibold text-white transition-colors hover:bg-primary_light"
+										className="order-1 flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primary_light md:order-2 md:px-8"
 									>
 										Lägg till i kundvagn
 									</button>
@@ -380,25 +348,27 @@ export default function Design({ products }: { products: any }) {
 							<h3 className="font-semibold">
 								Guide och stödlinjer
 							</h3>
-							<div className="flex gap-2">
-								<DesignerGuide
-									currentTool={selectedTool}
-									selectedObject={
-										currentDesign.objects.find(
-											(obj) =>
-												obj.id === selectedObjectID,
-										) || null
-									}
-								/>
-								<button
-									onClick={() =>
-										setShowCanvasSupport((s) => !s)
-									}
-									className="rounded-lg border-2 px-8 py-3 font-semibold transition-colors hover:bg-slate-100"
-								>
-									{showCanvasSupport ? "Dölj" : "Visa"}{" "}
-									stödlinjer
-								</button>
+							<div className="flex flex-wrap justify-between gap-2">
+								<div className="flex gap-2">
+									<DesignerGuide
+										currentTool={selectedTool}
+										selectedObject={
+											currentDesign.objects.find(
+												(obj) =>
+													obj.id === selectedObjectID,
+											) || null
+										}
+									/>
+									<button
+										onClick={() =>
+											setShowCanvasSupport((s) => !s)
+										}
+										className="rounded-lg border-2 px-6 py-3 font-semibold transition-colors hover:bg-slate-100 md:px-8"
+									>
+										{showCanvasSupport ? "Dölj" : "Visa"}{" "}
+										stödlinjer
+									</button>
+								</div>
 								<button
 									id="save-design"
 									disabled={!user}
@@ -413,7 +383,7 @@ export default function Design({ products }: { products: any }) {
 											},
 										)
 									}
-									className="ml-auto flex items-center gap-2 rounded-lg border-2 px-8 py-3 font-semibold transition-colors hover:bg-slate-100 disabled:bg-gray-100"
+									className="flex items-center gap-2 rounded-lg border-2 px-6 py-3 font-semibold transition-colors hover:bg-slate-100 disabled:bg-gray-100 md:px-8"
 								>
 									<FaSave />{" "}
 									{user
@@ -422,13 +392,13 @@ export default function Design({ products }: { products: any }) {
 								</button>
 							</div>
 						</div>
-						<div className="flex h-6 gap-4">
+						<div className="flex flex-wrap gap-4">
 							<div className="flex h-full gap-2">
-								<div className="aspect-square h-full rounded border bg-red-300"></div>
+								<div className="aspect-square h-6 rounded border bg-red-300"></div>
 								<p>Säkerhetsmarginal</p>
 							</div>
 							<div className="flex h-full gap-2">
-								<div className="aspect-square h-full rounded border bg-white"></div>
+								<div className="aspect-square h-6 rounded border bg-white"></div>
 								<p className="whitespace-nowrap">
 									Kanter{" "}
 									<span className="text-muted">
@@ -450,7 +420,7 @@ export default function Design({ products }: { products: any }) {
 							Produkter
 						</h2>
 						<ul
-							className="grid grid-cols-2 flex-col gap-2 lg:flex"
+							className="grid flex-col gap-2 md:grid-cols-2 lg:flex"
 							id="products"
 						>
 							{products.map((product: Product) => (
@@ -476,7 +446,7 @@ export default function Design({ products }: { products: any }) {
 												),
 											}))
 										}
-										className="max-sm:flex-col max-sm:pb-2 flex w-full items-center gap-4 sm:text-left"
+										className="max-sm:flex-col max-sm:pb-2 flex w-full items-center gap-4 text-left"
 									>
 										<div className="flex-shrink-0">
 											<img

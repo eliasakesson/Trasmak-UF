@@ -15,6 +15,7 @@ export default async function Draw(
 	ctx.save();
 
 	await DrawTray(ctx, design, tray);
+	ctx.clip();
 
 	design.objects?.sort((a, b) => a.order - b.order);
 
