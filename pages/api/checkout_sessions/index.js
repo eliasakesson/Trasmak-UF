@@ -46,7 +46,7 @@ export default async function handler(req, res) {
 				lineItems.reduce(
 					(acc, product) =>
 						acc + product.price_data.unit_amount * product.quantity,
-					0
+					0,
 				) >= data.freeShippingThreshold;
 
 			const metadata = {
@@ -54,12 +54,12 @@ export default async function handler(req, res) {
 					Object.values(cartDetails)
 						.map((product) =>
 							product.product_data.products.map((p) => ({
-								name: p.name,
+								id: product.id,
 								count: p.count,
 								image: shortenDownloadURL(p.image),
-							}))
+							})),
 						)
-						.flat()
+						.flat(),
 				),
 			};
 

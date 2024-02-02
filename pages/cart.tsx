@@ -21,8 +21,8 @@ export default function Cart({ products, config }: any) {
 				/>
 				<meta name="robots" content="index, follow" />
 			</Head>
-			<main className="max-w-7xl mx-auto px-8 py-16 space-y-8 min-h-[calc(100vh-108px)]">
-				<article className="grid lg:grid-cols-3 grid-cols-1 lg:gap-x-16 gap-x-0 gap-y-16">
+			<main className="mx-auto min-h-[calc(100vh-108px)] max-w-7xl space-y-8 px-8 py-16">
+				<article className="grid grid-cols-1 gap-x-0 gap-y-16 lg:grid-cols-3 lg:gap-x-16">
 					<CartItems products={products} />
 					<CartSummary config={config} />
 				</article>
@@ -34,9 +34,11 @@ export default function Cart({ products, config }: any) {
 function CartItems({ products }: { products: any }) {
 	const { cartDetails, cartCount }: any = useShoppingCart();
 
+	console.log(cartDetails);
+
 	return (
 		<div className="col-span-2">
-			<div className="flex justify-between items-center py-4 pb-8">
+			<div className="flex items-center justify-between py-4 pb-8">
 				<h1 className="text-4xl font-bold">Min Varukorg</h1>
 				<p className="text-gray-500">
 					{cartCount} {cartCount > 1 ? "produkter" : "produkt"} i
@@ -78,8 +80,8 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 						d.image !== design.image
 							? d
 							: d.count + inc > 0
-							? { ...d, count: d.count + inc }
-							: null
+								? { ...d, count: d.count + inc }
+								: null,
 					)
 					.filter((d: any) => d),
 			},
@@ -94,7 +96,7 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 			count: -design.count,
 			product_metadata: {
 				products: cartItem.product_data.products.filter(
-					(d: any) => d.image !== design.image
+					(d: any) => d.image !== design.image,
 				),
 			},
 		});
@@ -102,17 +104,17 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 
 	return (
 		<li className="border-b py-4">
-			<div className="flex md:gap-8 gap-4">
-				<div className="-z-10 bg-gray-100 rounded-lg border">
+			<div className="flex gap-4 md:gap-8">
+				<div className="-z-10 rounded-lg border bg-gray-100">
 					<Image
-						className="mix-blend-multiply object-contain aspect-square hue-rotate-[50deg] saturate-150"
+						className="aspect-square object-contain mix-blend-multiply hue-rotate-[50deg] saturate-150"
 						src={cartItem.image}
 						alt=""
 						width={64}
 						height={64}
 					/>
 				</div>
-				<div className="flex items-center md:flex-row flex-col flex-1">
+				<div className="flex flex-1 flex-col items-center md:flex-row">
 					<div className="flex-1">
 						<h2 className="text-xl font-semibold">
 							{cartItem.name}
@@ -125,8 +127,8 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 							})}
 						</p>
 					</div>
-					<div className="flex items-center md:gap-8 gap-2">
-						<p className="font-semibold text-xl md:flex-grow-0 flex-grow">
+					<div className="flex items-center gap-2 md:gap-8">
+						<p className="flex-grow text-xl font-semibold md:flex-grow-0">
 							{formatCurrencyString({
 								value: cartItem.price * cartItem.quantity,
 								currency: cartItem.currency,
@@ -138,10 +140,10 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 			<ul className="space-y-4 pt-4">
 				{cartItem?.product_data?.products?.map(
 					(design: any, i: number) => (
-						<li key={i} className="flex items-center gap-4 ml-4">
-							<div className="-z-10 bg-gray-100 rounded-lg border mr-auto">
+						<li key={i} className="ml-4 flex items-center gap-4">
+							<div className="-z-10 mr-auto rounded-lg border bg-gray-100">
 								<Image
-									className="mix-blend-multiply object-contain aspect-square"
+									className="aspect-square object-contain mix-blend-multiply"
 									src={design.cover}
 									alt=""
 									width={48}
@@ -153,12 +155,13 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 									Design {i + 1}
 								</h2>
 							</div>
-							<div className="px-2 flex gap-4 items-center border rounded-lg font-mono">
+							<div className="flex items-center gap-4 rounded-lg border px-2 font-mono">
 								<button
 									onClick={() =>
 										changeDesignCount(design, false)
 									}
-									className="md:p-2 p-1 font-semibold md:text-xl">
+									className="p-1 font-semibold md:p-2 md:text-xl"
+								>
 									-
 								</button>
 								<span className="font-semibold">
@@ -168,18 +171,20 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 									onClick={() =>
 										changeDesignCount(design, true)
 									}
-									className="md:p-2 p-1 font-semibold md:text-xl">
+									className="p-1 font-semibold md:p-2 md:text-xl"
+								>
 									+
 								</button>
 							</div>
 							<button
 								onClick={() => removeDesign(design)}
 								type="button"
-								className="p-2 text-muted">
+								className="p-2 text-muted"
+							>
 								<FaTrash />
 							</button>
 						</li>
-					)
+					),
 				)}
 			</ul>
 		</li>
@@ -222,20 +227,20 @@ function CartSummary({ config }: { config: any }) {
 	}
 
 	return (
-		<div className="p-8 bg-gray-100 space-y-8 h-fit">
+		<div className="h-fit space-y-8 bg-gray-100 p-8">
 			<div>
-				<div className="flex items-center justify-between py-4 border-b border-border_dark">
-					<p className="font-semibold text-xl">Delsumma</p>
-					<p className="font-semibold text-xl">
+				<div className="flex items-center justify-between border-b border-border_dark py-4">
+					<p className="text-xl font-semibold">Delsumma</p>
+					<p className="text-xl font-semibold">
 						{formatCurrencyString({
 							value: totalPrice,
 							currency,
 						})}
 					</p>
 				</div>
-				<div className="flex items-center justify-between py-4 border-b border-border_dark">
-					<p className="font-semibold text-xl">Frakt</p>
-					<p className="font-semibold text-xl">
+				<div className="flex items-center justify-between border-b border-border_dark py-4">
+					<p className="text-xl font-semibold">Frakt</p>
+					<p className="text-xl font-semibold">
 						{formatCurrencyString({
 							value:
 								totalPrice > 0 &&
@@ -246,9 +251,9 @@ function CartSummary({ config }: { config: any }) {
 						})}
 					</p>
 				</div>
-				<div className="flex items-center justify-between py-4 border-b border-border_dark">
-					<p className="font-semibold text-xl">Totalt</p>
-					<p className="font-semibold text-xl">
+				<div className="flex items-center justify-between border-b border-border_dark py-4">
+					<p className="text-xl font-semibold">Totalt</p>
+					<p className="text-xl font-semibold">
 						{formatCurrencyString({
 							value:
 								totalPrice > 0 &&
@@ -283,12 +288,14 @@ function CartSummary({ config }: { config: any }) {
 					}
 					onClick={onCheckout}
 					type="button"
-					className="py-4 px-8 bg-primary text-white hover:bg-primary_light transition-colors rounded-lg font-semibold disabled:bg-primary_dark">
+					className="rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light disabled:bg-primary_dark"
+				>
 					Gå till kassan
 				</button>
 				<Link
 					href="/products"
-					className="py-4 px-8 border-2 rounded-lg font-semibold text-center hover:bg-white transition-colors">
+					className="rounded-lg border-2 px-8 py-4 text-center font-semibold transition-colors hover:bg-white"
+				>
 					Fortsätt handla
 				</Link>
 			</div>
