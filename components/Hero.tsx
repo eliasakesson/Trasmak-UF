@@ -51,17 +51,12 @@ export default function Hero() {
 							“För dig som söker något unikt”
 						</span>
 					</Link>
-					<div className="flex items-center gap-4">
-						<Link
-							href="/products"
-							className="w-fit rounded-lg border-2 px-8 py-4 font-semibold transition-colors hover:bg-slate-100 2xl:px-16"
-						>
-							Se våra produkter
-						</Link>
-						<p className="hidden text-sm font-normal text-muted md:block">
-							20+ olika storlekar och former
-						</p>
-					</div>
+					<Link
+						href="/products"
+						className="w-fit rounded-lg border-2 px-8 py-4 font-semibold transition-colors hover:bg-slate-100 2xl:px-16"
+					>
+						Se våra produkter
+					</Link>
 					<Stars rating={5} size="xl" className="md:mt-4">
 						<p className="text-sm text-muted md:text-base">
 							10+ 5-stjärniga recensioner

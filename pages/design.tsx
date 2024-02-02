@@ -279,11 +279,11 @@ export default function Design({ products }: { products: any }) {
 							<h3 className="font-semibold">
 								Verktyg och bakgrundsfärg
 							</h3>
-							<div
-								className="flex flex-wrap justify-between gap-4"
-								id="tools"
-							>
-								<div className="flex h-12 items-center gap-2">
+							<div className="flex flex-wrap justify-between gap-4">
+								<div
+									className="flex h-12 items-center gap-2"
+									id="tools"
+								>
 									<Tool
 										tool="select"
 										selectedTool={selectedTool}
@@ -415,14 +415,14 @@ export default function Design({ products }: { products: any }) {
 							brickan.
 						</p>
 					</div>
-					<div className="col-span-3 row-span-2 lg:col-span-1">
+					<div
+						className="col-span-3 row-span-2 lg:col-span-1"
+						id="products"
+					>
 						<h2 className="mb-4 border-b pb-2 text-xl font-bold">
 							Produkter
 						</h2>
-						<ul
-							className="grid flex-col gap-2 md:grid-cols-2 lg:flex"
-							id="products"
-						>
+						<ul className="grid flex-col gap-2 md:grid-cols-2 lg:flex">
 							{products.map((product: Product) => (
 								<li
 									key={product.id}

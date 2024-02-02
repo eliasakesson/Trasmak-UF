@@ -78,7 +78,7 @@ export default function DesignerGuide({
 					/>
 					<button
 						onClick={() => setShow("hide")}
-						className="fixed bottom-4 right-4 flex items-center gap-2 rounded-md border-2 border-gray-300 px-4 py-2 font-semibold transition-colors hover:border-red-300 hover:bg-red-100"
+						className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-md border-2 border-gray-300 bg-white px-4 py-2 font-semibold transition-colors hover:border-red-300 hover:bg-red-100"
 					>
 						<FaTimes /> Avbryt guide
 					</button>
@@ -204,6 +204,7 @@ function Tutorial({
 			nextStep={NextStep}
 			elementID="products"
 			position="left"
+			mobilePosition="top"
 		/>,
 		<Step
 			key={1}
@@ -236,6 +237,7 @@ function Tutorial({
 			nextStep={NextStep}
 			elementID="canvasparent"
 			position="right"
+			mobilePosition="bottom"
 		/>,
 		<Step
 			key={4}
@@ -246,16 +248,18 @@ function Tutorial({
 			nextOnSelectType="text"
 			selectedObject={selectedObject}
 			position="right"
+			mobilePosition="bottom"
 			elementID="canvasparent"
 		/>,
 		<Step
 			key={5}
 			step={6}
 			title="Ändra text"
-			text="När du har placerat ut en text kan du ändra textens egenskaper i rutan till vänster. Du kan ändra textstorlek, typsnitt och färg."
+			text="När du har placerat ut en text kan du ändra textens egenskaper i rutan intill. Du kan ändra textstorlek, typsnitt och färg."
 			nextStep={NextStep}
 			elementID="editor"
 			position="right"
+			mobilePosition="bottom"
 		/>,
 		<Step
 			key={6}
@@ -278,6 +282,7 @@ function Tutorial({
 			nextStep={NextStep}
 			elementID="canvasparent"
 			position="right"
+			mobilePosition="bottom"
 		/>,
 		<Step
 			key={8}
@@ -289,16 +294,18 @@ function Tutorial({
 			selectedObject={selectedObject}
 			position="right"
 			elementID="canvasparent"
+			mobilePosition="bottom"
 		/>,
 		<Step
 			key={9}
 			step={10}
 			title="Ändra bild"
-			text="När du har placerat ut en bild kan du ändra bilden genom att välja en bild i rutan till vänster. Du kan även justera rundning på hörnen, och välja mellan olika fyllningslägen för bilden, 
+			text="När du har placerat ut en bild kan du ändra bilden genom att välja en bild i rutan intill. Du kan även justera rundning på hörnen, och välja mellan olika fyllningslägen för bilden, 
 			till exempel om bilden ska fylla hela platsen eller behålla sin proportioner."
 			nextStep={NextStep}
 			elementID="editor"
 			position="right"
+			mobilePosition="bottom"
 		/>,
 		<Step
 			key={10}
@@ -329,6 +336,7 @@ function Tutorial({
 			nextStep={NextStep}
 			elementID="save-design"
 			position="right"
+			mobilePosition="bottom"
 		/>,
 		<Step
 			key={13}
@@ -371,6 +379,7 @@ function Step({
 	nextStep,
 	elementID,
 	position,
+	mobilePosition,
 	nextOnToolSelect,
 	currentTool,
 	nextOnSelectType,
@@ -383,6 +392,7 @@ function Step({
 	nextStep: () => void;
 	elementID?: string;
 	position?: "left" | "right" | "top" | "bottom" | "center";
+	mobilePosition?: "left" | "right" | "top" | "bottom" | "center";
 	nextOnToolSelect?: "select" | "text" | "image";
 	currentTool?: string;
 	nextOnSelectType?: string;
@@ -393,7 +403,13 @@ function Step({
 	const ref = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (position === "center") {
+		const pos = !mobilePosition
+			? position
+			: window.innerWidth < 768
+				? mobilePosition
+				: position;
+
+		if (pos === "center") {
 			window.scrollTo({
 				top: 0,
 				behavior: "smooth",
@@ -418,18 +434,18 @@ function Step({
 
 			ref.current?.style.setProperty(
 				"left",
-				position === "left"
+				pos === "left"
 					? rectLeft - (ref.current?.offsetWidth || 0) - gap + "px"
-					: position === "right"
+					: pos === "right"
 						? rectLeft + rect.width + gap + "px"
 						: rectLeft + "px",
 			);
 
 			ref.current?.style.setProperty(
 				"top",
-				position === "top"
+				pos === "top"
 					? rectTop - (ref.current?.offsetHeight || 0) - gap + "px"
-					: position === "bottom"
+					: pos === "bottom"
 						? rectTop + rect.height + gap + "px"
 						: rectTop + gap + "px",
 			);
@@ -437,31 +453,37 @@ function Step({
 			window.scrollTo({
 				top:
 					(ref?.current?.offsetTop ?? 0) -
-					(position === "top"
+					(pos === "top"
 						? window.innerHeight / 6
 						: (window.innerHeight * 2) / 3),
 				behavior: "smooth",
 			});
 		}
-	}, [elementID, position, gap, ref]);
+	}, [elementID, position, mobilePosition, gap, ref]);
 
 	useEffect(() => {
+		let timeout: NodeJS.Timeout;
 		if (nextOnToolSelect && currentTool === nextOnToolSelect) {
-			nextStep();
+			timeout = setTimeout(nextStep, 100);
 		}
+
+		return () => clearTimeout(timeout);
 	}, [currentTool, nextOnToolSelect, nextStep]);
 
 	useEffect(() => {
+		let timeout: NodeJS.Timeout;
 		if (nextOnSelectType && selectedObject?.type === nextOnSelectType) {
-			nextStep();
+			timeout = setTimeout(nextStep, 100);
 		}
+
+		return () => clearTimeout(timeout);
 	}, [selectedObject, nextOnSelectType, nextStep]);
 
 	return (
 		<div
 			ref={ref}
 			key={title}
-			className="absolute z-40 flex flex-col gap-4 rounded-xl bg-white p-8 shadow-md"
+			className="absolute z-40 flex w-max max-w-[calc(100vw-32px)] flex-col gap-4 rounded-xl bg-white p-8 shadow-md"
 		>
 			<div>
 				<span className="font-semibold text-muted">Steg {step}</span>
