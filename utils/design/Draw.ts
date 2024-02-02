@@ -18,6 +18,7 @@ export default async function Draw(
 	ctx.clip();
 
 	design.objects?.sort((a, b) => a.order - b.order);
+	design.objects?.sort((a) => (a.template ? 1 : -1))
 
 	for (let i = 0; i < design.objects?.length; i++) {
 		const obj = design.objects?.[i];
@@ -56,8 +57,10 @@ export async function DrawRender(
 	ctx.save();
 
 	await DrawTray(ctx, design, tray, false);
+	ctx.clip();
 
 	design.objects?.sort((a, b) => a.order - b.order);
+	design.objects?.sort((a) => (a.template ? 1 : -1))
 
 	for (let i = 0; i < design.objects?.length; i++) {
 		const obj = design.objects?.[i];
@@ -137,15 +140,6 @@ async function DrawImage(
 				image,
 			);
 
-			// Make sure radius is not larger than half the width or height
-			const radius = Math.max(
-				Math.min(
-					Math.min(width, height) / 2,
-					(image.radius ?? 0) * scale,
-				),
-				0,
-			);
-
 			const { offsetX, offsetY, newWidth, newHeight } =
 				GetImageDimensions(
 					img,
@@ -156,13 +150,26 @@ async function DrawImage(
 					height,
 				);
 
+			const minWidth = Math.min(width, newWidth);
+			const minHeight = Math.min(height, newHeight);
+
+				// Make sure radius is not larger than half the width or height
+			const radius = Math.max(
+				Math.min(
+					Math.min(minWidth, minHeight) / 2,
+					(image.radius ?? 0) * scale,
+				),
+				0,
+			);
+
+
 			ctx.save();
 			GetRoundedRect(
 				ctx,
 				Math.max(x, offsetX),
 				Math.max(y, offsetY),
-				Math.min(width, newWidth),
-				Math.min(height, newHeight),
+				minWidth,
+				minHeight,
 				radius,
 			);
 			ctx.clip();

@@ -26,6 +26,7 @@ export interface ObjectProps {
 
 	bleed?: number;
 	edge?: number;
+	template?: boolean;
 }
 
 export interface SelectionProps {

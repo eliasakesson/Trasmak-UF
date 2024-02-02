@@ -6,6 +6,9 @@ import { FaTrash, FaChevronUp, FaChevronDown, FaExpand } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
 import { GetObjectDimensions } from "../../utils/design/Helper";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase";
+import useIsAdmin from "@/utils/useIsAdmin";
 
 const SelectedObjectContext = createContext({
 	object: null as ObjectProps | null,
@@ -25,6 +28,9 @@ export default function DesignEditor({
 	setObject: (obj: ObjectProps) => void;
 	removeObject: () => void;
 }) {
+	const [user] = useAuthState(auth);
+	const isAdmin = useIsAdmin(user);
+
 	if (!object) return null;
 
 	return (
@@ -149,8 +155,15 @@ export default function DesignEditor({
 						objKey="radius"
 						type="number"
 					/>
+					{isAdmin && (
+						<Input
+							label="Template"
+							objKey="template"
+							type="checkbox"
+							requiresKey={false}
+						/>
+					)}
 				</div>
-				<div className="flex items-stretch gap-2"></div>
 			</div>
 		</SelectedObjectContext.Provider>
 	);
@@ -238,6 +251,7 @@ function Input({
 	objKey,
 	type = "text",
 	className,
+	requiresKey = true,
 }: {
 	label: string;
 	objKey:
@@ -248,9 +262,11 @@ function Input({
 		| "radius"
 		| "size"
 		| "color"
-		| "content";
-	type?: string;
+		| "content"
+		| "template";
+	type?: "text" | "number" | "color" | "file" | "checkbox";
 	className?: string;
+	requiresKey?: boolean;
 }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
 
@@ -293,7 +309,30 @@ function Input({
 		setObject(value);
 	}, 10);
 
-	if (!object || !(objKey in object)) return null;
+	if (!object || (requiresKey && !(objKey in object))) return null;
+
+	if (type === "checkbox") {
+		return (
+			<div className="flex grow flex-col gap-1">
+				<label className="sr-only" htmlFor={label}>
+					{label}
+				</label>
+				<input
+					type="checkbox"
+					name={label}
+					id={label}
+					className="h-full rounded-md border border-gray-300 p-2"
+					checked={object[objKey] as boolean}
+					onChange={(e) =>
+						debouncedSetObject({
+							...(object as ObjectProps),
+							[objKey]: e.target.checked,
+						})
+					}
+				/>
+			</div>
+		);
+	}
 
 	if (type === "color")
 		return (
@@ -307,7 +346,7 @@ function Input({
 						name={label}
 						id={label}
 						className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-						value={object[objKey]}
+						value={object[objKey] as string}
 						onChange={(e) =>
 							debouncedSetObject({
 								...(object as ObjectProps),
@@ -380,7 +419,7 @@ function Input({
 					id={label}
 					min="0"
 					max="200"
-					value={objKey in object ? object[objKey] : ""}
+					value={(objKey in object ? object[objKey] : "") as string}
 					onChange={(e) =>
 						setObject({
 							...object,
@@ -393,7 +432,7 @@ function Input({
 					name={label}
 					id={label}
 					className="h-full w-[6ch] py-2 outline-none"
-					value={objKey in object ? object[objKey] : ""}
+					value={(objKey in object ? object[objKey] : "") as string}
 					onChange={(e) =>
 						setObject({
 							...object,
@@ -414,7 +453,7 @@ function Input({
 				name={label}
 				id={label}
 				className="h-full rounded-md border border-gray-300 p-2"
-				value={objKey in object ? object[objKey] : ""}
+				value={(objKey in object ? object[objKey] : "") as string}
 				onChange={(e) =>
 					setObject({
 						...object,

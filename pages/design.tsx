@@ -324,7 +324,7 @@ export default function Design({ products }: { products: any }) {
 										href={`/products/${currentDesign.id}`}
 										className="order-2 rounded-lg border-2 px-6 py-3 font-semibold transition-colors hover:bg-slate-100 md:order-1 md:px-8"
 									>
-										Till produkt
+										Till produktsida
 									</Link>
 									<button
 										onClick={() =>

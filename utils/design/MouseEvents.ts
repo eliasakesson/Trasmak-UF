@@ -428,6 +428,7 @@ function GetObjectFromPointer(
 
 	return currentDesign.objects
 		.sort((a, b) => b.order - a.order)
+		.filter((obj) => !obj.template)
 		.find((obj) => {
 			const { x, y, width, height } = GetObjectDimensions(ctx, tray, obj);
 
