@@ -78,7 +78,7 @@ export function GetTrayObjFromCanvas(
 		id: 0,
 		type: "tray",
 		content: "",
-		color: "#eeeeee",
+		color: "#fafafa",
 		x: (canvas.width - newWidth) / 2,
 		y: (canvas.height - newHeight) / 2,
 		width: newWidth,

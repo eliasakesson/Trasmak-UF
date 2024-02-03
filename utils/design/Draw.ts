@@ -18,7 +18,7 @@ export default async function Draw(
 	ctx.clip();
 
 	design.objects?.sort((a, b) => a.order - b.order);
-	design.objects?.sort((a) => (a.template ? 1 : -1))
+	design.objects?.sort((a) => (a.template ? 1 : 0));
 
 	for (let i = 0; i < design.objects?.length; i++) {
 		const obj = design.objects?.[i];
@@ -60,7 +60,7 @@ export async function DrawRender(
 	ctx.clip();
 
 	design.objects?.sort((a, b) => a.order - b.order);
-	design.objects?.sort((a) => (a.template ? 1 : -1))
+	design.objects?.sort((a) => (a.template ? 1 : 0));
 
 	for (let i = 0; i < design.objects?.length; i++) {
 		const obj = design.objects?.[i];
@@ -153,7 +153,7 @@ async function DrawImage(
 			const minWidth = Math.min(width, newWidth);
 			const minHeight = Math.min(height, newHeight);
 
-				// Make sure radius is not larger than half the width or height
+			// Make sure radius is not larger than half the width or height
 			const radius = Math.max(
 				Math.min(
 					Math.min(minWidth, minHeight) / 2,
@@ -161,7 +161,6 @@ async function DrawImage(
 				),
 				0,
 			);
-
 
 			ctx.save();
 			GetRoundedRect(
@@ -356,7 +355,20 @@ function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
 
 function DrawTrayShadow(ctx: any, tray: ObjectProps) {
 	ctx.save();
-	ctx.strokeStyle = "#ffffff55";
+	const gradient = ctx.createConicGradient(
+		Math.PI / 2,
+		tray.x + (tray.width ?? 0) / 2,
+		tray.y + (tray.height ?? 0) / 2,
+		360,
+		360,
+	);
+	gradient.addColorStop(0, "#bbbbbb22");
+	gradient.addColorStop(0.25, "#ffffff55");
+	gradient.addColorStop(0.5, "#bbbbbb22");
+	gradient.addColorStop(0.75, "#ffffff55");
+	gradient.addColorStop(1, "#bbbbbb22");
+	ctx.strokeStyle = gradient;
+	ctx.filter = "blur(3px)";
 	ctx.lineWidth = tray.edge ?? 0;
 	GetRoundedRect(
 		ctx,
