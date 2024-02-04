@@ -31,16 +31,28 @@ export default function DesignsGrid({
 				);
 				if (!product) return;
 
+				const width = product.metadata?.width;
+				const height = product.metadata?.height;
+
 				const tray = GetTrayObjFromCanvas(
 					canvas as HTMLCanvasElement,
 					0.85,
-					product.metadata?.width,
-					product.metadata?.height,
+					width,
+					height,
 					product.metadata?.radius,
 					product.metadata?.bleed,
 					product.metadata?.edge,
 				);
 				Draw(canvas as HTMLCanvasElement, tray, designs[i]);
+
+				const nameSpan = canvas.nextElementSibling as HTMLSpanElement;
+				if (nameSpan) {
+					if (width === height) {
+						nameSpan.textContent = "⌀" + width + "cm";
+					} else {
+						nameSpan.textContent = width + "x" + height + "cm";
+					}
+				}
 			});
 		}, 10);
 
@@ -63,6 +75,7 @@ export default function DesignsGrid({
 							width={1280}
 							height={720}
 						></canvas>
+						<span className="absolute bottom-2 right-2 text-lg text-white"></span>
 					</button>
 					<div className="absolute right-4 top-4 flex flex-col gap-2">
 						{trashClicked && (
