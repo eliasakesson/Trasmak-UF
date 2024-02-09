@@ -64,8 +64,13 @@ export async function DrawRender(
 	await DrawTray(ctx, design, tray, false);
 	ctx.clip();
 
-	design.objects?.sort((a, b) => a.order - b.order);
-	design.objects?.sort((a) => (a.template ? 1 : 0));
+	design.objects?.sort((a, b) => {
+		if (a.template !== true && b.template !== true) {
+			return a.order - b.order;
+		}
+
+		return a.template === true ? 1 : -1;
+	});
 
 	for (let i = 0; i < design.objects?.length; i++) {
 		const obj = design.objects?.[i];
