@@ -41,15 +41,10 @@ export default function DesignEditor({
 			>
 				<div className="flex flex-wrap items-center gap-2">
 					{object?.type === "image" && (
-						<Input label="Bildkälla" objKey="content" type="file" />
+						<ImageInput label="Bildkälla" objKey="content" />
 					)}
 					{object?.type === "rectangle" && (
-						<Input
-							label="Färg"
-							objKey="color"
-							type="color"
-							className="h-16"
-						/>
+						<ColorInput label="Färg" objKey="color" />
 					)}
 					{object.type === "text" && (
 						<TextArea
@@ -58,7 +53,7 @@ export default function DesignEditor({
 							className="h-16"
 						/>
 					)}
-					<div className="flex h-16 flex-grow flex-wrap items-center justify-center gap-4 rounded-md border border-gray-300 px-4">
+					<div className="relative flex h-16 flex-wrap items-center justify-center gap-4 rounded-md border border-gray-300 px-4">
 						{object?.type !== "text" && (
 							<button
 								onClick={() =>
@@ -75,7 +70,7 @@ export default function DesignEditor({
 							</button>
 						)}
 						<div className="flex flex-col items-center">
-							<span className="-mt-5 mb-1 bg-white px-2 text-sm font-semibold leading-none text-muted_light">
+							<span className="absolute top-1 text-xs text-muted">
 								Lager
 							</span>
 							<div className="flex gap-4">
@@ -112,12 +107,12 @@ export default function DesignEditor({
 				</div>
 				<div className="flex flex-wrap gap-2">
 					{object?.type === "text" && (
-						<Input label="Färg" objKey="color" type="color" />
+						<ColorInput label="Färg" objKey="color" />
 					)}
-					<Input
+					<NumberInput
 						label="Textstorlek (px)"
 						objKey="size"
-						type="number"
+						range={{ min: 1, max: 250, step: 1 }}
 					/>
 					<Select
 						label="Font"
@@ -150,18 +145,14 @@ export default function DesignEditor({
 							{ value: "fill", text: "Sträckt" },
 						]}
 					/>
-					<Input
-						label="Rundning (px)"
+					<NumberInput
+						label="Rundning (%)"
 						objKey="radius"
-						type="number"
+						range={{ min: 0, max: 0.5, step: 0.01 }}
+						percentage
 					/>
 					{isAdmin && (
-						<Input
-							label="Template"
-							objKey="template"
-							type="checkbox"
-							requiresKey={false}
-						/>
+						<CheckboxInput label="Template" objKey="template" />
 					)}
 				</div>
 			</div>
@@ -246,28 +237,32 @@ function TextArea({
 	);
 }
 
-function Input({
-	label,
-	objKey,
-	type = "text",
-	className,
-	requiresKey = true,
-}: {
-	label: string;
-	objKey:
-		| "x"
-		| "y"
-		| "width"
-		| "height"
-		| "radius"
-		| "size"
-		| "color"
-		| "content"
-		| "template";
-	type?: "text" | "number" | "color" | "file" | "checkbox";
-	className?: string;
-	requiresKey?: boolean;
-}) {
+function TextInput({ label, objKey }: { label: string; objKey: "content" }) {
+	const { object, setObject } = useContext(SelectedObjectContext);
+
+	if (!object || !(objKey in object)) return null;
+
+	return (
+		<div className="flex grow flex-col gap-1">
+			<Label label={label} />
+			<input
+				type="text"
+				name={label}
+				id={label}
+				className="h-full rounded-md border border-gray-300 p-2"
+				value={(objKey in object ? object[objKey] : "") as string}
+				onChange={(e) =>
+					setObject({
+						...object,
+						[objKey]: e.target.value,
+					})
+				}
+			/>
+		</div>
+	);
+}
+
+function ImageInput({ label, objKey }: { label: string; objKey: "content" }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
 
 	const onDrop = useCallback(
@@ -300,164 +295,176 @@ function Input({
 		[objKey, object, setObject],
 	);
 
-	const { getRootProps, getInputProps, isDragActive } = useDropzone({
+	const { getRootProps, getInputProps } = useDropzone({
 		onDrop,
 		noClick: true,
 	});
+
+	if (!object || !(objKey in object)) return null;
+
+	return (
+		<div className="flex grow flex-col gap-1">
+			<label
+				{...getRootProps()}
+				className="h-16 cursor-pointer rounded-md border border-gray-300 px-4 hover:border-gray-200"
+				htmlFor={label}
+			>
+				<div className="flex h-full items-center justify-center gap-2">
+					<svg
+						className="h-6 w-6 text-muted_light"
+						aria-hidden="true"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 20 16"
+					>
+						<path
+							stroke="currentColor"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="2"
+							d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+						/>
+					</svg>
+					<div>
+						<p className="whitespace-nowrap text-sm font-semibold text-muted_light">
+							Klicka för att ladda upp bild
+						</p>
+						<p className="whitespace-nowrap text-sm text-muted_light">
+							eller dra och släpp en bild här
+						</p>
+					</div>
+				</div>
+				<input
+					{...getInputProps()}
+					name={label}
+					id={label}
+					className="hidden"
+				/>
+			</label>
+		</div>
+	);
+}
+
+function NumberInput({
+	label,
+	objKey,
+	range,
+	percentage = false,
+}: {
+	label: string;
+	objKey: "radius" | "size";
+	range: { min: number; max: number; step: number };
+	percentage?: boolean;
+}) {
+	const { object, setObject } = useContext(SelectedObjectContext);
+
+	if (!object || !(objKey in object)) return null;
+
+	function setValue(value: string, percentage = false) {
+		const roundedValue = value ? Math.round(+value * 100) / 100 : "";
+		setObject({
+			...(object as ObjectProps),
+			[objKey]: roundedValue
+				? percentage
+					? +roundedValue / 100
+					: roundedValue
+				: 0,
+		});
+	}
+
+	const value = object[objKey] as number;
+	const displayValue = value ? (percentage ? value * 100 : value) : "";
+
+	return (
+		<div className="relative flex grow items-center gap-2 rounded-md border border-gray-300 px-2 pt-3">
+			<Label label={label} />
+			<input
+				type="range"
+				name={label}
+				id={label + "range"}
+				min={range.min}
+				max={range.max}
+				step={range.step}
+				value={value}
+				onChange={(e) => setValue(e.target.value)}
+			/>
+			<input
+				type="text"
+				name={label}
+				id={label}
+				min={range.min * (percentage ? 100 : 1)}
+				max={range.max * (percentage ? 100 : 1)}
+				step={range.step * (percentage ? 100 : 1)}
+				className="h-full w-[3ch] py-2 outline-none"
+				placeholder="0"
+				value={displayValue}
+				onChange={(e) => setValue(e.target.value, percentage)}
+			/>
+		</div>
+	);
+}
+
+function ColorInput({ label, objKey }: { label: string; objKey: "color" }) {
+	const { object, setObject } = useContext(SelectedObjectContext);
 
 	const debouncedSetObject = debounce((value) => {
 		setObject(value);
 	}, 10);
 
-	if (!object || (requiresKey && !(objKey in object))) return null;
+	if (!object || !(objKey in object)) return null;
 
-	if (type === "checkbox") {
-		return (
-			<div className="flex grow flex-col gap-1">
-				<label className="sr-only" htmlFor={label}>
-					{label}
-				</label>
+	return (
+		<div className="relative flex aspect-square min-w-[48px] flex-col gap-1">
+			<Label label={label} />
+			<div className="relative h-full w-full rounded-md border border-gray-300">
 				<input
-					type="checkbox"
+					type="color"
 					name={label}
 					id={label}
-					className="h-full rounded-md border border-gray-300 p-2"
-					checked={object[objKey] as boolean}
+					className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+					value={object[objKey] as string}
 					onChange={(e) =>
 						debouncedSetObject({
 							...(object as ObjectProps),
-							[objKey]: e.target.checked,
-						})
-					}
-				/>
-			</div>
-		);
-	}
-
-	if (type === "color")
-		return (
-			<div className={`flex aspect-square flex-col gap-1 ${className}`}>
-				<label className="sr-only" htmlFor={label}>
-					{label}
-				</label>
-				<div className="relative h-full w-full rounded-md border border-gray-300">
-					<input
-						type="color"
-						name={label}
-						id={label}
-						className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-						value={object[objKey] as string}
-						onChange={(e) =>
-							debouncedSetObject({
-								...(object as ObjectProps),
-								[objKey]: e.target.value,
-							})
-						}
-					/>
-					<div
-						className="pointer-events-none absolute inset-0 rounded-[4px]"
-						style={{
-							backgroundColor: object[objKey] as string,
-						}}
-					></div>
-				</div>
-			</div>
-		);
-
-	if (type === "file")
-		return (
-			<div className="flex grow flex-col gap-1">
-				<label
-					{...getRootProps()}
-					className="h-16 cursor-pointer rounded-md border border-gray-300 px-4 hover:border-gray-200"
-					htmlFor={label}
-				>
-					<div className="flex h-full items-center justify-center gap-2">
-						<svg
-							className="h-6 w-6 text-muted_light"
-							aria-hidden="true"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 20 16"
-						>
-							<path
-								stroke="currentColor"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-							/>
-						</svg>
-						<div>
-							<p className="whitespace-nowrap text-sm font-semibold text-muted_light">
-								Klicka för att ladda upp bild
-							</p>
-							<p className="whitespace-nowrap text-sm text-muted_light">
-								eller dra och släpp en bild här
-							</p>
-						</div>
-					</div>
-					<input
-						{...getInputProps()}
-						name={label}
-						id={label}
-						className="hidden"
-					/>
-				</label>
-			</div>
-		);
-
-	if (type === "number")
-		return (
-			<div className="flex grow gap-2 rounded-md border border-gray-300 px-2">
-				<label className="sr-only" htmlFor={label}>
-					{label}
-				</label>
-				<input
-					type="range"
-					name={label}
-					id={label}
-					min="0"
-					max="200"
-					value={(objKey in object ? object[objKey] : "") as string}
-					onChange={(e) =>
-						setObject({
-							...object,
 							[objKey]: e.target.value,
 						})
 					}
 				/>
-				<input
-					type="number"
-					name={label}
-					id={label}
-					className="h-full w-[6ch] py-2 outline-none"
-					value={(objKey in object ? object[objKey] : "") as string}
-					onChange={(e) =>
-						setObject({
-							...object,
-							[objKey]: e.target.value,
-						})
-					}
-				/>
+				<div
+					className="pointer-events-none absolute inset-0 rounded-[4px]"
+					style={{
+						backgroundColor: object[objKey] as string,
+					}}
+				></div>
 			</div>
-		);
+		</div>
+	);
+}
+
+function CheckboxInput({
+	label,
+	objKey,
+}: {
+	label: string;
+	objKey: "template";
+}) {
+	const { object, setObject } = useContext(SelectedObjectContext);
+
+	if (!object) return null;
 
 	return (
-		<div className="flex grow flex-col gap-1">
-			<label className="sr-only" htmlFor={label}>
-				{label}
-			</label>
+		<div className="relative flex grow flex-col gap-1">
+			<Label label={label} />
 			<input
-				type={type}
+				type="checkbox"
 				name={label}
 				id={label}
 				className="h-full rounded-md border border-gray-300 p-2"
-				value={(objKey in object ? object[objKey] : "") as string}
+				checked={object[objKey] as boolean}
 				onChange={(e) =>
 					setObject({
 						...object,
-						[objKey]: e.target.value,
+						[objKey]: e.target.checked,
 					})
 				}
 			/>
@@ -479,14 +486,12 @@ function Select({
 	if (!object || !(objKey in object)) return null;
 
 	return (
-		<div className="flex grow flex-col gap-1">
-			<label className="sr-only" htmlFor={label}>
-				{label}
-			</label>
+		<div className="relative flex grow flex-col gap-1">
+			<Label label={label} />
 			<select
 				name={label}
 				id={label}
-				className="h-full rounded-md border border-gray-300 p-2"
+				className="h-full rounded-md border border-gray-300 px-1 pt-3"
 				style={objKey === "font" ? { fontFamily: object[objKey] } : {}}
 				value={object[objKey]}
 				onChange={(e) =>
@@ -511,6 +516,17 @@ function Select({
 				))}
 			</select>
 		</div>
+	);
+}
+
+function Label({ label }: { label: string }) {
+	return (
+		<label
+			className="absolute left-2 top-1 text-xs text-muted"
+			htmlFor={label}
+		>
+			{label}
+		</label>
 	);
 }
 

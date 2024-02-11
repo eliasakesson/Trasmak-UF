@@ -13,18 +13,30 @@ export default function AdminOrder({ order }: { order: any }) {
 }
 
 function AdminPage({ order }: { order: any }) {
-	console.log(order);
-
 	return (
 		<div className="mx-auto max-w-7xl space-y-8 px-8 py-16">
 			<Link href="/admin">{"<- Admin"}</Link>
 			<h1 className="text-5xl font-bold">Order</h1>
 			<div className="flex flex-wrap gap-16">
 				<div className="flex flex-col gap-4">
+					<h2 className="text-2xl font-bold">Orderinfo</h2>
+					<span className="font-semibold">
+						Totalt:{" "}
+						{formatCurrencyString({
+							value: order.total,
+							currency: order.currency,
+						})}
+					</span>
+					<span>
+						{new Date(order.created * 1000).toLocaleDateString()}
+					</span>
+				</div>
+				<div className="flex flex-col gap-4">
+					<h2 className="text-2xl font-bold">Kund</h2>
 					<div className="flex flex-col">
-						<h2 className="text-2xl font-bold">
+						<h3 className="text-xl font-semibold">
 							{order.customer.name}
-						</h2>
+						</h3>
 						<span>{order.customer.email}</span>
 					</div>
 					<span>
@@ -38,7 +50,7 @@ function AdminPage({ order }: { order: any }) {
 					</span>
 				</div>
 				<div className="flex flex-col gap-4">
-					<h2 className="text-2xl font-bold">Leverans</h2>
+					<h2 className="text-2xl font-bold">Leveransaddress</h2>
 					<div className="space-y-2">
 						<p>{order.shipping.name}</p>
 						<p>{order.shipping.address.line1}</p>
@@ -66,16 +78,14 @@ function Product({ product }: { product: any }) {
 	return (
 		<div className="flex flex-col gap-8 border-2 p-4">
 			<div className="flex items-center gap-4">
-				<Image
-					src={product.product.images[0]}
-					alt=""
-					width={64}
-					height={64}
-				/>
-				<div>
-					<h3 className="font-semibold">{product.product.name}</h3>
-					<span>{product.quantity} st</span>
-				</div>
+				<Image src={product.image} alt="" width={64} height={64} />
+				<h3 className="font-semibold">{product.name}</h3>
+				<span>
+					{formatCurrencyString({
+						value: product.price,
+						currency: product.currency,
+					})}
+				</span>
 			</div>
 			<div>
 				{product.designs.map((design: any, i: number) => (

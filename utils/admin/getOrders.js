@@ -1,3 +1,4 @@
+import GetProducts from "../getProducts";
 import { stripe } from "../stripe";
 
 export default async function GetOrders() {
@@ -53,24 +54,33 @@ export default async function GetOrders() {
 export async function GetOrder(id) {
 	const session = await stripe.checkout.sessions.retrieve(id);
 
-	const lineItems = await stripe.checkout.sessions.listLineItems(id, {
-		expand: ["data.price.product"],
-	});
+	const stripeProducts = await GetProducts();
 
 	const metadataProducts = JSON.parse(session.metadata.products);
 
-	const products = lineItems?.data
-		?.filter((lineItem) => lineItem.price)
-		.map((lineItem) => {
+	const products = stripeProducts
+		.filter((product) => {
+			const metadataProduct = metadataProducts.find(
+				(metadataProduct) =>
+					metadataProduct.id === product.id ||
+					metadataProduct.name === product.name,
+			);
+
+			if (metadataProduct) {
+				return true;
+			}
+
+			return false;
+		})
+		.map((product) => {
 			const designs = metadataProducts.filter(
 				(metadataProduct) =>
-					metadataProduct.id === lineItem.price.product.id ||
-					metadataProduct.name === lineItem.price.product.name,
+					metadataProduct.id === product.id ||
+					metadataProduct.name === product.name,
 			);
 
 			return {
-				...lineItem,
-				product: lineItem.price.product,
+				...product,
 				designs,
 			};
 		});

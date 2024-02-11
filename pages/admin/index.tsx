@@ -4,6 +4,8 @@ import GetOrders from "@/utils/admin/getOrders";
 import GetBalance, { GetOrderTotal } from "@/utils/admin/getBalance";
 import { formatCurrencyString } from "use-shopping-cart";
 import Link from "next/link";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase";
 
 export default function Admin() {
 	return (
@@ -14,6 +16,7 @@ export default function Admin() {
 }
 
 function AdminPage() {
+	const [user] = useAuthState(auth);
 	const [orderTotal, setOrderTotal] = useState<any>(0);
 	const [balance, setBalance] = useState<any>(0);
 	const [orders, setOrders] = useState<any>([]);
@@ -29,8 +32,14 @@ function AdminPage() {
 	}, []);
 
 	return (
-		<div className="mx-auto max-w-7xl space-y-8 px-8 py-16">
-			<h1 className="text-5xl font-bold">Admin</h1>
+		<div className="mx-auto min-h-screen max-w-7xl space-y-8 px-8 py-16">
+			<span className="text-xl font-semibold text-muted">Admin</span>
+			<h1 className="text-5xl font-semibold">
+				Hej,{" "}
+				<span className="font-bold">
+					{user?.displayName?.split(" ")[0]}
+				</span>
+			</h1>
 			<div className="flex gap-16">
 				<div className="space-y-4">
 					<h2 className="text-3xl font-semibold">Konto</h2>
@@ -81,8 +90,8 @@ function AdminPage() {
 function Order({ order }: { order: any }) {
 	return (
 		<Link href={`/admin/orders/${order.id}`}>
-			<div className="flex items-center gap-8 border-2 p-4">
-				<div className="flex flex-col">
+			<div className="flex items-center justify-end gap-8 border-2 p-4">
+				<div className="flex flex-1 flex-col">
 					<h2 className="font-bold">{order.customer.name}</h2>
 					<span>{order.customer.email}</span>
 				</div>
