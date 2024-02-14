@@ -55,7 +55,36 @@ export async function GetOrder(id) {
 	const session = await stripe.checkout.sessions.retrieve(id);
 
 	const stripeProducts = await GetProducts();
+	const metadataProducts = JSON.parse(session.metadata.products);
 
+	const products = metadataProducts.map((metadataProduct) => {
+		const product = stripeProducts.find(
+			(stripeProduct) =>
+				stripeProduct.id === metadataProduct.id ||
+				stripeProduct.name === metadataProduct.name,
+		);
+
+		return {
+			...product,
+			image: metadataProduct.image,
+			quantity: metadataProduct.count,
+		};
+	});
+
+	return {
+		...session,
+		total: session.amount_total,
+		currency: session.currency,
+		customer: session.customer_details,
+		products,
+		shipping: session.shipping_details,
+	};
+}
+
+export async function GetOrderCompacted(id) {
+	const session = await stripe.checkout.sessions.retrieve(id);
+
+	const stripeProducts = await GetProducts();
 	const metadataProducts = JSON.parse(session.metadata.products);
 
 	const products = stripeProducts

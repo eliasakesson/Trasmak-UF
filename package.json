@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^3.3.8",
     "@stripe/stripe-js": "^2.1.7",
     "@types/lodash.debounce": "^4.0.9",
     "@types/uuid": "^9.0.6",

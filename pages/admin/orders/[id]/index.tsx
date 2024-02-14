@@ -1,5 +1,5 @@
 import AdminWrapper from "@/components/admin/AdminWrapper";
-import GetOrders, { GetOrder } from "@/utils/admin/getOrders";
+import GetOrders, { GetOrderCompacted } from "@/utils/admin/getOrders";
 import Image from "next/image";
 import Link from "next/link";
 import { formatCurrencyString } from "use-shopping-cart";
@@ -30,6 +30,12 @@ function AdminPage({ order }: { order: any }) {
 					<span>
 						{new Date(order.created * 1000).toLocaleDateString()}
 					</span>
+					<Link
+						className="text-primary underline"
+						href={`/admin/orders/${order.id}/pdf`}
+					>
+						Visa PDF
+					</Link>
 				</div>
 				<div className="flex flex-col gap-4">
 					<h2 className="text-2xl font-bold">Kund</h2>
@@ -128,7 +134,7 @@ function GetImagePath(image: string) {
 }
 
 export async function getStaticProps({ params }: { params: { id: string } }) {
-	const order = await GetOrder(params.id);
+	const order = await GetOrderCompacted(params.id);
 
 	return {
 		props: {
