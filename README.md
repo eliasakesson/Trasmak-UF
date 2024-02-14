@@ -13,7 +13,7 @@
     Next.js & Stripe E-Commerce app with custom design tool
     <br />
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/eliasakesson/trasmak-uf"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://www.trasmakuf.se">View App</a>
