@@ -3,7 +3,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="https://github.com/eliasakesson/trasmak-uf">
     <img src="public/images/logo-big.png" alt="Logo" width="120" height="120">
   </a>
 
