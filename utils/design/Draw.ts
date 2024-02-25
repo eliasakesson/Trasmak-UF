@@ -7,6 +7,7 @@ export default async function Draw(
 	design: DesignProps,
 	selectedObjectID?: number | null,
 	showSupport: boolean = false,
+	scale: number = 1,
 ) {
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
@@ -28,7 +29,7 @@ export default async function Draw(
 	for (let i = 0; i < design.objects?.length; i++) {
 		const obj = design.objects?.[i];
 		if (obj.type === "text") {
-			DrawText(ctx, tray, obj);
+			DrawText(ctx, tray, obj, scale);
 		} else if (obj.type === "rectangle") {
 			DrawRectangle(ctx, tray, obj);
 		} else if (obj.type === "image") {
@@ -149,14 +150,7 @@ async function DrawImage(
 			);
 
 			const { offsetX, offsetY, newWidth, newHeight } =
-				GetImageDimensions(
-					img,
-					image.fit || "contain",
-					x,
-					y,
-					width,
-					height,
-				);
+				GetImageDimensions2(tray, image);
 
 			const minWidth = Math.min(width, newWidth);
 			const minHeight = Math.min(height, newHeight);
@@ -206,23 +200,17 @@ async function DrawImage(
 
 function GetImageDimensions(
 	image: HTMLImageElement,
-	type: string,
 	x: number,
 	y: number,
 	width: number,
 	height: number,
 ) {
-	if (type === "fill") {
-		return { offsetX: x, offsetY: y, newWidth: width, newHeight: height };
-	}
-
 	// Calculate scaling factors for width and height
 	const scaleX = width / image.width;
 	const scaleY = height / image.height;
 
 	// Choose the larger scale to cover the target area
-	const scale =
-		type === "cover" ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY);
+	const scale = Math.max(scaleX, scaleY);
 
 	// Calculate the new image dimensions
 	const newWidth = image.width * scale;
@@ -235,38 +223,39 @@ function GetImageDimensions(
 	return { offsetX, offsetY, newWidth, newHeight };
 }
 
-function HighlightSelectedObject(
-	ctx: CanvasRenderingContext2D,
+function GetImageDimensions2(
 	tray: ObjectProps,
-	objects: ObjectProps[],
-	selectedObjectID?: number | null,
-) {
-	if (selectedObjectID === null) return;
+	image: ObjectProps,
+): { offsetX: number; offsetY: number; newWidth: number; newHeight: number } {
+	if (!image.image) {
+		return { offsetX: 0, offsetY: 0, newWidth: 0, newHeight: 0 };
+	}
 
-	const selectedObject = objects?.find(
-		(obj: ObjectProps) => obj.id === selectedObjectID,
-	);
-	if (!selectedObject) return;
+	const imageAspectRatio = image.image.width / image.image.height;
 
-	const { x, y, width, height } = GetObjectDimensions(
-		ctx,
-		tray,
-		selectedObject,
-	);
+	const width =
+		(tray.width ?? 0) *
+		((image.height || 0) * imageAspectRatio * (image.offsetWidth || 1));
+	const height = (tray.height ?? 0) * (image.width || 0);
 
-	const padding = selectedObject.type === "text" ? 8 : 2;
+	// Calculate scaling factors for width and height
+	const scaleX = width / image.image.width;
+	const scaleY = height / image.image.height;
 
-	ctx.save();
-	ctx.strokeStyle = "#999";
-	ctx.lineWidth = 4;
-	ctx.setLineDash([10, 5]);
-	ctx.strokeRect(
-		x - padding,
-		y - padding,
-		width + padding * 2,
-		height + padding * 2,
-	);
-	ctx.restore();
+	// Choose the larger scale to cover the target area
+	const scale = Math.max(scaleX, scaleY);
+
+	// Calculate the new image dimensions
+	const newWidth = image.image.width * scale;
+	const newHeight = image.image.height * scale;
+
+	// Calculate the position to center the image on the target area
+	const offsetX =
+		tray.x + (tray.width || 0) * image.x + (width - newWidth) / 2;
+	const offsetY =
+		tray.y + (tray.height || 0) * image.y + (height - newHeight) / 2;
+
+	return { offsetX, offsetY, newWidth, newHeight };
 }
 
 async function DrawTray(
@@ -286,7 +275,7 @@ async function DrawTray(
 	if (shadow) {
 		ctx.save();
 		ctx.fillStyle = "#000000ff";
-		ctx.shadowColor = "#00000077";
+		ctx.shadowColor = "#00000055";
 		ctx.shadowBlur = 100;
 		ctx.shadowOffsetX = 25;
 		ctx.shadowOffsetY = 25;
@@ -298,7 +287,6 @@ async function DrawTray(
 	function DrawImage(img: HTMLImageElement, resolve: any) {
 		const { offsetX, offsetY, newWidth, newHeight } = GetImageDimensions(
 			img,
-			"cover",
 			tray.x,
 			tray.y,
 			tray.width ?? 0,
@@ -440,4 +428,149 @@ function GetRoundedRect(
 	ctx.arcTo(x, y + height, x, y, radius);
 	ctx.arcTo(x, y, x + width, y, radius);
 	ctx.closePath();
+}
+
+function HighlightSelectedObject(
+	ctx: CanvasRenderingContext2D,
+	tray: ObjectProps,
+	objects: ObjectProps[],
+	selectedObjectID?: number | null,
+) {
+	if (selectedObjectID === null) return;
+
+	const selectedObject = objects?.find(
+		(obj: ObjectProps) => obj.id === selectedObjectID,
+	);
+	if (!selectedObject) return;
+
+	const {
+		x,
+		y,
+		width: objWidth,
+		height: objHeight,
+	} = GetObjectDimensions(ctx, tray, selectedObject);
+
+	const padding = 8;
+	const circleRadius = 6;
+	const handleWidth = 16;
+	const handleHeight = 4;
+
+	const top = y - padding;
+	const left = x - padding;
+	const width = objWidth + padding * 2;
+	const height = objHeight + padding * 2;
+
+	ctx.save();
+	ctx.strokeStyle = "#166534";
+	ctx.lineWidth = 2;
+	ctx.setLineDash([6, 6]);
+	ctx.strokeRect(left, top, width, height);
+	ctx.restore();
+
+	if (selectedObject.type !== "text") {
+		// Draw circles at the corners
+		ctx.save();
+		ctx.strokeStyle = "#166534";
+		ctx.fillStyle = "#ffffff";
+		ctx.lineWidth = 2;
+
+		ctx.beginPath();
+		ctx.arc(left, top, circleRadius, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		ctx.beginPath();
+		ctx.arc(left + width, top, circleRadius, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		ctx.beginPath();
+		ctx.arc(left, top + height, circleRadius, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+		ctx.beginPath();
+		ctx.arc(left + width, top + height, circleRadius, 0, 2 * Math.PI);
+		ctx.stroke();
+		ctx.fill();
+
+		ctx.restore();
+
+		// Draw handles at the center of each side
+		ctx.save();
+		ctx.strokeStyle = "#166534";
+		ctx.fillStyle = "#ffffff";
+		ctx.lineWidth = 2;
+
+		ctx.beginPath();
+		ctx.rect(
+			left + width / 2 - handleWidth / 2,
+			top - handleHeight / 2,
+			handleWidth,
+			handleHeight,
+		);
+		ctx.stroke();
+		ctx.fill();
+		ctx.beginPath();
+		ctx.rect(
+			left + width / 2 - handleWidth / 2,
+			top + height - handleHeight / 2,
+			handleWidth,
+			handleHeight,
+		);
+		ctx.stroke();
+		ctx.fill();
+		ctx.beginPath();
+		ctx.rect(
+			left - handleHeight / 2,
+			top + height / 2 - handleWidth / 2,
+			handleHeight,
+			handleWidth,
+		);
+		ctx.stroke();
+		ctx.fill();
+		ctx.beginPath();
+		ctx.rect(
+			left + width - handleHeight / 2,
+			top + height / 2 - handleWidth / 2,
+			handleHeight,
+			handleWidth,
+		);
+		ctx.stroke();
+		ctx.fill();
+
+		ctx.restore();
+	}
+}
+
+export function DrawSnapLineX(
+	canvas: HTMLCanvasElement,
+	tray: ObjectProps,
+	x: number,
+) {
+	const ctx = canvas.getContext("2d");
+	if (!ctx) return;
+
+	ctx.save();
+	ctx.strokeStyle = "#ff0000";
+	ctx.lineWidth = 1;
+	ctx.beginPath();
+	ctx.moveTo(tray.x + (tray.width ?? 0) * x, tray.y);
+	ctx.lineTo(tray.x + (tray.width ?? 0) * x, tray.y + (tray.height ?? 0));
+	ctx.stroke();
+	ctx.restore();
+}
+
+export function DrawSnapLineY(
+	canvas: HTMLCanvasElement,
+	tray: ObjectProps,
+	y: number,
+) {
+	const ctx = canvas.getContext("2d");
+	if (!ctx) return;
+	ctx.save();
+	ctx.strokeStyle = "#ff0000";
+	ctx.lineWidth = 1;
+	ctx.beginPath();
+	ctx.moveTo(tray.x, tray.y + (tray.height ?? 0) * y);
+	ctx.lineTo(tray.x + (tray.width ?? 0), tray.y + (tray.height ?? 0) * y);
+	ctx.stroke();
+	ctx.restore();
 }

@@ -10,7 +10,7 @@ export function GetObjectDimensions(
 		ctx: CanvasRenderingContext2D,
 		text: ObjectProps,
 	) {
-		ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
+		ctx.font = `${text.size}px ${text.font ?? "sans-serif"}`;
 		const lines = text.content.split("\n");
 		return Math.max(...lines.map((line) => ctx.measureText(line).width));
 	}
@@ -19,7 +19,7 @@ export function GetObjectDimensions(
 		ctx: CanvasRenderingContext2D,
 		text: ObjectProps,
 	) {
-		ctx.font = `bold ${text.size}px ${text.font ?? "sans-serif"}`;
+		ctx.font = `${text.size}px ${text.font ?? "sans-serif"}`;
 		const lines = text.content.split("\n");
 		return lines.length * (text.size || 0);
 	}
