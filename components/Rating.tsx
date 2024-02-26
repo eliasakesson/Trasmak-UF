@@ -57,25 +57,64 @@ export function Stars({
 		<div
 			className={`flex items-center ${size == "sm" ? "gap-0" : size == "md" ? "gap-1" : "gap-2"} ${className}`}
 		>
-			{[...Array(5)].map((_, index) =>
-				rating > index && rating < index + 1 ? (
-					<FaStarHalfAlt
-						key={index}
-						className={`text-yellow-500 ${size == "sm" ? "text-sm" : size == "md" ? "text-md" : "text-xl"}`}
-					/>
-				) : rating > index ? (
-					<FaStar
-						key={index}
-						className={`text-yellow-500 ${size == "sm" ? "text-sm" : size == "md" ? "text-md" : "text-xl"}`}
-					/>
-				) : (
-					<FaStar
-						key={index}
-						className={`text-gray-400 ${size == "sm" ? "text-sm" : size == "md" ? "text-md" : "text-xl"}`}
-					/>
-				),
-			)}
+			{[...Array(5)].map((_, index) => (
+				<Star key={index} rating={rating} index={index} size={size} />
+			))}
 			{children}
 		</div>
+	);
+}
+
+export function RatingStars({
+	rating,
+	setRating,
+	size = "md",
+}: {
+	rating: number;
+	setRating: (rating: number) => void;
+	size?: "sm" | "md" | "xl";
+}) {
+	return (
+		<div
+			className={`flex items-center ${size == "sm" ? "gap-0" : size == "md" ? "gap-1" : "gap-2"}`}
+		>
+			{[...Array(5)].map((_, index) => (
+				<button onClick={() => setRating(index + 1)}>
+					<Star
+						key={index}
+						rating={rating}
+						index={index}
+						size={size}
+					/>
+				</button>
+			))}
+		</div>
+	);
+}
+
+function Star({
+	rating,
+	index,
+	size = "md",
+}: {
+	rating: number;
+	index: number;
+	size?: "sm" | "md" | "xl";
+}) {
+	return rating > index && rating < index + 1 ? (
+		<FaStarHalfAlt
+			key={index}
+			className={`text-yellow-500 ${size == "sm" ? "text-sm" : size == "md" ? "text-md" : "text-xl"}`}
+		/>
+	) : rating > index ? (
+		<FaStar
+			key={index}
+			className={`text-yellow-500 ${size == "sm" ? "text-sm" : size == "md" ? "text-md" : "text-xl"}`}
+		/>
+	) : (
+		<FaStar
+			key={index}
+			className={`text-gray-400 ${size == "sm" ? "text-sm" : size == "md" ? "text-md" : "text-xl"}`}
+		/>
 	);
 }
