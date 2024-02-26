@@ -12,7 +12,10 @@ export default function AdminWrapper({
 	const [isAdmin, setIsAdmin] = useState(false);
 
 	useEffect(() => {
-		if (!user || loading || error) return;
+		if (!user || loading || error) {
+			setIsAdmin(false);
+			return;
+		}
 
 		async function getAdmin() {
 			if (!user) return;

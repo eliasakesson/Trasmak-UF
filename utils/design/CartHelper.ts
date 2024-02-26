@@ -30,7 +30,7 @@ export default async function AddToCart(
 	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 	const height = (metadata?.height ?? 33) * 0.393701 * 300;
-	const upScaleFactor = height / canvas.height;
+	const upScaleFactor = height / (canvas.height * 0.85);
 
 	const newCanvas = document.createElement("canvas");
 	newCanvas.width =

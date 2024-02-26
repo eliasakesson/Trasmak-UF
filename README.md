@@ -1,40 +1,104 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<a name="readme-top"></a>
 
-## Getting Started
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/eliasakesson/trasmak-uf">
+    <img src="https://raw.githubusercontent.com/eliasakesson/Trasmak-UF/main/public/images/logo-big.png" alt="Logo" width="120" height="120">
+  </a>
 
-First, run the development server:
+  <h3 align="center">Träsmak UF</h3>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+  <p align="center">
+    Next.js & Stripe E-Commerce app with custom design tool
+    <br />
+    <br />
+    <a href="https://github.com/eliasakesson/trasmak-uf"><strong>Explore the docs</strong></a>
+    <br />
+    <br />
+    <a href="https://www.trasmakuf.se">View App</a>
+  </p>
+</div>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+<!-- ABOUT THE PROJECT -->
+## About The Project
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+<div style="display:flex;gap:8px">
+  <img src="https://raw.githubusercontent.com/eliasakesson/Trasmak-UF/main/public/images/home-page.png" alt="" width="49%" />
+  <img src="https://raw.githubusercontent.com/eliasakesson/Trasmak-UF/main/public/images/designer.png" alt="" width="49%" />
+</div>
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### Träsmak UF
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Träsmak UF is a ecommerce website combined with a custom design tool built with Next.js, Firebase and Stripe, hosted on Vercel. It is built for the company Träsmak UF, a company that lets the user design and order custom wooden trays.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+The frontend features:
+* A custom design tool, where the user can customize and design a wooden tray with images and text
+* Authentication & User saved designs
+* Dynamic product ratings
+* Custom design generation & Design templates
 
-## Learn More
+The backend features:
+* Stripe for payments
+* Firebase for authentication, database and storage
+* REST API for communicating between the frontend and backend
+* Google Analytics is used for tracking user data
 
-To learn more about Next.js, take a look at the following resources:
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Built With
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Here are the main frameworks and libraries i've used for this project:
 
-## Deploy on Vercel
+* ![Next][Next.js]
+* ![React][React.js]
+* ![Stripe][Stripe]
+* ![Firebase][Firebase]
+* ![Typescript][Typescript]
+* ![Tailwind CSS][Tailwind]
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- CONTACT -->
+## Contact
+
+<div style="display:flex;gap:8px"> 
+  <a href="https://www.linkedin.com/in/eliasakesson/" target="blank"><img align="center" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/800px-LinkedIn_logo_initials.png" alt="Elias Åkesson" height="40" width="40"/></a>
+  <a href="https://github.com/eliasakesson" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/github.svg" alt="Elias Åkesson" height="40" width="40" /></a>
+</div>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+Here are a few of the libraries and tools i used for this project:
+
+* [Img Shields](https://shields.io)
+* [Font Awesome](https://fontawesome.com)
+* [React Icons](https://react-icons.github.io/react-icons/search)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[logo]: public/images/logo.png
+[product-screenshot]: public/images/home-page.png
+[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[Stripe]: https://img.shields.io/badge/Stripe-5433FF?style=for-the-badge&logo=stripe&logoColor=white
+[Firebase]: https://img.shields.io/badge/FireBase-FFCB2B?style=for-the-badge&logo=firebase&logoColor=black
+[Typescript]: https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white
+[Tailwind]: https://img.shields.io/badge/Tailwind_CSS-1CC6FF?style=for-the-badge&logo=tailwindcss&logoColor=white

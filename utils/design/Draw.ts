@@ -17,8 +17,13 @@ export default async function Draw(
 	await DrawTray(ctx, design, tray);
 	ctx.clip();
 
-	design.objects?.sort((a, b) => a.order - b.order);
-	design.objects?.sort((a) => (a.template ? 1 : -1))
+	design.objects?.sort((a, b) => {
+		if (a.template !== true && b.template !== true) {
+			return a.order - b.order;
+		}
+
+		return a.template === true ? 1 : -1;
+	});
 
 	for (let i = 0; i < design.objects?.length; i++) {
 		const obj = design.objects?.[i];
@@ -59,17 +64,22 @@ export async function DrawRender(
 	await DrawTray(ctx, design, tray, false);
 	ctx.clip();
 
-	design.objects?.sort((a, b) => a.order - b.order);
-	design.objects?.sort((a) => (a.template ? 1 : -1))
+	design.objects?.sort((a, b) => {
+		if (a.template !== true && b.template !== true) {
+			return a.order - b.order;
+		}
+
+		return a.template === true ? 1 : -1;
+	});
 
 	for (let i = 0; i < design.objects?.length; i++) {
 		const obj = design.objects?.[i];
 		if (obj.type === "text") {
 			DrawText(ctx, tray, obj, scale);
 		} else if (obj.type === "rectangle") {
-			DrawRectangle(ctx, tray, obj, scale);
+			DrawRectangle(ctx, tray, obj);
 		} else if (obj.type === "image") {
-			await DrawImage(ctx, tray, obj, scale);
+			await DrawImage(ctx, tray, obj);
 		}
 	}
 }
@@ -103,13 +113,12 @@ function DrawRectangle(
 	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
 	rectangle: ObjectProps,
-	scale: number = 1,
 ) {
 	const { x, y, width, height } = GetObjectDimensions(ctx, tray, rectangle);
 
 	// Make sure radius is not larger than half the width or height
 	const radius = Math.max(
-		Math.min(Math.min(width, height) / 2, (rectangle.radius ?? 0) * scale),
+		Math.min(Math.min(width, height) / 2, rectangle.radius ?? 0),
 		0,
 	);
 
@@ -126,7 +135,6 @@ async function DrawImage(
 	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
 	image: ObjectProps,
-	scale: number = 1,
 ) {
 	const loadImage = (image: ObjectProps): Promise<void> => {
 		function DrawImage(
@@ -153,15 +161,11 @@ async function DrawImage(
 			const minWidth = Math.min(width, newWidth);
 			const minHeight = Math.min(height, newHeight);
 
-				// Make sure radius is not larger than half the width or height
+			// Make sure radius is not larger than half the width or height
 			const radius = Math.max(
-				Math.min(
-					Math.min(minWidth, minHeight) / 2,
-					(image.radius ?? 0) * scale,
-				),
+				Math.min(Math.min(minWidth, minHeight) / 2, image.radius ?? 0),
 				0,
 			);
-
 
 			ctx.save();
 			GetRoundedRect(
@@ -342,13 +346,20 @@ function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
 	ctx.save();
 	ctx.strokeStyle = "#ff676caa";
 	ctx.lineWidth = tray.bleed ?? 0;
+
+	const minSide = Math.min(tray.width ?? 0, tray.height ?? 0);
+	const isCircular = tray.width === tray.height;
+	const radius = isCircular
+		? tray.radius ?? 0
+		: (tray.radius ?? 0) - (tray.bleed ?? 0) / (minSide * 2);
+
 	GetRoundedRect(
 		ctx,
 		tray.x + (tray.bleed ?? 0) / 2,
 		tray.y + (tray.bleed ?? 0) / 2,
 		(tray.width ?? 0) - (tray.bleed ?? 0),
 		(tray.height ?? 0) - (tray.bleed ?? 0),
-		(tray.radius ?? 0) - (tray.bleed ?? 0) / 2,
+		radius,
 	);
 	ctx.stroke();
 	ctx.restore();
@@ -356,16 +367,41 @@ function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
 
 function DrawTrayShadow(ctx: any, tray: ObjectProps) {
 	ctx.save();
-	ctx.strokeStyle = "#ffffff55";
+
+	const gradient = ctx.createConicGradient(
+		Math.PI / 2,
+		tray.x + (tray.width ?? 0) / 2,
+		tray.y + (tray.height ?? 0) / 2,
+		360,
+		360,
+	);
+
+	gradient.addColorStop(0, "#bbbbbb22");
+	gradient.addColorStop(0.25, "#ffffff55");
+	gradient.addColorStop(0.5, "#bbbbbb22");
+	gradient.addColorStop(0.75, "#ffffff55");
+	gradient.addColorStop(1, "#bbbbbb22");
+
+	ctx.strokeStyle = gradient;
+	ctx.filter = "blur(3px)";
 	ctx.lineWidth = tray.edge ?? 0;
+
+	const minSide = Math.min(tray.width ?? 0, tray.height ?? 0);
+	const isCircular = tray.width === tray.height;
+	const radius = isCircular
+		? tray.radius ?? 0
+		: (tray.radius ?? 0) -
+			((tray.bleed ?? 0) + (tray.edge ?? 0)) / (minSide * 2);
+
 	GetRoundedRect(
 		ctx,
 		tray.x + (tray.bleed ?? 0) + (tray.edge ?? 0) / 2,
 		tray.y + (tray.bleed ?? 0) + (tray.edge ?? 0) / 2,
 		(tray.width ?? 0) - (tray.bleed ?? 0) * 2 - (tray.edge ?? 0),
 		(tray.height ?? 0) - (tray.bleed ?? 0) * 2 - (tray.edge ?? 0),
-		(tray.radius ?? 0) - (tray.bleed ?? 0) - (tray.edge ?? 0) / 2,
+		radius,
 	);
+
 	ctx.stroke();
 	ctx.restore();
 }
@@ -394,6 +430,9 @@ function GetRoundedRect(
 	height: number,
 	radius: number,
 ) {
+	const minSize = Math.min(width, height);
+	radius = Math.max(Math.min(radius * minSize, minSize / 2), 0);
+
 	ctx.beginPath();
 	ctx.moveTo(x + radius, y);
 	ctx.arcTo(x + width, y, x + width, y + height, radius);

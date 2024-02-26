@@ -69,8 +69,7 @@ export function GetTrayObjFromCanvas(
 	const aspectRatio = widthWithBleed / heightWithBleed;
 	const newWidth = canvas.height * heightProcentage * aspectRatio;
 	const newHeight = canvas.height * heightProcentage;
-	const newRadius =
-		(radius / 100) * (newWidth > newHeight ? newHeight : newWidth);
+	const newRadius = radius / 100;
 	const newBleed = (bleed / 10) * (newWidth / width);
 	const newEdge = (edge / 20) * (newWidth / width);
 
@@ -78,7 +77,7 @@ export function GetTrayObjFromCanvas(
 		id: 0,
 		type: "tray",
 		content: "",
-		color: "#eeeeee",
+		color: "#fafafa",
 		x: (canvas.width - newWidth) / 2,
 		y: (canvas.height - newHeight) / 2,
 		width: newWidth,
