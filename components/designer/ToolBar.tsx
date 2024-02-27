@@ -1,4 +1,4 @@
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 import { FaImage, FaPlus, FaShapes } from "react-icons/fa";
 import { MdFormatColorFill, MdTextFields } from "react-icons/md";
 import { TbRectangleFilled } from "react-icons/tb";
@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import TextPopup from "./TextPopup";
 import ShapePopup from "./ShapePopup";
 import ImagePopup from "./ImagePopup";
+import { DesignerContext } from "@/pages/designer";
 
 export const ToolBarContext = createContext<{
 	openMenu: string | null;
@@ -48,7 +49,33 @@ export default function ToolBar() {
 					<TbRectangleFilled />
 				</Tool>
 			</div>
+			<SizeText />
 		</ToolBarContext.Provider>
+	);
+}
+
+function SizeText() {
+	const { currentDesign, products } = useContext(DesignerContext);
+	const [text, setText] = useState("");
+
+	useEffect(() => {
+		if (!currentDesign.id) return;
+
+		const selectedProduct = products.find(
+			(product) => product.id === `price_${currentDesign.id}`,
+		);
+
+		if (selectedProduct) {
+			setText(
+				`${selectedProduct.metadata.width}x${selectedProduct.metadata.height} cm`,
+			);
+		}
+	}, [currentDesign.id]);
+
+	return (
+		<span className="absolute bottom-28 left-1/2 -z-10 -translate-x-1/2 transform text-slate-700">
+			{text}
+		</span>
 	);
 }
 

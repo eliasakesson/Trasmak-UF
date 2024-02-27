@@ -39,10 +39,10 @@ export default async function Draw(
 
 	if (showSupport) {
 		DrawTraySupport(ctx, tray);
-		DrawTrayShadow(ctx, tray);
+		DrawTrayShadow(ctx, tray, scale);
 	}
 
-	DrawTrayShadow(ctx, tray);
+	DrawTrayShadow(ctx, tray, scale);
 	DrawTrayBorder(ctx, tray);
 
 	ctx.restore();
@@ -148,9 +148,10 @@ async function DrawImage(
 				tray,
 				image,
 			);
+			image.image = img;
 
 			const { offsetX, offsetY, newWidth, newHeight } =
-				GetImageDimensions2(tray, image);
+				GetImageDimensions2(ctx, tray, image);
 
 			const minWidth = Math.min(width, newWidth);
 			const minHeight = Math.min(height, newHeight);
@@ -224,6 +225,7 @@ function GetImageDimensions(
 }
 
 function GetImageDimensions2(
+	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
 	image: ObjectProps,
 ): { offsetX: number; offsetY: number; newWidth: number; newHeight: number } {
@@ -231,14 +233,8 @@ function GetImageDimensions2(
 		return { offsetX: 0, offsetY: 0, newWidth: 0, newHeight: 0 };
 	}
 
-	const imageAspectRatio = image.image.width / image.image.height;
+	const { x, y, width, height } = GetObjectDimensions(ctx, tray, image);
 
-	const width =
-		(tray.width ?? 0) *
-		((image.height || 0) * imageAspectRatio * (image.offsetWidth || 1));
-	const height = (tray.height ?? 0) * (image.width || 0);
-
-	// Calculate scaling factors for width and height
 	const scaleX = width / image.image.width;
 	const scaleY = height / image.image.height;
 
@@ -250,10 +246,8 @@ function GetImageDimensions2(
 	const newHeight = image.image.height * scale;
 
 	// Calculate the position to center the image on the target area
-	const offsetX =
-		tray.x + (tray.width || 0) * image.x + (width - newWidth) / 2;
-	const offsetY =
-		tray.y + (tray.height || 0) * image.y + (height - newHeight) / 2;
+	const offsetX = x + (width - newWidth) / 2;
+	const offsetY = y + (height - newHeight) / 2;
 
 	return { offsetX, offsetY, newWidth, newHeight };
 }
@@ -353,7 +347,7 @@ function DrawTraySupport(ctx: CanvasRenderingContext2D, tray: ObjectProps) {
 	ctx.restore();
 }
 
-function DrawTrayShadow(ctx: any, tray: ObjectProps) {
+function DrawTrayShadow(ctx: any, tray: ObjectProps, scale: number = 1) {
 	ctx.save();
 
 	const gradient = ctx.createConicGradient(
@@ -370,23 +364,24 @@ function DrawTrayShadow(ctx: any, tray: ObjectProps) {
 	gradient.addColorStop(0.75, "#ffffff55");
 	gradient.addColorStop(1, "#bbbbbb22");
 
+	const edgeWidth = (tray.edge ?? 0) * scale;
+
 	ctx.strokeStyle = gradient;
 	ctx.filter = "blur(3px)";
-	ctx.lineWidth = tray.edge ?? 0;
+	ctx.lineWidth = edgeWidth;
 
 	const minSide = Math.min(tray.width ?? 0, tray.height ?? 0);
 	const isCircular = tray.width === tray.height;
 	const radius = isCircular
 		? tray.radius ?? 0
-		: (tray.radius ?? 0) -
-			((tray.bleed ?? 0) + (tray.edge ?? 0)) / (minSide * 2);
+		: (tray.radius ?? 0) - ((tray.bleed ?? 0) + edgeWidth) / (minSide * 2);
 
 	GetRoundedRect(
 		ctx,
-		tray.x + (tray.bleed ?? 0) + (tray.edge ?? 0) / 2,
-		tray.y + (tray.bleed ?? 0) + (tray.edge ?? 0) / 2,
-		(tray.width ?? 0) - (tray.bleed ?? 0) * 2 - (tray.edge ?? 0),
-		(tray.height ?? 0) - (tray.bleed ?? 0) * 2 - (tray.edge ?? 0),
+		tray.x + (tray.bleed ?? 0) + edgeWidth / 2,
+		tray.y + (tray.bleed ?? 0) + edgeWidth / 2,
+		(tray.width ?? 0) - (tray.bleed ?? 0) * 2 - edgeWidth,
+		(tray.height ?? 0) - (tray.bleed ?? 0) * 2 - edgeWidth,
 		radius,
 	);
 

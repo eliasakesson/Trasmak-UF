@@ -1,164 +1,212 @@
-import { RefObject, createContext, useCallback, useContext } from "react";
+import {
+	HTMLProps,
+	LegacyRef,
+	RefObject,
+	createContext,
+	forwardRef,
+	useCallback,
+	useContext,
+} from "react";
 import { DesignProps, ObjectProps } from "../../utils/design/Interfaces";
 import debounce from "lodash.debounce";
 
-import { FaTrash, FaChevronUp, FaChevronDown, FaExpand } from "react-icons/fa";
+import { FaTrash, FaExpand } from "react-icons/fa";
+import { BiSolidLayerPlus, BiSolidLayerMinus } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
 import { GetObjectDimensions } from "../../utils/design/Helper";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 import useIsAdmin from "@/utils/useIsAdmin";
+import { DesignerContext } from "@/pages/designer";
+import { TbStackPop, TbStackPush } from "react-icons/tb";
 
 const SelectedObjectContext = createContext({
 	object: null as ObjectProps | null,
 	setObject: (obj: ObjectProps) => {},
 });
 
-export default function DesignEditor({
-	design,
-	setDesign,
-	object,
-	setObject,
-	removeObject,
-}: {
-	design: DesignProps;
-	setDesign: (design: DesignProps) => void;
-	object: ObjectProps | null;
-	setObject: (obj: ObjectProps) => void;
-	removeObject: () => void;
-}) {
-	const [user] = useAuthState(auth);
-	const isAdmin = useIsAdmin(user);
+export const DesignEditor = forwardRef<HTMLElement, HTMLProps<HTMLDivElement>>(
+	(props, ref) => {
+		const {
+			currentDesign,
+			setCurrentDesign,
+			selectedObjectID,
+			setSelectedObjectID,
+		} = useContext(DesignerContext);
+		const [user] = useAuthState(auth);
+		const isAdmin = useIsAdmin(user);
 
-	if (!object) return null;
+		const object =
+			currentDesign?.objects?.find(
+				(obj) => obj.id === selectedObjectID,
+			) ?? null;
 
-	return (
-		<SelectedObjectContext.Provider value={{ object, setObject }}>
-			<div
-				className="flex max-w-full flex-col gap-2 rounded-md border bg-white p-4"
-				id="editor"
-			>
-				<div className="flex flex-wrap items-center gap-2">
-					{object?.type === "image" && (
-						<ImageInput label="Bildkälla" objKey="content" />
-					)}
-					{object?.type === "rectangle" && (
-						<ColorInput label="Färg" objKey="color" />
-					)}
-					{object.type === "text" && (
-						<TextArea
-							label="Text"
-							objKey="content"
-							className="h-16"
-						/>
-					)}
-					<div className="relative flex h-16 flex-wrap items-center justify-center gap-4 rounded-md border border-gray-300 px-4">
-						{object?.type !== "text" && (
-							<button
-								onClick={() =>
-									setObject({
-										...object,
-										x: 0,
-										y: 0,
-										width: 1,
-										height: 1,
-									})
-								}
-							>
-								<FaExpand />
-							</button>
-						)}
-						<div className="flex flex-col items-center">
-							<span className="absolute top-1 text-xs text-muted">
-								Lager
-							</span>
-							<div className="flex gap-4">
-								<button
-									onClick={() =>
-										ChangeOrder(
-											design,
-											setDesign,
-											object,
-											1,
-										)
-									}
-								>
-									<FaChevronUp />
-								</button>
-								<button
-									onClick={() =>
-										ChangeOrder(
-											design,
-											setDesign,
-											object,
-											-1,
-										)
-									}
-								>
-									<FaChevronDown />
-								</button>
+		function setObject(obj: ObjectProps) {
+			const objects = currentDesign.objects.map((o: ObjectProps) => {
+				if (o.id === obj.id) {
+					return obj;
+				}
+				return o;
+			});
+			setCurrentDesign({ ...currentDesign, objects });
+		}
+
+		function removeObject() {
+			const objects = currentDesign.objects.filter(
+				(o) => o.id !== selectedObjectID,
+			);
+			setCurrentDesign({ ...currentDesign, objects });
+			setSelectedObjectID(null);
+		}
+
+		return (
+			<SelectedObjectContext.Provider value={{ object, setObject }}>
+				<div
+					ref={ref as LegacyRef<HTMLDivElement> | undefined}
+					style={!object ? { display: "none" } : {}}
+					className="absolute z-30 flex max-w-full flex-col gap-2 rounded-md border bg-white p-4"
+					id="editor"
+				>
+					{object && (
+						<>
+							<div className="flex flex-wrap items-center gap-2">
+								{object?.type === "image" && (
+									<ImageInput
+										label="Bildkälla"
+										objKey="content"
+									/>
+								)}
+								{object?.type === "rectangle" && (
+									<ColorInput label="Färg" objKey="color" />
+								)}
+								{object.type === "text" && (
+									<TextArea
+										label="Text"
+										objKey="content"
+										className="h-16"
+									/>
+								)}
+								<div className="relative flex h-16 flex-wrap items-center justify-center gap-4 rounded-md border border-gray-300 px-4">
+									{object?.type !== "text" && (
+										<button
+											onClick={() =>
+												setObject({
+													...object,
+													x: 0,
+													y: 0,
+													width: 1,
+													height: 1,
+												})
+											}
+										>
+											<FaExpand />
+										</button>
+									)}
+									<button
+										onClick={() =>
+											ChangeOrder(
+												currentDesign,
+												setCurrentDesign,
+												object,
+												1,
+											)
+										}
+									>
+										<TbStackPop className="text-xl" />
+									</button>
+									<button
+										onClick={() =>
+											ChangeOrder(
+												currentDesign,
+												setCurrentDesign,
+												object,
+												-1,
+											)
+										}
+									>
+										<TbStackPush className="text-xl" />
+									</button>
+									<button onClick={() => removeObject()}>
+										<FaTrash />
+									</button>
+								</div>
 							</div>
-						</div>
-						<button onClick={() => removeObject()}>
-							<FaTrash />
-						</button>
-					</div>
-				</div>
-				<div className="flex flex-wrap gap-2">
-					{object?.type === "text" && (
-						<ColorInput label="Färg" objKey="color" />
+							<div className="flex flex-wrap gap-2">
+								{object?.type === "text" && (
+									<ColorInput label="Färg" objKey="color" />
+								)}
+								<NumberInput
+									label="Textstorlek (px)"
+									objKey="size"
+									range={{ min: 1, max: 250, step: 1 }}
+								/>
+								<Select
+									label="Font"
+									objKey="font"
+									options={[
+										{ value: "cinzel", text: "Cinzel" },
+										{
+											value: "dancing script",
+											text: "Dancing Script",
+										},
+										{
+											value: "comfortaa",
+											text: "Comfortaa",
+										},
+										{
+											value: "courgette",
+											text: "Courgette",
+										},
+										{ value: "sono", text: "Sono" },
+										{ value: "whisper", text: "Whisper" },
+										{
+											value: "plus jakarta sans",
+											text: "Plus Jakarta Sans",
+										},
+										{
+											value: "courier new",
+											text: "Courier New",
+										},
+										{
+											value: "times new roman",
+											text: "Times New Roman",
+										},
+										{ value: "arial", text: "Arial" },
+									]}
+								/>
+								<Select
+									label="Bildjustering"
+									objKey="fit"
+									options={[
+										{ value: "cover", text: "Zoomad" },
+										{
+											value: "contain",
+											text: "Proportionell",
+										},
+										{ value: "fill", text: "Sträckt" },
+									]}
+								/>
+								<NumberInput
+									label="Rundning (%)"
+									objKey="radius"
+									range={{ min: 0, max: 0.5, step: 0.01 }}
+									percentage
+								/>
+								{isAdmin && (
+									<CheckboxInput
+										label="Template"
+										objKey="template"
+									/>
+								)}
+							</div>
+						</>
 					)}
-					<NumberInput
-						label="Textstorlek (px)"
-						objKey="size"
-						range={{ min: 1, max: 250, step: 1 }}
-					/>
-					<Select
-						label="Font"
-						objKey="font"
-						options={[
-							{ value: "cinzel", text: "Cinzel" },
-							{ value: "dancing script", text: "Dancing Script" },
-							{ value: "comfortaa", text: "Comfortaa" },
-							{ value: "courgette", text: "Courgette" },
-							{ value: "sono", text: "Sono" },
-							{ value: "whisper", text: "Whisper" },
-							{
-								value: "plus jakarta sans",
-								text: "Plus Jakarta Sans",
-							},
-							{ value: "courier new", text: "Courier New" },
-							{
-								value: "times new roman",
-								text: "Times New Roman",
-							},
-							{ value: "arial", text: "Arial" },
-						]}
-					/>
-					<Select
-						label="Bildjustering"
-						objKey="fit"
-						options={[
-							{ value: "cover", text: "Zoomad" },
-							{ value: "contain", text: "Proportionell" },
-							{ value: "fill", text: "Sträckt" },
-						]}
-					/>
-					<NumberInput
-						label="Rundning (%)"
-						objKey="radius"
-						range={{ min: 0, max: 0.5, step: 0.01 }}
-						percentage
-					/>
-					{isAdmin && (
-						<CheckboxInput label="Template" objKey="template" />
-					)}
 				</div>
-			</div>
-		</SelectedObjectContext.Provider>
-	);
-}
+			</SelectedObjectContext.Provider>
+		);
+	},
+);
 
 function ChangeOrder(
 	design: DesignProps,

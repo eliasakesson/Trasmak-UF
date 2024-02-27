@@ -127,6 +127,9 @@ export function SetTrayObject(
 	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 	if (!canvas) return;
 
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight - 116;
+
 	const metadata = products.find(
 		(product: any) =>
 			product.id.substring(6, product.id.length) === currentDesignID,
@@ -134,7 +137,7 @@ export function SetTrayObject(
 
 	const tray = GetTrayObjFromCanvas(
 		canvas,
-		0.85,
+		0.6,
 		metadata?.width,
 		metadata?.height,
 		metadata?.radius,

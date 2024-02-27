@@ -194,12 +194,57 @@ export default function SetupMouseEvents(
 				snapLineX = snapX;
 				snapLineY = snapY;
 			} else if (dragType === "resize") {
-				if (resizeDirection === "right") {
+				if (
+					resizeDirection === "top-right" ||
+					resizeDirection === "right" ||
+					resizeDirection === "bottom-right"
+				) {
+					dragObject.width = Math.max(
+						0.001,
+						(clickX - trayObject.x) / (trayObject.width || 1) -
+							dragObject.x,
+					);
+				} else if (
+					resizeDirection === "top-left" ||
+					resizeDirection === "left" ||
+					resizeDirection === "bottom-left"
+				) {
 					const oldX = dragObject.x ?? 0;
 					const newX =
-						(clickX - trayObject.x) / (trayObject.width || 1) -
-						dragObject.x;
-					dragObject.width = Math.max(0.001, newX);
+						(clickX - trayObject.x) / (trayObject.width || 1);
+					dragObject.x =
+						newX < newX + (dragObject.width ?? 0) ? newX : oldX;
+
+					dragObject.width = Math.max(
+						0.001,
+						oldX - dragObject.x + (dragObject.width ?? 0),
+					);
+				}
+
+				if (
+					resizeDirection === "top-left" ||
+					resizeDirection === "top" ||
+					resizeDirection === "top-right"
+				) {
+					const oldY = dragObject.y ?? 0;
+					const newY =
+						(clickY - trayObject.y) / (trayObject.height || 1);
+					dragObject.y =
+						newY < newY + (dragObject.height ?? 0) ? newY : oldY;
+					dragObject.height = Math.max(
+						0.001,
+						oldY - dragObject.y + (dragObject.height ?? 0),
+					);
+				} else if (
+					resizeDirection === "bottom-left" ||
+					resizeDirection === "bottom" ||
+					resizeDirection === "bottom-right"
+				) {
+					dragObject.height = Math.max(
+						0.001,
+						(clickY - trayObject.y) / (trayObject.height || 1) -
+							dragObject.y,
+					);
 				}
 			}
 
@@ -379,56 +424,3 @@ function GetResizeDirection(
 
 	return undefined;
 }
-
-// if (
-// 	resizeDirection === "top-right" ||
-// 	resizeDirection === "right" ||
-// 	resizeDirection === "bottom-right"
-// ) {
-// 	dragObject.width = Math.max(
-// 		0.001,
-// 		(clickX - trayObject.x) / (trayObject.width || 1) -
-// 			dragObject.x,
-// 	);
-// } else if (
-// 	resizeDirection === "top-left" ||
-// 	resizeDirection === "left" ||
-// 	resizeDirection === "bottom-left"
-// ) {
-// 	const oldX = dragObject.x ?? 0;
-// 	const newX =
-// 		(clickX - trayObject.x) / (trayObject.width || 1);
-// 	dragObject.x =
-// 		newX < newX + (dragObject.width ?? 0) ? newX : oldX;
-
-// 	dragObject.width = Math.max(
-// 		0.001,
-// 		oldX - dragObject.x + (dragObject.width ?? 0),
-// 	);
-// }
-
-// if (
-// 	resizeDirection === "top-left" ||
-// 	resizeDirection === "top" ||
-// 	resizeDirection === "top-right"
-// ) {
-// 	const oldY = dragObject.y ?? 0;
-// 	const newY =
-// 		(clickY - trayObject.y) / (trayObject.height || 1);
-// 	dragObject.y =
-// 		newY < newY + (dragObject.height ?? 0) ? newY : oldY;
-// 	dragObject.height = Math.max(
-// 		0.001,
-// 		oldY - dragObject.y + (dragObject.height ?? 0),
-// 	);
-// } else if (
-// 	resizeDirection === "bottom-left" ||
-// 	resizeDirection === "bottom" ||
-// 	resizeDirection === "bottom-right"
-// ) {
-// 	dragObject.height = Math.max(
-// 		0.001,
-// 		(clickY - trayObject.y) / (trayObject.height || 1) -
-// 			dragObject.y,
-// 	);
-// }

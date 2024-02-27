@@ -236,43 +236,7 @@ export default function Design({ products }: { products: any }) {
 								className="absolute z-50 max-w-full"
 								ref={designEditorRef}
 							>
-								{selectedObjectID && (
-									<DesignEditor
-										design={currentDesign}
-										setDesign={setCurrentDesign}
-										object={
-											currentDesign?.objects?.find(
-												(obj) =>
-													obj.id === selectedObjectID,
-											) ?? null
-										}
-										setObject={(obj: ObjectProps) =>
-											setCurrentDesign((design) => {
-												if (!design) return design;
-												const objects =
-													design.objects.map((o) => {
-														if (o.id === obj.id)
-															return obj;
-														return o;
-													});
-												return { ...design, objects };
-											})
-										}
-										removeObject={() => {
-											setCurrentDesign((design) => {
-												if (!design) return design;
-												const objects =
-													design.objects.filter(
-														(o) =>
-															o.id !==
-															selectedObjectID,
-													);
-												return { ...design, objects };
-											});
-											setSelectedObjectID(null);
-										}}
-									/>
-								)}
+								{selectedObjectID && <DesignEditor />}
 							</div>
 						</div>
 						<div className="flex flex-col gap-2">

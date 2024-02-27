@@ -3,7 +3,6 @@ import { DesignProps } from "../../utils/design/Interfaces";
 import { GetTrayObjFromCanvas } from "../../utils/design/Helper";
 import Draw from "../../utils/design/Draw";
 import { FaTrash, FaUpload } from "react-icons/fa";
-import Image from "next/image";
 
 export default function DesignsGrid({
 	designs,
