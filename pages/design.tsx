@@ -4,7 +4,8 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 
 import DesignerGuide from "@/components/design/DesignerGuide";
-import DesignEditor, {
+import {
+	DesignEditor,
 	MoveDesignEditor,
 } from "@/components/design/DesignEditor";
 import CanvasTextEditorInput from "@/utils/design/TextEditorInput";
@@ -36,8 +37,10 @@ import TrayBackgroundPopup from "@/components/design/TrayBackgroundPopup";
 import { useAnalytics } from "@/firebase";
 import { logEvent } from "firebase/analytics";
 import { SiteContext } from "./_app";
+import { useRouter } from "next/router";
 
 export default function Design({ products }: { products: any }) {
+	const router = useRouter();
 	const { analytics } = useAnalytics();
 	const { cartDetails, addItem } = useShoppingCart();
 
@@ -67,6 +70,10 @@ export default function Design({ products }: { products: any }) {
 	const designEditorRef = useRef<HTMLDivElement>(null);
 	const isAddingToCart = useRef(false);
 	const lastAddedImageURL = useRef<string | null>(null);
+
+	useEffect(() => {
+		router.push("/designer");
+	}, [router]);
 
 	useEffect(() => {
 		analytics && logEvent(analytics, "design_view");
