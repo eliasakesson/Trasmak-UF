@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { DesignerContext } from "@/pages/designer";
 import AddToCart from "@/utils/design/CartHelper";
 import { useShoppingCart } from "use-shopping-cart";
@@ -95,6 +95,10 @@ function BottomRightButtons() {
 	const { cartDetails, addItem } = useShoppingCart();
 	const isAddingToCart = useRef(false);
 	const lastAddedImageURL = useRef<string | null>(null);
+
+	useEffect(() => {
+		lastAddedImageURL.current = null;
+	}, [currentDesign]);
 
 	return (
 		<div className="pointer-events-none absolute bottom-36 right-8 flex flex-col-reverse items-end gap-4 lg:bottom-8">
