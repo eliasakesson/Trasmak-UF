@@ -12,6 +12,7 @@ import { DesignProps, ObjectProps } from "@/utils/design/Interfaces";
 import SetupMouseEventsNew from "@/utils/design/MouseEventsNew";
 import GetProducts from "@/utils/getProducts";
 import { set } from "firebase/database";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { createContext, useEffect, useRef, useState } from "react";
 import { Product } from "use-shopping-cart/core";
@@ -149,60 +150,72 @@ export default function Designer({ products }: { products: any[] }) {
 	}
 
 	return (
-		<DesignerContext.Provider
-			value={{
-				currentDesign,
-				setCurrentDesign,
-				traySize: {
-					width: trayObject?.width ?? 0,
-					height: trayObject?.height ?? 0,
-				},
-				products,
-				selectedObjectID,
-				setSelectedObjectID,
-			}}
-		>
-			<div>
-				<div className="relative h-[calc(100vh-116px)] overflow-hidden">
-					<canvas
-						ref={canvasRef}
-						id="canvas"
-						className="w-full"
-					></canvas>
-					<ToolBar />
-					<DesignerButtons />
-					<DesignEditor ref={designEditorRef} />
+		<>
+			<Head>
+				<title>Designer - Träsmak UF</title>
+				<meta
+					name="description"
+					content="Designa din egen träbricka med vårt enkla verktyg. Utgå från en av våra färdiga mallar eller skapa en helt egen design. Välj mellan olika storlekar och få en närproducerad bricka levererad till dörren."
+				/>
+				<meta name="robots" content="index, follow" />
+			</Head>
+			<DesignerContext.Provider
+				value={{
+					currentDesign,
+					setCurrentDesign,
+					traySize: {
+						width: trayObject?.width ?? 0,
+						height: trayObject?.height ?? 0,
+					},
+					products,
+					selectedObjectID,
+					setSelectedObjectID,
+				}}
+			>
+				<div>
+					<div className="relative h-[calc(100vh-116px)] overflow-hidden">
+						<canvas
+							ref={canvasRef}
+							id="canvas"
+							className="w-full"
+						></canvas>
+						<ToolBar />
+						<DesignerButtons />
+						<DesignEditor ref={designEditorRef} />
+					</div>
+					<div className="space-y-4 p-16" id="saved-designs">
+						<h2 className="text-2xl font-semibold">
+							Sparade designer
+						</h2>
+						<SavedDesigns
+							products={products}
+							onSelect={(design) => {
+								setSelectedObjectID(null);
+								setCurrentDesign(design);
+								router.replace("/designer", undefined, {
+									shallow: true,
+								});
+							}}
+							canvasClassKey="saved-design-canvas"
+						/>
+					</div>
+					<div className="space-y-4 p-16" id="templates">
+						<h2 className="text-2xl font-semibold">Mallar</h2>
+						<TemplateDesigns
+							products={products}
+							onSelect={(design) => {
+								setSelectedObjectID(null);
+								setCurrentDesign(design);
+								router.replace("/designer", undefined, {
+									shallow: true,
+								});
+							}}
+							canvasClassKey="templates-canvas"
+						/>
+					</div>
 				</div>
-				<div className="space-y-4 p-16" id="saved-designs">
-					<h2 className="text-2xl font-semibold">Sparade designer</h2>
-					<SavedDesigns
-						products={products}
-						onSelect={(design) => {
-							setSelectedObjectID(null);
-							setCurrentDesign(design);
-							router.replace("/designer", undefined, {
-								shallow: true,
-							});
-						}}
-						canvasClassKey="saved-design-canvas"
-					/>
-				</div>
-				<div className="space-y-4 p-16" id="templates">
-					<h2 className="text-2xl font-semibold">Mallar</h2>
-					<TemplateDesigns
-						products={products}
-						onSelect={(design) => {
-							setSelectedObjectID(null);
-							setCurrentDesign(design);
-							router.replace("/designer", undefined, {
-								shallow: true,
-							});
-						}}
-						canvasClassKey="templates-canvas"
-					/>
-				</div>
-			</div>
-		</DesignerContext.Provider>
+			</DesignerContext.Provider>
+		</>
 	);
 }
 
