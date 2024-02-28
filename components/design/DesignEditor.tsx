@@ -229,6 +229,8 @@ export const DesignEditor = forwardRef<HTMLElement, HTMLProps<HTMLDivElement>>(
 	},
 );
 
+DesignEditor.displayName = "DesignEditor";
+
 function ChangeOrder(
 	design: DesignProps,
 	setDesign: (design: any) => void,
