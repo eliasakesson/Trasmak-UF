@@ -27,9 +27,8 @@ export default function DesignerGuide({
 
 	useEffect(() => {
 		if (router.query.t) {
-			console.log("t");
 			setTimeout(() => setShow("starttutorial"), 500);
-			router.replace("/design");
+			router.replace("/designer");
 		}
 	}, [router, router.query.t]);
 

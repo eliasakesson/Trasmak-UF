@@ -6,15 +6,17 @@ import { uploadBlob } from "../firebase";
 
 export async function SaveDesign(design: DesignProps, user: User) {
 	const newDesign = await GetDesignWithUploadedImages(design);
-	
+
 	const designRef = ref(db, `users/${user.uid}/savedDesigns/${Date.now()}`);
 
-	return set(designRef, newDesign).then(() => {
-		return newDesign;
-	}).catch((error) => {
-		console.log(error);
-		return null;
-	});
+	return set(designRef, newDesign)
+		.then(() => {
+			return newDesign;
+		})
+		.catch((error) => {
+			console.log(error);
+			return null;
+		});
 }
 
 export async function UploadTemplate(design: DesignProps) {
@@ -38,20 +40,16 @@ export function DeleteDesign(designKey: string, user: User) {
 }
 
 async function GetDesignWithUploadedImages(design: DesignProps) {
-	console.log("Uploading images");
 	const imageStrings = design.objects
 		.filter((object) => object.type == "image")
 		.map((object) => object.content);
-	console.log(imageStrings);
 
 	const promises = imageStrings.map((imageString) => {
 		return new Promise((resolve, reject) => {
 			fetch(imageString)
 				.then(async (r) => {
-					console.log("Uploading");
 					try {
 						const blob = await r.blob();
-						console.log(blob);
 						const url = await uploadBlob(blob);
 						resolve(url);
 					} catch (error) {
@@ -66,7 +64,6 @@ async function GetDesignWithUploadedImages(design: DesignProps) {
 
 	try {
 		const urls = await Promise.all(promises);
-		console.log(urls);
 		return {
 			...design,
 			objects: design.objects.map((object_2) => ({

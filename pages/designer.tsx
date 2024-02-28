@@ -11,6 +11,8 @@ import { LoadImages, SetTrayObject } from "@/utils/design/Helper";
 import { DesignProps, ObjectProps } from "@/utils/design/Interfaces";
 import SetupMouseEventsNew from "@/utils/design/MouseEventsNew";
 import GetProducts from "@/utils/getProducts";
+import { set } from "firebase/database";
+import { useRouter } from "next/router";
 import { createContext, useEffect, useRef, useState } from "react";
 import { Product } from "use-shopping-cart/core";
 
@@ -38,6 +40,8 @@ export const DesignerContext = createContext<{
 });
 
 export default function Designer({ products }: { products: any[] }) {
+	const router = useRouter();
+
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const designEditorRef = useRef<HTMLDivElement>(null);
 
@@ -65,12 +69,19 @@ export default function Designer({ products }: { products: any[] }) {
 			return;
 		}
 
-		window.addEventListener("resize", (ev: UIEvent) => DrawDesign());
+		let timeout: NodeJS.Timeout;
+		window.addEventListener("resize", (ev: UIEvent) => {
+			clearTimeout(timeout);
+			timeout = setTimeout(
+				() => SetTrayObject(products, currentDesign.id, setTrayObject),
+				50,
+			);
+		});
 		DrawDesign();
 
 		LoadImages(currentDesign, (design) =>
 			setTimeout(() => {
-				DrawDesign(design);
+				SetTrayObject(products, currentDesign.id, setTrayObject);
 			}, 50),
 		);
 
@@ -102,6 +113,7 @@ export default function Designer({ products }: { products: any[] }) {
 		return () => {
 			window.removeEventListener("resize", (ev: UIEvent) => DrawDesign());
 			mouseEventCleanup();
+			clearInterval(timeout);
 		};
 	}, [
 		currentDesign,
@@ -151,7 +163,7 @@ export default function Designer({ products }: { products: any[] }) {
 			}}
 		>
 			<div>
-				<div className="relative h-[calc(100vh-116px)]">
+				<div className="relative h-[calc(100vh-116px)] overflow-hidden">
 					<canvas
 						ref={canvasRef}
 						id="canvas"
@@ -168,6 +180,9 @@ export default function Designer({ products }: { products: any[] }) {
 						onSelect={(design) => {
 							setSelectedObjectID(null);
 							setCurrentDesign(design);
+							router.replace("/designer", undefined, {
+								shallow: true,
+							});
 						}}
 						canvasClassKey="saved-design-canvas"
 					/>
@@ -179,6 +194,9 @@ export default function Designer({ products }: { products: any[] }) {
 						onSelect={(design) => {
 							setSelectedObjectID(null);
 							setCurrentDesign(design);
+							router.replace("/designer", undefined, {
+								shallow: true,
+							});
 						}}
 						canvasClassKey="templates-canvas"
 					/>

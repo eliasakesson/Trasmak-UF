@@ -28,7 +28,6 @@ export default function Rating({
 				(acc: any, current: any) => acc + current.rating,
 				0,
 			);
-			console.log(total / amount);
 
 			setAmount(amount);
 			setRating(total / amount);

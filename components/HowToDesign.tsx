@@ -31,14 +31,14 @@ export default function HowToDesign() {
 					</p>
 					<br />
 					<div className="flex flex-col gap-2 lg:flex-row lg:gap-4">
-						<Link
-							href="/design?t=guide"
+						{/* <Link
+							href="/designer?t=guide"
 							className="w-full rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:w-fit 2xl:px-16"
 						>
 							Starta guiden
-						</Link>
+						</Link> */}
 						<Link
-							href="/design"
+							href="/designer"
 							className="w-full rounded-lg border-2 px-8 py-4 font-semibold transition-colors hover:bg-slate-100 lg:w-fit 2xl:px-16"
 						>
 							Designa själv

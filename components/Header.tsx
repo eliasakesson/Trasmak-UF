@@ -678,7 +678,7 @@ const DesignNav = forwardRef<HTMLUListElement>((props, ref) => {
 					title="Designa fritt"
 					description="Designa din bricka från grunden"
 					Icon={RiPencilFill}
-					href="/design"
+					href="/designer"
 				/>
 			</li>
 			<li className="order-3 md:order-2">
@@ -689,14 +689,14 @@ const DesignNav = forwardRef<HTMLUListElement>((props, ref) => {
 					href="/templates"
 				/>
 			</li>
-			<li className="order-1 md:order-1">
+			{/* <li className="order-1 md:order-1">
 				<NavItem
 					title="Lär dig designern"
 					description="Lär dig hur du använder vårt designverktyg"
 					Icon={RiGuideFill}
-					href="/design?t=guide"
+					href="/designer?t=guide"
 				/>
-			</li>
+			</li> */}
 			<li className="order-4">
 				<NavItem
 					title="Designa från bild"

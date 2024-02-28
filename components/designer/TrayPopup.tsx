@@ -15,22 +15,22 @@ export default function TrayPopup() {
 	}
 
 	return (
-		<div className="space-y-2 rounded-xl bg-slate-200  p-4">
+		<div className="space-y-2 rounded-xl bg-slate-200 p-4">
 			<h3 className="text-xl font-semibold">Storlekar</h3>
 			<div className="grid grid-cols-[repeat(2,1fr)] gap-2">
 				{products.map((product, i) => (
 					<button
 						onClick={() => selectProduct(product)}
 						key={i}
-						className="relative flex w-full gap-4 rounded-lg bg-white p-2 text-2xl"
+						className="relative flex w-full flex-col rounded-lg bg-white p-2 text-2xl lg:flex-row lg:gap-4"
 					>
-						<div className="relative aspect-square h-16">
+						<div className="relative aspect-square h-12 lg:h-16">
 							<Image src={product.image} alt="" fill />
 						</div>
-						<p className="w-[20ch] py-2 text-left text-base">
+						<p className="w-[15ch] py-2 text-left text-base lg:w-[20ch]">
 							{product.name}
 						</p>
-						<span className="absolute bottom-2 right-2 text-base text-muted">
+						<span className="bottom-2 right-2 text-base text-muted lg:absolute">
 							{formatCurrencyString({
 								value: product.price,
 								currency: product.currency,

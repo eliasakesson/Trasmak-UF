@@ -104,7 +104,10 @@ export default function Footer() {
 									</Link>
 								</li>
 								<li>
-									<Link href="/design" className="underline">
+									<Link
+										href="/designer"
+										className="underline"
+									>
 										Designer
 									</Link>
 								</li>

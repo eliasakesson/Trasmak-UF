@@ -34,8 +34,6 @@ export default function Cart({ products, config }: any) {
 function CartItems({ products }: { products: any }) {
 	const { cartDetails, cartCount }: any = useShoppingCart();
 
-	console.log(cartDetails);
-
 	return (
 		<div className="col-span-2">
 			<div className="flex items-center justify-between py-4 pb-8">

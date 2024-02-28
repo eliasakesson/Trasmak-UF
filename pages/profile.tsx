@@ -25,8 +25,8 @@ export default function Profile({ products }: { products: any[] }) {
 				<meta name="robots" content="noindex, follow" />
 			</Head>
 			{user ? (
-				<main className="max-w-7xl w-full mx-auto px-8 py-16 flex flex-col items-center space-y-16 min-h-[calc(100vh-108px)]">
-					<div className="flex flex-col items-center gap-2 border-b pb-8 w-full">
+				<main className="mx-auto flex min-h-[calc(100vh-108px)] w-full max-w-7xl flex-col items-center space-y-16 px-8 py-16">
+					<div className="flex w-full flex-col items-center gap-2 border-b pb-8">
 						<Image
 							src={user.photoURL || "/images/default-profile.png"}
 							alt=""
@@ -43,7 +43,7 @@ export default function Profile({ products }: { products: any[] }) {
 						<h2 className="text-4xl font-bold">
 							Mina sparade designs
 						</h2>
-						<p className="text-muted text-lg">
+						<p className="text-lg text-muted">
 							Fortsätt där du slutade och spara dina designs för
 							att komma tillbaka till dem senare.
 						</p>
@@ -53,7 +53,7 @@ export default function Profile({ products }: { products: any[] }) {
 							onSelect={(design) => {
 								setDesign(design);
 								router.push({
-									pathname: "/design",
+									pathname: "/designer",
 								});
 							}}
 							canvasClassKey="profile-saved-template-canvas"
@@ -61,11 +61,11 @@ export default function Profile({ products }: { products: any[] }) {
 					</div>
 				</main>
 			) : loading ? (
-				<div className="max-w-7xl w-full mx-auto px-8 py-16 flex flex-col items-center space-y-8 min-h-[calc(100vh-108px)]">
+				<div className="mx-auto flex min-h-[calc(100vh-108px)] w-full max-w-7xl flex-col items-center space-y-8 px-8 py-16">
 					<div>Laddar...</div>
 				</div>
 			) : (
-				<div className="max-w-7xl w-full mx-auto px-8 py-16 flex flex-col items-center space-y-8 min-h-[calc(100vh-108px)]">
+				<div className="mx-auto flex min-h-[calc(100vh-108px)] w-full max-w-7xl flex-col items-center space-y-8 px-8 py-16">
 					<div>Du är inte inloggad</div>
 				</div>
 			)}

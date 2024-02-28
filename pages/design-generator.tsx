@@ -18,7 +18,6 @@ export default function DesignGenerator({ products }: { products: any[] }) {
 	const { setDesign } = useContext(SiteContext);
 
 	const onDrop = useCallback((acceptedFiles: any) => {
-		console.log(acceptedFiles);
 		if (acceptedFiles && acceptedFiles.length > 0) {
 			const reader = new FileReader();
 
@@ -30,7 +29,7 @@ export default function DesignGenerator({ products }: { products: any[] }) {
 					const resolution = img.width * img.height;
 					if (resolution < 250000) {
 						toast.error(
-							"Bilden är för lågupplöst. Välj en bild med högre upplösning."
+							"Bilden är för lågupplöst. Välj en bild med högre upplösning.",
 						);
 					} else {
 						toast.success("Bilden är uppladdad!");
@@ -50,7 +49,7 @@ export default function DesignGenerator({ products }: { products: any[] }) {
 
 	function onSelect(design: DesignProps) {
 		setDesign(design);
-		router.push("/design");
+		router.push("/designer");
 	}
 
 	return (
@@ -63,29 +62,31 @@ export default function DesignGenerator({ products }: { products: any[] }) {
 				/>
 				<meta name="robots" content="index, follow" />
 			</Head>
-			<main className="max-w-7xl mx-auto px-8 py-16 space-y-8 min-h-[calc(100vh-108px)]">
-				<div className="text-center flex flex-col gap-4">
+			<main className="mx-auto min-h-[calc(100vh-108px)] max-w-7xl space-y-8 px-8 py-16">
+				<div className="flex flex-col gap-4 text-center">
 					<h1 className="text-4xl font-bold text-gray-900">
 						Ladda upp en bild, vi gör resten
 					</h1>
-					<p className="max-w-prose text-muted mx-auto">
+					<p className="mx-auto max-w-prose text-muted">
 						Vi genererar ett urval av designförslag baserat på din
 						bild. Välj en design för att komma till designern, där
 						du kan anpassa den efter dina önskemål.
 					</p>
 				</div>
-				<div className="flex flex-col gap-1 grow max-w-7xl mx-auto">
+				<div className="mx-auto flex max-w-7xl grow flex-col gap-1">
 					<label
 						{...getRootProps()}
-						className="cursor-pointer border border-gray-300 rounded-md px-4 py-8 hover:border-gray-200"
-						htmlFor="image-upload">
-						<div className="flex flex-col items-center justify-center gap-2 h-full">
+						className="cursor-pointer rounded-md border border-gray-300 px-4 py-8 hover:border-gray-200"
+						htmlFor="image-upload"
+					>
+						<div className="flex h-full flex-col items-center justify-center gap-2">
 							<svg
-								className="w-12 h-12 text-muted_light"
+								className="h-12 w-12 text-muted_light"
 								aria-hidden="true"
 								xmlns="http://www.w3.org/2000/svg"
 								fill="none"
-								viewBox="0 0 20 16">
+								viewBox="0 0 20 16"
+							>
 								<path
 									stroke="currentColor"
 									strokeLinecap="round"
@@ -95,10 +96,10 @@ export default function DesignGenerator({ products }: { products: any[] }) {
 								/>
 							</svg>
 							<div>
-								<p className="text-muted_light font-semibold whitespace-nowrap">
+								<p className="whitespace-nowrap font-semibold text-muted_light">
 									Klicka för att ladda upp bild
 								</p>
-								<p className="text-muted_light whitespace-nowrap">
+								<p className="whitespace-nowrap text-muted_light">
 									eller dra och släpp en bild här
 								</p>
 							</div>

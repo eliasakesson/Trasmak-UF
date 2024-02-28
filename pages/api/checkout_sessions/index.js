@@ -63,8 +63,6 @@ export default async function handler(req, res) {
 				),
 			};
 
-			console.log(metadata);
-
 			const session = await stripe.checkout.sessions.create({
 				mode: "payment",
 				payment_method_types: ["card", "klarna"],
@@ -98,7 +96,6 @@ export default async function handler(req, res) {
 					},
 				],
 			});
-			console.log("Session: " + session);
 			res.status(200).json({ id: session.id });
 		} catch (error) {
 			console.error(error);

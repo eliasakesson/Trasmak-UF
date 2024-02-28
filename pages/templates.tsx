@@ -36,7 +36,7 @@ export default function Templates({ products }: { products: Product[] }) {
 					onSelect={(design) => {
 						setDesign(design);
 						router.push({
-							pathname: "/design",
+							pathname: "/designer",
 						});
 					}}
 					canvasClassKey="homepage-template-canvas"

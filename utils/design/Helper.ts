@@ -67,11 +67,16 @@ export function GetTrayObjFromCanvas(
 	const widthWithBleed = Number(width) + Number(bleed / 5);
 	const heightWithBleed = Number(height) + Number(bleed / 5);
 	const aspectRatio = widthWithBleed / heightWithBleed;
-	const newWidth = canvas.height * heightProcentage * aspectRatio;
-	const newHeight = canvas.height * heightProcentage;
+	let newWidth = canvas.height * heightProcentage * aspectRatio;
+	let newHeight = canvas.height * heightProcentage;
 	const newRadius = radius / 100;
 	const newBleed = (bleed / 10) * (newWidth / width);
 	const newEdge = (edge / 20) * (newWidth / width);
+
+	if (newWidth > canvas.width * 0.8) {
+		newWidth = canvas.width * 0.8;
+		newHeight = newWidth / aspectRatio;
+	}
 
 	return {
 		id: 0,
@@ -79,7 +84,7 @@ export function GetTrayObjFromCanvas(
 		content: "",
 		color: "#fafafa",
 		x: (canvas.width - newWidth) / 2,
-		y: (canvas.height - newHeight) / 2,
+		y: (canvas.height - newHeight) / 2 - 60,
 		width: newWidth,
 		height: newHeight,
 		radius: newRadius,
@@ -136,7 +141,11 @@ export function SetTrayObject(
 	)?.metadata;
 
 	const tray = GetTrayObjFromCanvas(
-		canvas,
+		{
+			...canvas,
+			width: window.innerWidth,
+			height: window.innerHeight - 116,
+		} as HTMLCanvasElement,
 		0.6,
 		metadata?.width,
 		metadata?.height,

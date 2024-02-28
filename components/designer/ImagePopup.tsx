@@ -42,6 +42,8 @@ export default function ImagePopup() {
 					y,
 					width,
 					height,
+					imageX: 0.5,
+					imageY: 0.5,
 				},
 			],
 		} as DesignProps);
@@ -80,7 +82,6 @@ function ImageInput({
 								"Bilden är för lågupplöst. Välj en bild med högre upplösning.",
 							);
 						} else {
-							console.log(reader.result);
 							setImage(img);
 						}
 					};

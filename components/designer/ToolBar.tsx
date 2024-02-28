@@ -30,7 +30,7 @@ export default function ToolBar() {
 					className="fixed bottom-0 left-0 right-0 top-0"
 				></div>
 			)}
-			<div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 gap-2 rounded-xl bg-slate-200 p-2">
+			<div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 gap-2 rounded-xl bg-slate-200 p-2">
 				<Tool tool="text" tooltip="Lägg till text">
 					<MdTextFields />
 					<FaPlus className="absolute right-2 top-2 text-xs text-slate-700" />
@@ -131,7 +131,7 @@ function Tool({
 	};
 
 	return (
-		<div className="relative">
+		<div className="lg:relative">
 			<ToolPopup tool={tool} />
 			<ButtonWithTooltip
 				tooltip={tooltip}

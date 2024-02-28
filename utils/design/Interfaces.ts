@@ -20,14 +20,13 @@ export interface ObjectProps {
 
 	width?: number;
 	height?: number;
-	offsetX?: number;
-	offsetY?: number;
-	offsetWidth?: number;
-	offsetHeight?: number;
 
 	radius?: number;
 	image?: HTMLImageElement;
 	fit?: string;
+	imageX?: number;
+	imageY?: number;
+	zoom?: number;
 
 	bleed?: number;
 	edge?: number;

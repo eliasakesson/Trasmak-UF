@@ -32,7 +32,7 @@ export default function Section1() {
 							som present?
 						</p>
 						<Link
-							href="/design"
+							href="/designer"
 							className="w-full rounded-lg border-2 px-8 py-4 font-semibold text-white transition-colors hover:bg-slate-100 lg:w-fit lg:text-gray-900 2xl:px-16"
 						>
 							Designa din bricka

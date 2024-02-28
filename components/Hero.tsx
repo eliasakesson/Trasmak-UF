@@ -43,7 +43,7 @@ export default function Hero() {
 			<div className="grid flex-grow-0 gap-8 md:flex-grow md:grid-cols-2">
 				<div className="flex flex-col gap-4 px-8 pb-4 md:px-[8vw] md:pb-8 md:pr-0">
 					<Link
-						href="/design"
+						href="/designer"
 						className="flex w-full items-center justify-between rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light 2xl:px-16"
 					>
 						Designa din bricka

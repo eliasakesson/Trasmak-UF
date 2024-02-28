@@ -11,7 +11,6 @@ import { DesignProps, ObjectProps } from "../../utils/design/Interfaces";
 import debounce from "lodash.debounce";
 
 import { FaTrash, FaExpand } from "react-icons/fa";
-import { BiSolidLayerPlus, BiSolidLayerMinus } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
 import { GetObjectDimensions } from "../../utils/design/Helper";
@@ -19,7 +18,18 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 import useIsAdmin from "@/utils/useIsAdmin";
 import { DesignerContext } from "@/pages/designer";
-import { TbStackPop, TbStackPush } from "react-icons/tb";
+import {
+	TbChevronDownLeft,
+	TbChevronDownRight,
+	TbChevronUpLeft,
+	TbChevronUpRight,
+	TbSquareChevronDown,
+	TbSquareChevronLeft,
+	TbSquareChevronRight,
+	TbSquareChevronUp,
+	TbStackPop,
+	TbStackPush,
+} from "react-icons/tb";
 
 const SelectedObjectContext = createContext({
 	object: null as ObjectProps | null,
@@ -131,6 +141,11 @@ export const DesignEditor = forwardRef<HTMLElement, HTMLProps<HTMLDivElement>>(
 										<FaTrash />
 									</button>
 								</div>
+								<DirectionInput
+									label="Riktning"
+									objKeyX="imageX"
+									objKeyY="imageY"
+								/>
 							</div>
 							<div className="flex flex-wrap gap-2">
 								{object?.type === "text" && (
@@ -179,10 +194,10 @@ export const DesignEditor = forwardRef<HTMLElement, HTMLProps<HTMLDivElement>>(
 									label="Bildjustering"
 									objKey="fit"
 									options={[
-										{ value: "cover", text: "Zoomad" },
+										{ value: "cover", text: "Inzoomad" },
 										{
 											value: "contain",
-											text: "Proportionell",
+											text: "Utzoomad",
 										},
 										{ value: "fill", text: "Sträckt" },
 									]}
@@ -191,6 +206,12 @@ export const DesignEditor = forwardRef<HTMLElement, HTMLProps<HTMLDivElement>>(
 									label="Rundning (%)"
 									objKey="radius"
 									range={{ min: 0, max: 0.5, step: 0.01 }}
+									percentage
+								/>
+								<NumberInput
+									label="Zoom (%)"
+									objKey="zoom"
+									range={{ min: 1, max: 2.5, step: 0.01 }}
 									percentage
 								/>
 								{isAdmin && (
@@ -310,6 +331,91 @@ function TextInput({ label, objKey }: { label: string; objKey: "content" }) {
 	);
 }
 
+function DirectionInput({
+	label,
+	objKeyX,
+	objKeyY,
+}: {
+	label: string;
+	objKeyX: "imageX";
+	objKeyY: "imageY";
+}) {
+	const { object, setObject } = useContext(SelectedObjectContext);
+
+	if (!object || object.type !== "image") return null;
+
+	function setDirection(x: number, y: number) {
+		setObject({
+			...(object as ObjectProps),
+			[objKeyX]: x,
+			[objKeyY]: y,
+		});
+	}
+
+	const x = (object[objKeyX] ?? 0.5) as number;
+	const y = (object[objKeyY] ?? 0.5) as number;
+
+	return (
+		<div className="grid aspect-square grid-cols-3 grid-rows-3">
+			<button
+				className={x === 0 && y === 0 ? "text-primary_light" : ""}
+				onClick={() => setDirection(0, 0)}
+			>
+				<TbChevronUpLeft />
+			</button>
+			<button
+				className={x === 0.5 && y === 0 ? "text-primary_light" : ""}
+				onClick={() => setDirection(0.5, 0)}
+			>
+				<TbSquareChevronUp />
+			</button>
+			<button
+				className={x === 1 && y === 0 ? "text-primary_light" : ""}
+				onClick={() => setDirection(1, 0)}
+			>
+				<TbChevronUpRight />
+			</button>
+			<button
+				className={x === 0 && y === 0.5 ? "text-primary_light" : ""}
+				onClick={() => setDirection(0, 0.5)}
+			>
+				<TbSquareChevronLeft />
+			</button>
+			<button
+				className={
+					(x === 0.5 && y === 0.5 ? "bg-primary_light" : "bg-black") +
+					" m-1 rounded-full"
+				}
+				onClick={() => setDirection(0.5, 0.5)}
+			></button>
+			<button
+				className={x === 1 && y === 0.5 ? "text-primary_light" : ""}
+				onClick={() => setDirection(1, 0.5)}
+			>
+				<TbSquareChevronRight />
+			</button>
+			<button
+				className={x === 0 && y === 1 ? "text-primary_light" : ""}
+				onClick={() => setDirection(0, 1)}
+			>
+				<TbChevronDownLeft />
+			</button>
+			<button
+				className={x === 0.5 && y === 1 ? "text-primary_light" : ""}
+				onClick={() => setDirection(0.5, 1)}
+			>
+				<TbSquareChevronDown />
+			</button>
+			<button
+				className={x === 1 && y === 1 ? "text-primary_light" : ""}
+				onClick={() => setDirection(1, 1)}
+			>
+				<TbChevronDownRight />
+			</button>
+		</div>
+	);
+}
+
 function ImageInput({ label, objKey }: { label: string; objKey: "content" }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
 
@@ -400,13 +506,18 @@ function NumberInput({
 	percentage = false,
 }: {
 	label: string;
-	objKey: "radius" | "size";
+	objKey: "radius" | "size" | "zoom";
 	range: { min: number; max: number; step: number };
 	percentage?: boolean;
 }) {
 	const { object, setObject } = useContext(SelectedObjectContext);
 
-	if (!object || !(objKey in object)) return null;
+	if (
+		!object ||
+		(!(objKey in object) && object.type !== "image") ||
+		(object.type !== "text" && objKey !== "zoom" && objKey !== "radius")
+	)
+		return null;
 
 	function setValue(value: string, percentage = false) {
 		const roundedValue = value ? Math.round(+value * 100) / 100 : "";
@@ -420,7 +531,7 @@ function NumberInput({
 		});
 	}
 
-	const value = object[objKey] as number;
+	const value = (object[objKey] ?? range.min) as number;
 	const displayValue = value ? (percentage ? value * 100 : value) : "";
 
 	return (

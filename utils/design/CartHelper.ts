@@ -75,7 +75,6 @@ export default async function AddToCart(
 		}
 
 		await DrawRender(newCanvas, renderTray, currentDesign, upScaleFactor);
-		console.log("Rendered");
 
 		const coverImage = uploadFromCanvas(canvas);
 		const renderImage = uploadFromCanvas(newCanvas);
@@ -86,7 +85,7 @@ export default async function AddToCart(
 					id: toastID,
 				});
 
-				console.log(values[0], values[1]);
+				console.log(values[0]);
 
 				AddProductToCart(
 					product,

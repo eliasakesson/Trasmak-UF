@@ -20,7 +20,7 @@ export default function DesignerButtons() {
 		<>
 			<BottomRightButtons />
 			<BottomLeftButtons />
-			<TopLeftButtons />
+			{/* <TopLeftButtons /> */}
 		</>
 	);
 }
@@ -31,7 +31,7 @@ function BottomLeftButtons() {
 	const { currentDesign } = useContext(DesignerContext);
 
 	return (
-		<div className="absolute bottom-8 left-8 flex flex-col-reverse items-start gap-4">
+		<div className="absolute right-8 top-8 flex gap-4 lg:bottom-8 lg:left-8 lg:top-auto lg:flex-col-reverse lg:items-start">
 			<ButtonWithTooltip
 				className="flex items-center gap-2 rounded-lg bg-primary p-4 font-semibold text-white transition-colors hover:bg-primary_light disabled:hover:bg-primary_dark"
 				position="right"
@@ -97,7 +97,7 @@ function BottomRightButtons() {
 	const lastAddedImageURL = useRef<string | null>(null);
 
 	return (
-		<div className="pointer-events-none absolute bottom-8 right-8 flex flex-col-reverse items-end gap-4">
+		<div className="pointer-events-none absolute bottom-36 right-8 flex flex-col-reverse items-end gap-4 lg:bottom-8">
 			<button
 				className="pointer-events-auto flex items-center gap-2 rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light"
 				onClick={() =>
@@ -144,7 +144,7 @@ function ButtonWithTooltip({
 		>
 			{children}
 			<span
-				className={`${position === "left" ? "right-full group-hover:-translate-x-4" : "left-full group-hover:translate-x-4"} pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-400 px-3 py-1 text-lg font-semibold opacity-0 transition-all group-hover:opacity-100 group-hover:delay-100`}
+				className={`${position === "left" ? "right-full group-hover:-translate-x-4" : "left-full group-hover:translate-x-4"} pointer-events-none absolute top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-400 px-3 py-1 text-lg font-semibold opacity-0 transition-all group-hover:opacity-100 group-hover:delay-100 lg:block`}
 			>
 				{tooltip}
 			</span>

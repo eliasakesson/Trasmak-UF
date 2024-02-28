@@ -151,7 +151,7 @@ async function DrawImage(
 			image.image = img;
 
 			const { offsetX, offsetY, newWidth, newHeight } =
-				GetImageDimensions2(ctx, tray, image);
+				GetImageDimensions2(ctx, tray, image, image.fit);
 
 			const minWidth = Math.min(width, newWidth);
 			const minHeight = Math.min(height, newHeight);
@@ -228,6 +228,7 @@ function GetImageDimensions2(
 	ctx: CanvasRenderingContext2D,
 	tray: ObjectProps,
 	image: ObjectProps,
+	type: string = "cover",
 ): { offsetX: number; offsetY: number; newWidth: number; newHeight: number } {
 	if (!image.image) {
 		return { offsetX: 0, offsetY: 0, newWidth: 0, newHeight: 0 };
@@ -235,19 +236,24 @@ function GetImageDimensions2(
 
 	const { x, y, width, height } = GetObjectDimensions(ctx, tray, image);
 
-	const scaleX = width / image.image.width;
-	const scaleY = height / image.image.height;
+	if (type === "fill") {
+		const { x, y, width, height } = GetObjectDimensions(ctx, tray, image);
+		return { offsetX: x, offsetY: y, newWidth: width, newHeight: height };
+	}
+	const scaleX = (width / image.image.width) * (image.zoom ?? 1);
+	const scaleY = (height / image.image.height) * (image.zoom ?? 1);
 
 	// Choose the larger scale to cover the target area
-	const scale = Math.max(scaleX, scaleY);
+	const scale =
+		type === "cover" ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY);
 
 	// Calculate the new image dimensions
 	const newWidth = image.image.width * scale;
 	const newHeight = image.image.height * scale;
 
 	// Calculate the position to center the image on the target area
-	const offsetX = x + (width - newWidth) / 2;
-	const offsetY = y + (height - newHeight) / 2;
+	const offsetX = x + (width - newWidth) * (image.imageX ?? 0.5);
+	const offsetY = y + (height - newHeight) * (image.imageY ?? 0.5);
 
 	return { offsetX, offsetY, newWidth, newHeight };
 }
