@@ -4,6 +4,7 @@ import {
 } from "@/components/design/DesignEditor";
 import SavedDesigns from "@/components/design/SavedDesigns";
 import TemplateDesigns from "@/components/design/TemplateDesigns";
+import TemplateDesigns from "@/components/design/TemplateDesigns";
 import DesignerButtons from "@/components/designer/DesignerButtons";
 import ToolBar from "@/components/designer/ToolBar";
 import Draw, { DrawSnapLineX, DrawSnapLineY } from "@/utils/design/Draw";
