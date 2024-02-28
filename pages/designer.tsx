@@ -3,6 +3,7 @@ import {
 	MoveDesignEditor,
 } from "@/components/design/DesignEditor";
 import SavedDesigns from "@/components/design/SavedDesigns";
+import TemplateDesigns from "@/components/design/TemplateDesigns";
 import DesignerButtons from "@/components/designer/DesignerButtons";
 import ToolBar from "@/components/designer/ToolBar";
 import Draw, { DrawSnapLineX, DrawSnapLineY } from "@/utils/design/Draw";
@@ -160,7 +161,7 @@ export default function Designer({ products }: { products: any[] }) {
 					<DesignerButtons />
 					<DesignEditor ref={designEditorRef} />
 				</div>
-				<div className="space-y-4 p-16">
+				<div className="space-y-4 p-16" id="saved-designs">
 					<h2 className="text-2xl font-semibold">Sparade designer</h2>
 					<SavedDesigns
 						products={products}
@@ -169,6 +170,17 @@ export default function Designer({ products }: { products: any[] }) {
 							setCurrentDesign(design);
 						}}
 						canvasClassKey="saved-design-canvas"
+					/>
+				</div>
+				<div className="space-y-4 p-16" id="templates">
+					<h2 className="text-2xl font-semibold">Mallar</h2>
+					<TemplateDesigns
+						products={products}
+						onSelect={(design) => {
+							setSelectedObjectID(null);
+							setCurrentDesign(design);
+						}}
+						canvasClassKey="templates-canvas"
 					/>
 				</div>
 			</div>

@@ -8,6 +8,8 @@ import TextPopup from "./TextPopup";
 import ShapePopup from "./ShapePopup";
 import ImagePopup from "./ImagePopup";
 import { DesignerContext } from "@/pages/designer";
+import TrayPopup from "./TrayPopup";
+import Image from "next/image";
 
 export const ToolBarContext = createContext<{
 	openMenu: string | null;
@@ -87,6 +89,7 @@ function ToolPopup({ tool }: { tool: string }) {
 		text: <TextPopup />,
 		shape: <ShapePopup />,
 		image: <ImagePopup />,
+		tray: <TrayPopup />,
 	};
 
 	if (openMenu !== tool) return null;
