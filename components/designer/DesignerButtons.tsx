@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { SaveDesign } from "@/utils/design/DesignSaver";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
+import { useRouter } from "next/router";
 
 export default function DesignerButtons() {
 	return (
@@ -26,6 +27,7 @@ export default function DesignerButtons() {
 
 function BottomLeftButtons() {
 	const [user] = useAuthState(auth);
+	const router = useRouter();
 	const { currentDesign } = useContext(DesignerContext);
 
 	return (
@@ -57,6 +59,7 @@ function BottomLeftButtons() {
 						: "Logga in för att se sparade designs"
 				}
 				disabled={!user}
+				onClick={() => router.replace("/designer#saved-designs")}
 			>
 				<FaHeart className="text-2xl" />
 			</ButtonWithTooltip>
@@ -64,6 +67,7 @@ function BottomLeftButtons() {
 				position="right"
 				className="rounded-lg bg-slate-400 p-4 text-2xl text-white transition-colors hover:bg-slate-500"
 				tooltip="Mallar"
+				onClick={() => router.replace("/designer#templates")}
 			>
 				<HiTemplate className="text-2xl" />
 			</ButtonWithTooltip>
