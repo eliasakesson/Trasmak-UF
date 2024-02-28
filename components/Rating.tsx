@@ -78,7 +78,7 @@ export function RatingStars({
 			className={`flex items-center ${size == "sm" ? "gap-0" : size == "md" ? "gap-1" : "gap-2"}`}
 		>
 			{[...Array(5)].map((_, index) => (
-				<button onClick={() => setRating(index + 1)}>
+				<button key={index} onClick={() => setRating(index + 1)}>
 					<Star
 						key={index}
 						rating={rating}
