@@ -31,7 +31,7 @@ function BottomLeftButtons() {
 	const { currentDesign } = useContext(DesignerContext);
 
 	return (
-		<div className="absolute right-8 top-8 flex gap-4 lg:bottom-8 lg:left-8 lg:top-auto lg:flex-col-reverse lg:items-start">
+		<div className="absolute right-8 top-8 flex gap-4 lg:bottom-8 lg:left-8 lg:right-auto lg:top-auto lg:flex-col-reverse lg:items-start">
 			<ButtonWithTooltip
 				className="flex items-center gap-2 rounded-lg bg-primary p-4 font-semibold text-white transition-colors hover:bg-primary_light disabled:hover:bg-primary_dark"
 				position="right"
