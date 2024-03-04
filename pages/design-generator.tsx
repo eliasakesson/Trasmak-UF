@@ -6,15 +6,11 @@ import { useCallback, useContext, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 import { SiteContext } from "./_app";
-import { useWindowSize } from "@/utils/hooks";
 import Head from "next/head";
-import { FaCircleXmark } from "react-icons/fa6";
-import Link from "next/link";
 
 export default function DesignGenerator({ products }: { products: any[] }) {
 	const [image, setImage] = useState("");
 	const router = useRouter();
-	const windowSize = useWindowSize();
 	const { setDesign } = useContext(SiteContext);
 
 	const onDrop = useCallback((acceptedFiles: any) => {

@@ -5,6 +5,7 @@ import {
 import SavedDesigns from "@/components/design/SavedDesigns";
 import TemplateDesigns from "@/components/design/TemplateDesigns";
 import DesignerButtons from "@/components/designer/DesignerButtons";
+import LocalDesignSaver from "@/components/designer/LocalDesignSaver";
 import ToolBar from "@/components/designer/ToolBar";
 import Draw, { DrawSnapLineX, DrawSnapLineY } from "@/utils/design/Draw";
 import { LoadImages, SetTrayObject } from "@/utils/design/Helper";
@@ -14,8 +15,9 @@ import GetProducts from "@/utils/getProducts";
 import { set } from "firebase/database";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Product } from "use-shopping-cart/core";
+import { SiteContext } from "./_app";
 
 export const DesignerContext = createContext<{
 	currentDesign: DesignProps;
@@ -45,7 +47,9 @@ export default function Designer({ products }: { products: any[] }) {
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const designEditorRef = useRef<HTMLDivElement>(null);
+	const isDrawing = useRef(false);
 
+	const { design, setDesign } = useContext(SiteContext);
 	const [currentDesign, setCurrentDesign] = useState<DesignProps>({
 		id: "",
 		color: "#eeeeee",
@@ -125,21 +129,29 @@ export default function Designer({ products }: { products: any[] }) {
 	]);
 
 	useEffect(() => {
-		if (products.length > 0 && !currentDesign.id) {
+		if (design) {
+			setDesign(null);
+			console.log(design);
+			setCurrentDesign(design);
+		} else if (products.length > 0 && currentDesign?.id?.length <= 0) {
+			console.log(currentDesign.id);
 			setCurrentDesign((current) => ({
 				...current,
 				id: products[0].id.substring(6, products[0].id.length),
 			}));
 		}
-	}, [products, currentDesign.id]);
+	}, [products, currentDesign.id, design]);
 
 	async function DrawDesign(design?: DesignProps) {
+		if (isDrawing.current) return;
+
 		const canvas = canvasRef.current;
 		if (!canvas || !trayObject) return;
 
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
 
+		isDrawing.current = true;
 		await Draw(
 			canvas,
 			trayObject,
@@ -147,6 +159,7 @@ export default function Designer({ products }: { products: any[] }) {
 			selectedObjectID,
 			false,
 		);
+		isDrawing.current = false;
 	}
 
 	return (
@@ -172,6 +185,7 @@ export default function Designer({ products }: { products: any[] }) {
 					setSelectedObjectID,
 				}}
 			>
+				<LocalDesignSaver />
 				<div>
 					<div className="relative h-[calc(100vh-116px)] overflow-hidden">
 						<canvas

@@ -4,7 +4,7 @@ import { DesignerContext } from "@/pages/designer";
 import AddToCart from "@/utils/design/CartHelper";
 import { useShoppingCart } from "use-shopping-cart";
 
-import { MdAddShoppingCart } from "react-icons/md";
+import { MdAddShoppingCart, MdBugReport } from "react-icons/md";
 import { CiShoppingTag } from "react-icons/ci";
 import { FaHeart, FaInfo, FaSave } from "react-icons/fa";
 import { HiTemplate } from "react-icons/hi";
@@ -20,7 +20,7 @@ export default function DesignerButtons() {
 		<>
 			<BottomRightButtons />
 			<BottomLeftButtons />
-			{/* <TopLeftButtons /> */}
+			<TopLeftButtons />
 		</>
 	);
 }
@@ -78,13 +78,21 @@ function BottomLeftButtons() {
 function TopLeftButtons() {
 	return (
 		<div className="absolute left-8 top-8 flex flex-col items-start gap-4">
-			<ButtonWithTooltip
+			{/* <ButtonWithTooltip
 				position="right"
 				className="rounded-lg bg-slate-400 p-4 text-2xl text-white transition-colors hover:bg-slate-500"
 				tooltip="Visa guide"
 			>
 				<FaInfo className="text-2xl" />
-			</ButtonWithTooltip>
+			</ButtonWithTooltip> */}
+			<LinkWithTooltip
+				href="/bug-report"
+				position="right"
+				className="rounded-lg bg-slate-400 p-4 text-2xl text-white transition-colors hover:bg-slate-500"
+				tooltip="Rapportera bugg"
+			>
+				<MdBugReport className="text-2xl" />
+			</LinkWithTooltip>
 		</div>
 	);
 }

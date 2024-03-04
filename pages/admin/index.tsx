@@ -1,110 +1,228 @@
 import AdminWrapper from "@/components/admin/AdminWrapper";
-import { useEffect, useState } from "react";
+import { ReactNode, use, useEffect, useMemo, useRef, useState } from "react";
 import GetOrders from "@/utils/admin/getOrders";
-import GetBalance, { GetOrderTotal } from "@/utils/admin/getBalance";
 import { formatCurrencyString } from "use-shopping-cart";
-import Link from "next/link";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
+import { useRouter } from "next/router";
+import { TbBrandCashapp } from "react-icons/tb";
+import { FaShoppingCart, FaUsers } from "react-icons/fa";
 
-export default function Admin() {
+export default function Admin({ ...props }) {
 	return (
 		<AdminWrapper>
-			<AdminPage />
+			<AdminPage {...props} />
 		</AdminWrapper>
 	);
 }
 
 function AdminPage() {
 	const [user] = useAuthState(auth);
-	const [orderTotal, setOrderTotal] = useState<any>(0);
-	const [balance, setBalance] = useState<any>(0);
-	const [orders, setOrders] = useState<any>([]);
+
+	const [orders, setOrders] = useState<any[]>([]);
+	const orderTotal = useMemo(() => {
+		return orders.reduce(
+			(acc: any, order: any) => {
+				acc.total += order.total;
+				return acc;
+			},
+			{ total: 0, currency: "SEK" },
+		);
+	}, [orders]);
 
 	useEffect(() => {
-		const fetch = async () => {
-			setOrderTotal(await GetOrderTotal());
-			setOrders(await GetOrders());
-			setBalance(await GetBalance());
-		};
+		if (!user) return;
 
-		fetch();
-	}, []);
+		async function getOrders() {
+			const orders = await GetOrders();
+			setOrders(orders);
+		}
+
+		getOrders();
+	}, [user]);
 
 	return (
 		<div className="mx-auto min-h-screen max-w-7xl space-y-8 px-8 py-16">
-			<span className="text-xl font-semibold text-muted">Admin</span>
-			<h1 className="text-5xl font-semibold">
+			<span className="text-xl text-muted">
 				Hej,{" "}
 				<span className="font-bold">
 					{user?.displayName?.split(" ")[0]}
 				</span>
-			</h1>
-			<div className="flex gap-16">
-				<div className="space-y-4">
-					<h2 className="text-3xl font-semibold">Konto</h2>
-					<div className="flex items-center justify-between gap-8">
-						<h3 className="font-semibold">Total försäljning</h3>
-						<span>
-							{orderTotal &&
-								formatCurrencyString({
-									value: orderTotal.total,
-									currency: orderTotal.currency,
-								})}
-						</span>
-					</div>
-					<div className="flex items-center justify-between gap-8">
-						<h3 className="font-semibold">Tillgängligt</h3>
-						<span>
-							{balance &&
-								formatCurrencyString({
-									value: balance.available,
-									currency: balance.currency,
-								})}
-						</span>
-					</div>
-					<div className="flex items-center justify-between gap-8">
-						<h3 className="font-semibold">Pågående</h3>
-						<span>
-							{balance &&
-								formatCurrencyString({
-									value: balance.pending,
-									currency: balance.currency,
-								})}
-						</span>
-					</div>
-				</div>
-				<div className="space-y-4">
-					<h2 className="text-3xl font-semibold">Orders</h2>
-					<div className="flex w-fit flex-col gap-4">
-						{orders.map((order: any, i: number) => (
-							<Order order={order} key={i} />
-						))}
-					</div>
-				</div>
+				. Här är din översikt.
+			</span>
+			<TopCards orderTotal={orderTotal} orders={orders} />
+			<Orders orders={orders} />
+		</div>
+	);
+}
+
+function TopCards({ orderTotal, orders }: { orderTotal: any; orders: any }) {
+	const productsSold = useMemo(() => {
+		return orders.reduce((acc: number, order: any) => {
+			return acc + order.products.length;
+		}, 0);
+	}, [orders]);
+
+	const [totalVisits, setTotalVisits] = useState(0);
+
+	useEffect(() => {
+		async function getAnalytics() {
+			// const analytics = await GetAnalytics();
+			// console.log(analytics);
+		}
+
+		getAnalytics();
+	}, []);
+
+	return (
+		<div className="grid grid-cols-4 gap-8">
+			<Card
+				title="Total omsättning"
+				value={formatCurrencyString({
+					value: orderTotal.total,
+					currency: orderTotal.currency,
+				})}
+				icon={<TbBrandCashapp />}
+				className="!bg-primary text-white"
+			/>
+			<Card
+				title="Antal produkter sålda"
+				value={productsSold}
+				icon={<FaShoppingCart />}
+			/>
+			<Card
+				title="Totalt antal besök"
+				value={totalVisits.toString()}
+				icon={<FaUsers />}
+			/>
+		</div>
+	);
+}
+
+export function Card({
+	title,
+	value,
+	icon,
+	className,
+}: {
+	title: string;
+	value: string;
+	icon: ReactNode;
+	className?: string;
+}) {
+	return (
+		<div
+			className={`flex flex-col justify-between gap-8 rounded-lg bg-slate-300 p-8 ${className}`}
+		>
+			<div className="text-6xl">{icon}</div>
+			<div className="flex flex-col gap-2">
+				<span className="text-lg">{title}</span>
+				<span className="text-4xl font-bold">{value}</span>
 			</div>
 		</div>
 	);
 }
 
-function Order({ order }: { order: any }) {
+function Orders({ orders }: { orders: any[] }) {
 	return (
-		<Link href={`/admin/orders/${order.id}`}>
-			<div className="flex items-center justify-end gap-8 border-2 p-4">
-				<div className="flex flex-1 flex-col">
-					<h2 className="font-bold">{order.customer.name}</h2>
-					<span>{order.customer.email}</span>
-				</div>
-				<span>
-					{new Date(order.created * 1000).toLocaleDateString()}
-				</span>
-				<span className="font-bold">
-					{formatCurrencyString({
-						value: order.total,
-						currency: order.currency,
-					})}
-				</span>
-			</div>
-		</Link>
+		<div className="pt-16">
+			<table className="w-full divide-y">
+				<thead>
+					<tr>
+						<th className="pb-4 text-left">Nr</th>
+						<th className="pb-4 text-left">Kund</th>
+						<th className="pb-4 text-left">Produkter</th>
+						<th className="pb-4 text-left">Datum</th>
+						<th className="pb-4 text-left">Status</th>
+						<th className="pb-4 text-left">Pris</th>
+					</tr>
+				</thead>
+				<tbody className="divide-y">
+					{orders.map((order: any, i: number) => (
+						<OrderRow
+							order={order}
+							key={i}
+							nr={orders.length - i}
+						/>
+					))}
+					{orders.length == 0 &&
+						Array(5)
+							.fill(null)
+							.map((_, i) => <SkeletonOrderRow key={i} />)}
+				</tbody>
+			</table>
+		</div>
+	);
+}
+
+function OrderRow({ order, nr }: { order: any; nr: number }) {
+	const router = useRouter();
+
+	return (
+		<tr
+			onClick={() => router.push(`/admin/orders/${order.id}`)}
+			className="cursor-pointer"
+		>
+			<td className="py-2">
+				<span className="font-semibold">{nr}</span>
+			</td>
+			<td className="py-2">
+				<span className="font-semibold">{order.customer.name}</span>
+				<br />
+				<span className="text-muted">{order.customer.email}</span>
+			</td>
+			<td className="space-x-2 space-y-2">
+				{order.products.map((product: any, i: number) => (
+					<span
+						key={i}
+						className="rounded-full bg-slate-300 px-2 py-1"
+					>
+						{product.metadata.width}x{product.metadata.height}
+					</span>
+				))}
+			</td>
+			<td>{new Date(order.created * 1000).toLocaleDateString()}</td>
+			<td>
+				{order.status === "complete" ? (
+					<div className="flex items-center gap-1">
+						<span className="size-2 rounded-full bg-green-500"></span>
+						<span className="text-sm">Betald</span>
+					</div>
+				) : (
+					<span className="text-red-500">Ej betald</span>
+				)}
+			</td>
+			<td className="font-semibold text-muted">
+				{formatCurrencyString({
+					value: order.total,
+					currency: order.currency,
+				})}
+			</td>
+		</tr>
+	);
+}
+
+function SkeletonOrderRow() {
+	return (
+		<tr className="animate-pulse">
+			<td>
+				<div className="my-4 block h-6 w-full bg-slate-300"></div>
+			</td>
+			<td>
+				<div className="my-4 block h-6 w-full bg-slate-300"></div>
+			</td>
+			<td>
+				<div className="my-4 block h-6 w-full bg-slate-300"></div>
+			</td>
+			<td>
+				<div className="my-4 block h-6 w-full bg-slate-300"></div>
+			</td>
+			<td>
+				<div className="my-4 block h-6 w-full bg-slate-300"></div>
+			</td>
+			<td>
+				<div className="my-4 block h-6 w-full bg-slate-300"></div>
+			</td>
+		</tr>
 	);
 }

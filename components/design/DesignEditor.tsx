@@ -97,7 +97,14 @@ export const DesignEditor = forwardRef<HTMLElement, HTMLProps<HTMLDivElement>>(
 										className="h-16"
 									/>
 								)}
-								<div className="relative flex h-16 flex-wrap items-center justify-center gap-4 rounded-md border border-gray-300 px-4">
+								<div className="relative flex h-16 flex-wrap items-center justify-center gap-4 rounded-md border border-gray-300 px-4 pt-4">
+									<Label
+										label={
+											object?.type !== "text"
+												? "Expandera & Ordning"
+												: "Ordning"
+										}
+									/>
 									{object?.type !== "text" && (
 										<button
 											onClick={() =>
@@ -286,14 +293,12 @@ function TextArea({
 	if (!object || !(objKey in object)) return null;
 
 	return (
-		<div className={`flex grow flex-col gap-1  ${className}`}>
-			<label className="sr-only" htmlFor={label}>
-				{label}
-			</label>
+		<div className={`relative flex grow flex-col gap-1  ${className}`}>
+			<Label label={label} />
 			<textarea
 				name={label}
 				id={label}
-				className="h-full resize-none rounded-md border border-gray-300 p-2"
+				className="h-full resize-none rounded-md border border-gray-300 p-2 pt-5"
 				rows={1}
 				placeholder={label}
 				value={object[objKey]}
@@ -683,7 +688,7 @@ function Select({
 function Label({ label }: { label: string }) {
 	return (
 		<label
-			className="absolute left-2 top-1 text-xs text-muted"
+			className="absolute left-2 top-1 z-10 text-xs text-muted"
 			htmlFor={label}
 		>
 			{label}

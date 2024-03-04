@@ -1,127 +1,161 @@
 import AdminWrapper from "@/components/admin/AdminWrapper";
-import GetOrders, { GetOrderCompacted } from "@/utils/admin/getOrders";
+import { auth } from "@/firebase";
+import { GetOrder } from "@/utils/admin/getOrders";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useMemo, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { formatCurrencyString } from "use-shopping-cart";
+import { Card } from "../..";
+import { TbBrandCashapp } from "react-icons/tb";
+import { FaShoppingCart } from "react-icons/fa";
 
-export default function AdminOrder({ order }: { order: any }) {
+export default function AdminOrder() {
 	return (
 		<AdminWrapper>
-			<AdminPage order={order} />
+			<AdminPage />
 		</AdminWrapper>
 	);
 }
 
-function AdminPage({ order }: { order: any }) {
+function AdminPage() {
+	const router = useRouter();
+	const [user] = useAuthState(auth);
+
+	const [order, setOrder] = useState<any>(null);
+	const productCount = useMemo(() => {
+		return order?.products.reduce((acc: any, product: any) => {
+			acc += product.quantity;
+
+			return acc;
+		}, 0);
+	}, [order]);
+
+	useEffect(() => {
+		if (!user) return;
+
+		async function getOrders() {
+			const order = await GetOrder(router.query.id as string);
+			console.log(order);
+			setOrder(order);
+		}
+
+		getOrders();
+	}, [router, user]);
+
 	return (
 		<div className="mx-auto max-w-7xl space-y-8 px-8 py-16">
 			<Link href="/admin">{"<- Admin"}</Link>
-			<h1 className="text-5xl font-bold">Order</h1>
-			<div className="flex flex-wrap gap-16">
-				<div className="flex flex-col gap-4">
-					<h2 className="text-2xl font-bold">Orderinfo</h2>
-					<span className="font-semibold">
-						Totalt:{" "}
-						{formatCurrencyString({
-							value: order.total,
-							currency: order.currency,
-						})}
-					</span>
-					<span>
-						{new Date(order.created * 1000).toLocaleDateString()}
-					</span>
+			<div className="grid grid-cols-4 gap-8">
+				<Card
+					title="Totalt"
+					value={
+						order
+							? formatCurrencyString({
+									value: order.total,
+									currency: order.currency,
+								})
+							: "0"
+					}
+					icon={<TbBrandCashapp />}
+					className="!bg-primary text-white"
+				/>
+				<Card
+					title="Antal produkter"
+					value={productCount}
+					icon={<FaShoppingCart />}
+				/>
+			</div>
+			<div className="flex flex-col divide-y border-slate-300">
+				<div className="flex flex-col py-4">
 					<Link
 						className="text-primary underline"
-						href={`/admin/orders/${order.id}/pdf`}
+						href={`/admin/orders/${order?.id}/pdf`}
 					>
-						Visa PDF
+						Visa Order PDF
 					</Link>
-				</div>
-				<div className="flex flex-col gap-4">
-					<h2 className="text-2xl font-bold">Kund</h2>
-					<div className="flex flex-col">
-						<h3 className="text-xl font-semibold">
-							{order.customer.name}
-						</h3>
-						<span>{order.customer.email}</span>
-					</div>
-					<span>
-						{new Date(order.created * 1000).toLocaleDateString()}
+					<span className="text-muted">
+						{order &&
+							new Date(order.created * 1000).toLocaleDateString()}
 					</span>
-					<span className="font-bold">
-						{formatCurrencyString({
-							value: order.total,
-							currency: order.currency,
-						})}
-					</span>
+					<br />
+					<h3 className="text-xl font-semibold">
+						{order?.customer.name}
+					</h3>
+					<span className="text-muted">{order?.customer.email}</span>
 				</div>
-				<div className="flex flex-col gap-4">
-					<h2 className="text-2xl font-bold">Leveransaddress</h2>
-					<div className="space-y-2">
-						<p>{order.shipping.name}</p>
-						<p>{order.shipping.address.line1}</p>
-						<p>{order.shipping.address.postal_code}</p>
-						<p>
-							{order.shipping.address.city},{" "}
-							{order.shipping.address.country}
-						</p>
-					</div>
-				</div>
-				<div className="space-y-4">
-					<h2 className="text-2xl font-bold">Produkter</h2>
-					<div className="space-y-4">
-						{order.products.map((product: any, i: number) => (
-							<Product product={product} key={i} />
-						))}
-					</div>
+				<div className="flex flex-col py-4">
+					<p>{order?.shipping.address.line1}</p>
+					<p>{order?.shipping.address.postal_code}</p>
+					<p>
+						{order?.shipping.address.city},{" "}
+						{order?.shipping.address.country}
+					</p>
 				</div>
 			</div>
+			<Products products={order?.products || []} />
 		</div>
 	);
 }
 
-function Product({ product }: { product: any }) {
+function Products({ products }: { products: any[] }) {
 	return (
-		<div className="flex flex-col gap-8 border-2 p-4">
-			<div className="flex items-center gap-4">
-				<Image src={product.image} alt="" width={64} height={64} />
-				<h3 className="font-semibold">{product.name}</h3>
-				<span>
-					{formatCurrencyString({
-						value: product.price,
-						currency: product.currency,
-					})}
-				</span>
-			</div>
-			<div>
-				{product.designs.map((design: any, i: number) => (
-					<a
-						key={i}
-						href={GetImagePath(design.image)}
-						target="_blank"
-						rel="noreferrer"
-					>
-						<div className="flex items-center gap-4">
-							<div className="">
-								<Image
-									className="aspect-square object-contain mix-blend-multiply"
-									src={GetImagePath(design.image)}
-									alt=""
-									width={48}
-									height={48}
-								/>
-							</div>
-							<div className="flex-1">
-								<h2 className="text-xl font-semibold">
-									Design {i + 1}
-								</h2>
-							</div>
-							<span>{design.count} st</span>
-						</div>
-					</a>
-				))}
-			</div>
+		<div className="pt-16">
+			<table className="w-full divide-y">
+				<thead>
+					<tr>
+						<th className="pb-4 text-left">Nr</th>
+						<th className="pb-4 text-left">Bild</th>
+						<th className="pb-4 text-left">Namn</th>
+						<th className="pb-4 text-left">Art nr</th>
+						<th className="pb-4 text-left">Pris</th>
+					</tr>
+				</thead>
+				<tbody className="divide-y">
+					{products.map((product: any, i: number) => (
+						<ProductRow product={product} key={i} nr={i + 1} />
+					))}
+				</tbody>
+			</table>
 		</div>
+	);
+}
+
+function ProductRow({ product, nr }: { product: any; nr: number }) {
+	return (
+		<tr
+			onClick={() => window.open(GetImagePath(product.image), "_blank")}
+			className="cursor-pointer"
+		>
+			<td className="py-2">
+				<span className="font-semibold">{nr}</span>
+			</td>
+			<td className="py-2">
+				<Image
+					src={GetImagePath(product.image)}
+					alt=""
+					width={128}
+					height={96}
+				/>
+			</td>
+			<td className="space-y-2">
+				<span className="font-semibold">{product.name}</span>
+				<br />
+				<span className="text-muted">Design {nr}</span>
+			</td>
+			<td className="space-y-2">
+				<span className="font-semibold">{product.metadata.artnr}</span>
+				<br />
+				<span className="text-muted">{product.metadata.artnr2}</span>
+			</td>
+			<td className="font-semibold text-muted">
+				{formatCurrencyString({
+					value: product.price,
+					currency: product.currency,
+				})}
+			</td>
+		</tr>
 	);
 }
 
@@ -131,30 +165,4 @@ function GetImagePath(image: string) {
 		image +
 		"?alt=media"
 	);
-}
-
-export async function getStaticProps({ params }: { params: { id: string } }) {
-	const order = await GetOrderCompacted(params.id);
-
-	return {
-		props: {
-			order,
-		},
-		revalidate: 3600,
-	};
-}
-
-export async function getStaticPaths() {
-	const orders = await GetOrders();
-
-	const paths = orders.map((order: any) => ({
-		params: {
-			id: order.id,
-		},
-	}));
-
-	return {
-		paths,
-		fallback: "blocking",
-	};
 }

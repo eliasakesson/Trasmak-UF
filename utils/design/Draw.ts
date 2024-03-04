@@ -148,6 +148,7 @@ async function DrawImage(
 				tray,
 				image,
 			);
+			img.crossOrigin = "anonymous";
 			image.image = img;
 
 			const { offsetX, offsetY, newWidth, newHeight } =
@@ -292,6 +293,15 @@ async function DrawTray(
 			tray.width ?? 0,
 			tray.height ?? 0,
 		);
+
+		if (tray.width === tray.height) {
+			ctx.translate(offsetX + newWidth / 2, offsetY + newHeight / 2);
+			ctx.rotate(Math.PI / 2);
+			ctx.translate(
+				-(offsetX + newWidth / 2),
+				-(offsetY + newHeight / 2),
+			);
+		}
 
 		GetRoundedRect(
 			ctx,

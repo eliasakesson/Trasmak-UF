@@ -12,18 +12,18 @@ export default function ShapePopup() {
 			value: "circle",
 			icon: <div className="h-8 w-8 rounded-full bg-black"></div>,
 		},
-		{
-			value: "triangle",
-			icon: (
-				<div
-					className="h-0 w-0 
-		border-b-[24px] border-l-[16px]
-		border-r-[16px] border-b-black
-		border-l-transparent border-r-transparent"
-				></div>
-			),
-		},
-		{ value: "star", icon: <FaStar className="h-8 w-8" /> },
+		// {
+		// 	value: "triangle",
+		// 	icon: (
+		// 		<div
+		// 			className="h-0 w-0
+		// border-b-[24px] border-l-[16px]
+		// border-r-[16px] border-b-black
+		// border-l-transparent border-r-transparent"
+		// 		></div>
+		// 	),
+		// },
+		// { value: "star", icon: <FaStar className="h-8 w-8" /> },
 	];
 
 	const { currentDesign, setCurrentDesign } = useContext(DesignerContext);
@@ -47,6 +47,7 @@ export default function ShapePopup() {
 					content: shape,
 					id,
 					order,
+					radius: shape === "circle" ? 0.5 : 0,
 				},
 			],
 		} as DesignProps);
