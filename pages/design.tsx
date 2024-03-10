@@ -114,10 +114,9 @@ export default function Design({ products }: { products: any }) {
 		return unsub;
 	}, [trayObject]);
 
-	useEffect(
-		() => SetTrayObject(products, currentDesign.id, setTrayObject),
-		[currentDesign.id, products],
-	);
+	useEffect(() => {
+		SetTrayObject(products, currentDesign.id, setTrayObject);
+	}, [currentDesign.id, products]);
 
 	useEffect(() => {
 		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
