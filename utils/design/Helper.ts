@@ -131,7 +131,7 @@ export function SetTrayObject(
 	setTrayObject: (tray: ObjectProps) => void,
 ) {
 	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-	if (!canvas) return;
+	if (!canvas) return null;
 
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight - 116;
@@ -145,7 +145,7 @@ export function SetTrayObject(
 		{
 			...canvas,
 			width: window.innerWidth,
-			height: window.innerHeight - 116,
+			height: window.innerHeight - (window.innerWidth >= 1024 ? 116 : 80),
 		} as HTMLCanvasElement,
 		0.6,
 		metadata?.width,
@@ -159,6 +159,8 @@ export function SetTrayObject(
 	if (tray) {
 		setTrayObject(tray);
 	}
+
+	return tray;
 }
 
 export function LoopUntilSetTrayObject(

@@ -7,11 +7,13 @@ import { stripe } from "@/utils/stripe";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import toast from "react-hot-toast";
+import { useContext } from "react";
 import { FaCreditCard } from "react-icons/fa";
 import { FaEarthAmericas } from "react-icons/fa6";
 import { MdLocalShipping } from "react-icons/md";
 import { formatCurrencyString } from "use-shopping-cart";
+import { SiteContext } from "../_app";
+import { DesignProps } from "@/utils/design/Interfaces";
 
 export default function Product({
 	product,
@@ -32,8 +34,10 @@ export default function Product({
 				/>
 				<meta name="robots" content="index, follow" />
 			</Head>
-			<main className="mx-auto max-w-7xl space-y-4 px-8 py-8">
-				<Breadcrumbs productName={product.name} />
+			<main className="mx-auto max-w-7xl space-y-4 px-8 py-4 lg:py-8">
+				<div className="hidden lg:block">
+					<Breadcrumbs productName={product.name} />
+				</div>
 				<article className="grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-2 lg:gap-16">
 					<Images image={product.image} />
 					<ProductInfo product={product} />
@@ -55,7 +59,7 @@ export default function Product({
 
 function Images({ image }: { image: string }) {
 	return (
-		<div className="row-end-1 flex gap-8">
+		<div className="row-end-1 flex h-fit gap-8">
 			<div className="relative -z-10 aspect-square flex-1 overflow-hidden rounded-xl bg-gray-100">
 				<Image
 					src={image}
@@ -70,62 +74,33 @@ function Images({ image }: { image: string }) {
 }
 
 function ProductInfo({ product }: { product: any }) {
-	const { width } = useWindowSize();
+	const { design, setDesign } = useContext(SiteContext);
 
 	return (
-		<div className="space-y-8">
-			<div className="space-y-2">
-				<h1 className="text-4xl font-semibold">{product.name}</h1>
+		<div className="space-y-4 lg:space-y-8">
+			<div className="flex justify-between gap-2 lg:flex-col">
+				<h1 className="text-xl font-semibold lg:text-4xl">
+					{product.name}
+				</h1>
 				<div className="flex items-center gap-4">
 					<Stars productID={product.id} />
 				</div>
 			</div>
-			<p className="max-w-prose text-base text-muted lg:text-lg">
-				{product.description ?? ""} Brickan är perfekt för dig som vill
-				servera fika eller mat. Med designverktyget kan du sätta en
-				personlig prägel på brickan och det är din fantasi som sätter
-				gränserna. Designa brickor med egna motiv som matchar din stil
-				och gör varje måltid till en personlig upplevelse. Brickan
-				passar till både vardagliga måltider och speciella tillfällen.
-				Brickan är tillverkad av högkvalitativt material för att
-				garantera hållbarhet och långvarig användning.
-			</p>
-			<p className="text-4xl font-semibold">
+			<p className="w-fit bg-primary p-2 text-xl font-semibold text-white lg:text-4xl">
 				{formatCurrencyString({
 					value: product.price,
 					currency: product.currency,
 				})}
 			</p>
-			<div className="flex gap-4">
-				{width >= 768 ? (
-					<Link
-						href={`/design?d=${product.id.substring(
-							6,
-							product.id.length,
-						)}`}
-						className="rounded-lg bg-primary px-12 py-4 font-semibold text-white transition-colors hover:bg-primary_light"
-					>
-						Designa nu
-					</Link>
-				) : (
-					<button
-						onClick={() =>
-							toast.error(
-								"Designern fungerar bäst på större skärmar. Vänligen byt enhet för att börja designa.",
-							)
-						}
-						type="button"
-						className="rounded-lg bg-primary px-12 py-4 font-semibold text-white transition-colors hover:bg-primary_light"
-					>
-						Designa nu
-					</button>
-				)}
-			</div>
-
-			<ul className="space-y-2 text-muted">
+			<ul className="space-y-2 py-4 text-muted lg:py-0">
 				<li className="flex items-center gap-4">
 					<MdLocalShipping />
-					Gratis frakt över 500 kr (Sverige)
+					Gratis frakt över{" "}
+					{formatCurrencyString({
+						value: 59900,
+						currency: product.currency,
+					})}{" "}
+					(Sverige)
 				</li>
 
 				<li className="flex items-center gap-4">
@@ -138,6 +113,35 @@ function ProductInfo({ product }: { product: any }) {
 					Tillverkad i Sverige
 				</li>
 			</ul>
+			<div className="flex gap-4">
+				<Link
+					onClick={() =>
+						setDesign({
+							...design,
+							objects: [],
+							id: product.id.substring(6, product.id.length),
+						} as DesignProps)
+					}
+					href={`/designer`}
+					className="w-full rounded-lg bg-primary px-12 py-4 font-semibold text-white transition-colors hover:bg-primary_light"
+				>
+					Designa nu
+				</Link>
+			</div>
+			<br />
+			<p className="max-w-prose text-base text-muted lg:text-lg">
+				{product.description ?? ""} Brickan är perfekt för dig som vill
+				servera fika eller mat. Med designverktyget kan du sätta en
+				personlig prägel på brickan och det är din fantasi som sätter
+				gränserna.
+				<br />
+				<br />
+				Designa brickor med egna motiv som matchar din stil och gör
+				varje måltid till en personlig upplevelse. Brickan passar till
+				både vardagliga måltider och speciella tillfällen. Brickan är
+				tillverkad av högkvalitativt material för att garantera
+				hållbarhet och långvarig användning.
+			</p>
 		</div>
 	);
 }

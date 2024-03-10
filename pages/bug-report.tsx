@@ -60,7 +60,7 @@ export default function BugReport() {
 		<main className="mx-auto flex min-h-[calc(100vh-108px)] w-full max-w-7xl flex-col items-center space-y-16 px-8 py-16">
 			<div className="flex w-full flex-col items-center gap-6 border-b pb-8">
 				<MdBugReport className="text-6xl text-primary" />
-				<h1 className="text-4xl font-bold text-gray-900">
+				<h1 className="text-center text-4xl font-bold text-gray-900">
 					Bugg-rapportering
 				</h1>
 				<span className="max-w-prose text-center text-muted">
@@ -156,7 +156,7 @@ export default function BugReport() {
 						className="flex flex-col items-center gap-4 rounded-xl bg-primary p-16 text-white"
 					>
 						<FaCheck className="text-5xl" />
-						<span className="text-2xl font-semibold">
+						<span className="text-center text-2xl font-semibold">
 							Tack för din rapport!
 						</span>
 						<br />

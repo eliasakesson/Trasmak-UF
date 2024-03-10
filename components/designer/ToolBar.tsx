@@ -30,28 +30,30 @@ export default function ToolBar() {
 					className="fixed bottom-0 left-0 right-0 top-0"
 				></div>
 			)}
-			<div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 gap-2 rounded-xl bg-slate-200 p-2">
-				<Tool tool="text" tooltip="Lägg till text">
-					<MdTextFields />
-					<FaPlus className="absolute right-2 top-2 text-xs text-slate-700" />
-				</Tool>
-				<Tool tool="image" tooltip="Lägg till bild">
-					<FaImage />
-					<FaPlus className="absolute right-2 top-2 text-xs text-slate-700" />
-				</Tool>
-				<Tool tool="shape" tooltip="Lägg till form">
-					<FaShapes />
-					<FaPlus className="absolute right-2 top-2 text-xs text-slate-700" />
-				</Tool>
-				<div className="border border-slate-300"></div>
-				<Tool tool="color" tooltip="Byt bakgrundsfärg">
-					<MdFormatColorFill />
-				</Tool>
-				<Tool tool="tray" tooltip="Byt bricka">
-					<TbRectangleFilled />
-				</Tool>
+			<div className="absolute bottom-24 left-1/2 z-20 -translate-x-1/2 lg:bottom-8">
+				<div className="relative flex gap-2 rounded-xl bg-slate-300 p-2 lg:bg-slate-200">
+					<Tool tool="text" tooltip="Lägg till text">
+						<MdTextFields />
+						<FaPlus className="absolute right-2 top-2 text-xs text-slate-700" />
+					</Tool>
+					<Tool tool="image" tooltip="Lägg till bild">
+						<FaImage />
+						<FaPlus className="absolute right-2 top-2 text-xs text-slate-700" />
+					</Tool>
+					<Tool tool="shape" tooltip="Lägg till form">
+						<FaShapes />
+						<FaPlus className="absolute right-2 top-2 text-xs text-slate-700" />
+					</Tool>
+					<div className="border border-slate-300"></div>
+					<Tool tool="color" tooltip="Byt bakgrundsfärg">
+						<MdFormatColorFill />
+					</Tool>
+					<Tool tool="tray" tooltip="Byt bricka">
+						<TbRectangleFilled />
+					</Tool>
+					<SizeText />
+				</div>
 			</div>
-			<SizeText />
 		</ToolBarContext.Provider>
 	);
 }
@@ -75,7 +77,7 @@ function SizeText() {
 	}, [currentDesign.id]);
 
 	return (
-		<span className="absolute bottom-28 left-1/2 -z-10 -translate-x-1/2 transform text-slate-700">
+		<span className="absolute bottom-20 left-0 -z-10 transform text-slate-700 lg:bottom-20 lg:left-1/2 lg:-translate-x-1/2">
 			{text}
 		</span>
 	);

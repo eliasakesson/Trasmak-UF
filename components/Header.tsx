@@ -72,8 +72,11 @@ function Announcement() {
 		<div className="bg-primary py-2 text-white">
 			<div className="container mx-auto flex items-center justify-center">
 				{freeShippingThreshold > 0 ? (
-					<p className="text-center text-sm font-semibold">
-						FRI FRAKT VID KÖP ÖVER {freeShippingThreshold / 100} KR
+					<p className="flex gap-2 text-center text-sm font-semibold">
+						<span className="rounded-full bg-white px-2 text-primary">
+							Fri Frakt
+						</span>{" "}
+						Vid Köp Över {freeShippingThreshold / 100} KR
 					</p>
 				) : (
 					"‎"

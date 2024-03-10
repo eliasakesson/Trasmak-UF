@@ -5,7 +5,7 @@ export default function Footer() {
 	return (
 		<footer className="mt-16 bg-gray-100">
 			<div className="w-full border-y border-gray-300 bg-white py-2">
-				<ul className="flex h-8 justify-center gap-2 sm:gap-8">
+				<ul className="xs:gap-2 flex h-8  justify-center gap-1 sm:gap-8">
 					<li className="relative aspect-video">
 						<Image
 							src="https://images.asos-media.com/navigation/klarna-gb-png"

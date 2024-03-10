@@ -12,11 +12,9 @@ import { LoadImages, SetTrayObject } from "@/utils/design/Helper";
 import { DesignProps, ObjectProps } from "@/utils/design/Interfaces";
 import SetupMouseEventsNew from "@/utils/design/MouseEventsNew";
 import GetProducts from "@/utils/getProducts";
-import { set } from "firebase/database";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { Product } from "use-shopping-cart/core";
 import { SiteContext } from "./_app";
 
 export const DesignerContext = createContext<{
@@ -60,33 +58,43 @@ export default function Designer({ products }: { products: any[] }) {
 	);
 	const [trayObject, setTrayObject] = useState<ObjectProps | null>(null);
 
-	useEffect(
-		() => SetTrayObject(products, currentDesign.id, setTrayObject),
-		[currentDesign.id, products],
-	);
-
 	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (!canvas) return;
-
-		if (!trayObject) {
-			SetTrayObject(products, currentDesign.id, setTrayObject);
-			return;
-		}
-
 		let timeout: NodeJS.Timeout;
-		window.addEventListener("resize", (ev: UIEvent) => {
+
+		SetTrayObject(products, currentDesign.id, setTrayObject);
+
+		function onResize(ev: UIEvent) {
 			clearTimeout(timeout);
 			timeout = setTimeout(
 				() => SetTrayObject(products, currentDesign.id, setTrayObject),
 				50,
 			);
-		});
-		DrawDesign();
+		}
+
+		window.addEventListener("resize", onResize);
+
+		return () => {
+			window.removeEventListener("resize", onResize);
+			clearInterval(timeout);
+		};
+	}, [products, currentDesign.id, setTrayObject]);
+
+	useEffect(() => {
+		console.log(trayObject);
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+
+		let tray = trayObject;
+		if (!tray) {
+			tray = SetTrayObject(products, currentDesign.id, setTrayObject);
+		}
+		if (!tray) return;
+
+		DrawDesign(currentDesign);
 
 		LoadImages(currentDesign, (design) =>
 			setTimeout(() => {
-				SetTrayObject(products, currentDesign.id, setTrayObject);
+				DrawDesign(design);
 			}, 50),
 		);
 
@@ -94,11 +102,11 @@ export default function Designer({ products }: { products: any[] }) {
 			(object) => object.id === selectedObjectID,
 		);
 
-		MoveDesignEditor(designEditorRef, canvas, trayObject, selectedObject);
+		MoveDesignEditor(designEditorRef, canvas, tray, selectedObject);
 
 		const mouseEventCleanup = SetupMouseEventsNew(
 			canvas,
-			trayObject,
+			tray,
 			currentDesign,
 			setCurrentDesign,
 			selectedObjectID,
@@ -106,19 +114,18 @@ export default function Designer({ products }: { products: any[] }) {
 			designEditorRef.current,
 			async (design, snapLineX, snapLineY) => {
 				await DrawDesign(design);
+				if (!tray) return;
 				if (snapLineX !== null) {
-					DrawSnapLineX(canvas, trayObject, snapLineX);
+					DrawSnapLineX(canvas, tray, snapLineX);
 				}
 				if (snapLineY !== null) {
-					DrawSnapLineY(canvas, trayObject, snapLineY);
+					DrawSnapLineY(canvas, tray, snapLineY);
 				}
 			},
 		);
 
 		return () => {
-			window.removeEventListener("resize", (ev: UIEvent) => DrawDesign());
 			mouseEventCleanup();
-			clearInterval(timeout);
 		};
 	}, [
 		currentDesign,
@@ -131,10 +138,9 @@ export default function Designer({ products }: { products: any[] }) {
 	useEffect(() => {
 		if (design) {
 			setDesign(null);
-			console.log(design);
 			setCurrentDesign(design);
+			SetTrayObject(products, design.id, setTrayObject);
 		} else if (products.length > 0 && currentDesign?.id?.length <= 0) {
-			console.log(currentDesign.id);
 			setCurrentDesign((current) => ({
 				...current,
 				id: products[0].id.substring(6, products[0].id.length),
@@ -142,23 +148,23 @@ export default function Designer({ products }: { products: any[] }) {
 		}
 	}, [products, currentDesign.id, design]);
 
-	async function DrawDesign(design?: DesignProps) {
+	async function DrawDesign(design: DesignProps) {
 		if (isDrawing.current) return;
 
 		const canvas = canvasRef.current;
-		if (!canvas || !trayObject) return;
+		if (!canvas) return;
+
+		let tray = trayObject;
+		if (!tray) {
+			tray = SetTrayObject(products, design.id, setTrayObject);
+		}
+		if (!tray) return;
 
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
 
 		isDrawing.current = true;
-		await Draw(
-			canvas,
-			trayObject,
-			design || currentDesign,
-			selectedObjectID,
-			false,
-		);
+		await Draw(canvas, tray, design, selectedObjectID, false);
 		isDrawing.current = false;
 	}
 
@@ -197,7 +203,7 @@ export default function Designer({ products }: { products: any[] }) {
 						<DesignerButtons />
 						<DesignEditor ref={designEditorRef} />
 					</div>
-					<div className="space-y-4 p-16" id="saved-designs">
+					<div className="space-y-4 p-4 lg:p-16" id="saved-designs">
 						<h2 className="text-2xl font-semibold">
 							Sparade designer
 						</h2>
@@ -213,7 +219,7 @@ export default function Designer({ products }: { products: any[] }) {
 							canvasClassKey="saved-design-canvas"
 						/>
 					</div>
-					<div className="space-y-4 p-16" id="templates">
+					<div className="space-y-4 p-4 lg:p-16" id="templates">
 						<h2 className="text-2xl font-semibold">Mallar</h2>
 						<TemplateDesigns
 							products={products}
@@ -222,6 +228,10 @@ export default function Designer({ products }: { products: any[] }) {
 								setCurrentDesign(design);
 								router.replace("/designer", undefined, {
 									shallow: true,
+								});
+								window.scrollTo({
+									top: 0,
+									behavior: "smooth",
 								});
 							}}
 							canvasClassKey="templates-canvas"

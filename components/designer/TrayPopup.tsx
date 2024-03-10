@@ -22,20 +22,22 @@ export default function TrayPopup() {
 					<button
 						onClick={() => selectProduct(product)}
 						key={i}
-						className="relative flex w-full flex-col rounded-lg bg-white p-2 text-2xl lg:flex-row lg:gap-4"
+						className="relative flex w-full flex-col items-center rounded-lg bg-white p-2 text-2xl lg:flex-row lg:gap-4"
 					>
 						<div className="relative aspect-square h-12 lg:h-16">
 							<Image src={product.image} alt="" fill />
 						</div>
-						<p className="w-[15ch] py-2 text-left text-base lg:w-[20ch]">
-							{product.name}
-						</p>
-						<span className="bottom-2 right-2 text-base text-muted lg:absolute">
-							{formatCurrencyString({
-								value: product.price,
-								currency: product.currency,
-							})}
-						</span>
+						<div className="flex flex-col">
+							<p className="w-[15ch] py-2 text-sm lg:w-[20ch] lg:text-left lg:text-base">
+								{product.name}
+							</p>
+							<span className="text-center text-xs text-muted lg:text-left lg:text-base">
+								{formatCurrencyString({
+									value: product.price,
+									currency: product.currency,
+								})}
+							</span>
+						</div>
 					</button>
 				))}
 			</div>

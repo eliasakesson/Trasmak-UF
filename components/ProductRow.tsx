@@ -94,11 +94,7 @@ export function ProductCard({
 	const { width } = useWindowSize();
 
 	return (
-		<Link
-			href={`/${
-				width < 768 || toProductPage ? "products/" : "design?d="
-			}${id.substring(6, id.length)}`}
-		>
+		<Link href={`/products/${id.substring(6, id.length)}`}>
 			<div className="flex h-full flex-col">
 				<div className="relative aspect-square">
 					<div className="h-full w-full">

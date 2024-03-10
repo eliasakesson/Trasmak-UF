@@ -31,7 +31,7 @@ function BottomLeftButtons() {
 	const { currentDesign } = useContext(DesignerContext);
 
 	return (
-		<div className="absolute right-8 top-8 flex gap-4 lg:bottom-8 lg:left-8 lg:right-auto lg:top-auto lg:flex-col-reverse lg:items-start">
+		<div className="absolute right-4 top-4 flex gap-4 lg:bottom-8 lg:left-8 lg:right-auto lg:top-auto lg:flex-col-reverse lg:items-start">
 			<ButtonWithTooltip
 				className="flex items-center gap-2 rounded-lg bg-primary p-4 font-semibold text-white transition-colors hover:bg-primary_light disabled:hover:bg-primary_dark"
 				position="right"
@@ -77,7 +77,7 @@ function BottomLeftButtons() {
 
 function TopLeftButtons() {
 	return (
-		<div className="absolute left-8 top-8 flex flex-col items-start gap-4">
+		<div className="absolute left-4 top-4 flex flex-col items-start gap-4 lg:left-8 lg:top-8">
 			{/* <ButtonWithTooltip
 				position="right"
 				className="rounded-lg bg-slate-400 p-4 text-2xl text-white transition-colors hover:bg-slate-500"
@@ -109,9 +109,9 @@ function BottomRightButtons() {
 	}, [currentDesign]);
 
 	return (
-		<div className="pointer-events-none absolute bottom-36 right-8 flex flex-col-reverse items-end gap-4 lg:bottom-8">
+		<div className="absolute bottom-4 left-4 right-4 flex flex-row-reverse items-end justify-between gap-4 lg:pointer-events-none lg:bottom-8 lg:right-8 lg:flex-col-reverse">
 			<button
-				className="pointer-events-auto flex items-center gap-2 rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light"
+				className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:pointer-events-auto"
 				onClick={() =>
 					AddToCart(
 						products,

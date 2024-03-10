@@ -39,7 +39,7 @@ export default function HowToDesign() {
 						</Link> */}
 						<Link
 							href="/designer"
-							className="w-full rounded-lg border-2 px-8 py-4 font-semibold transition-colors hover:bg-slate-100 lg:w-fit 2xl:px-16"
+							className="w-full rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:w-fit 2xl:px-16"
 						>
 							Designa själv
 						</Link>
@@ -64,7 +64,6 @@ export default function HowToDesign() {
 						fill
 						className="border-2 border-gray-300 object-cover object-top"
 					/>
-					d
 				</div>
 				<div className="flex flex-col space-y-4 lg:items-end lg:text-right">
 					<h3 className="flex items-center gap-4 text-3xl font-bold">
