@@ -1,8 +1,9 @@
 import { DesignerContext } from "@/pages/designer";
 import { useContext } from "react";
 import defaultDesign from "@/data/defaultdesign.json";
-import { DesignProps, ObjectProps } from "@/utils/design/Interfaces";
+import { DesignProps, ObjectProps } from "@/utils/designer/Interfaces";
 import { ToolBarContext } from "./ToolBar";
+import { GetObjectDimensions } from "@/utils/designer/Helper";
 
 export default function TextPopup() {
 	const fonts = [
@@ -24,7 +25,8 @@ export default function TextPopup() {
 		{ value: "arial", text: "Arial" },
 	];
 
-	const { currentDesign, setCurrentDesign } = useContext(DesignerContext);
+	const { currentDesign, setCurrentDesign, trayObject } =
+		useContext(DesignerContext);
 	const { setOpenMenu } = useContext(ToolBarContext);
 
 	function addText(font: string) {
@@ -36,17 +38,36 @@ export default function TextPopup() {
 		const order =
 			Math.max(...currentDesign.objects.map((obj) => obj.order), 0) + 1;
 
+		let object = {
+			...defaultDesign["text"],
+			font,
+			id,
+			order,
+		} as ObjectProps;
+
+		const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+		const ctx = canvas.getContext("2d");
+
+		if (ctx && trayObject) {
+			const { width, height } = GetObjectDimensions(
+				ctx,
+				trayObject,
+				object,
+			);
+
+			const x = 0.5 - width / (trayObject.width ?? 1) / 2;
+			const y = 0.5 - height / (trayObject.height ?? 1) / 2;
+
+			object = {
+				...object,
+				x,
+				y,
+			};
+		}
+
 		setCurrentDesign({
 			...currentDesign,
-			objects: [
-				...currentDesign.objects,
-				{
-					...defaultDesign["text"],
-					font,
-					id,
-					order,
-				},
-			],
+			objects: [...currentDesign.objects, object],
 		} as DesignProps);
 
 		setOpenMenu(null);

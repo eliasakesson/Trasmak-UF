@@ -2,7 +2,7 @@ import { ref, remove, set } from "firebase/database";
 import { DesignProps } from "./Interfaces";
 import { db } from "@/firebase";
 import { User } from "firebase/auth";
-import { uploadBlob } from "../firebase";
+import { uploadBlob } from "../firebase/helper";
 
 export async function SaveDesign(design: DesignProps, user: User) {
 	const newDesign = await GetDesignWithUploadedImages(design);

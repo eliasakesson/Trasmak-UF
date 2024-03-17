@@ -19,7 +19,6 @@ import {
 } from "react-icons/fa";
 import {
 	RiFunctionFill,
-	RiGuideFill,
 	RiImageFill,
 	RiPencilFill,
 	RiStackFill,
@@ -31,13 +30,13 @@ import { GoLaw } from "react-icons/go";
 import { BsChevronDown } from "react-icons/bs";
 import { motion, useAnimationControls } from "framer-motion";
 import { useShoppingCart } from "use-shopping-cart";
-import GetProducts from "@/utils/getProducts";
+import GetProducts from "@/utils/stripe/getProducts";
 import { useRouter } from "next/router";
 import { FaX } from "react-icons/fa6";
-import { signInWithGoogle } from "@/utils/firebase";
+import { signInWithGoogle } from "@/utils/firebase/helper";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
-import GetConfig from "@/utils/getConfig";
+import GetConfig from "@/utils/firebase/getConfig";
 import { useWindowSize } from "@/utils/hooks";
 import { User } from "firebase/auth";
 import SlideWrapper from "./SlideWrapper";

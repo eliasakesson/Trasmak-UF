@@ -36,7 +36,7 @@ export default function Login() {
 			await createUserWithEmailAndPassword(
 				auth,
 				input.email,
-				input.password
+				input.password,
 			);
 
 			toast.success("Kontot har skapats");
@@ -68,26 +68,27 @@ export default function Login() {
 				<meta name="robots" content="index, follow" />
 			</Head>
 			<main className="relative pb-16">
-				<section className="lg:min-h-[calc(100vh-153px)] min-h-[calc(100vh-111px)] flex lg:flex-row flex-col-reverse max-lg:gap-8">
-					<div className="lg:flex-1 flex max-lg:h-1/2">
-						<div className="lg:pl-[10vw] lg:pr-[5vw] px-8 lg:h-md:pb-[153px] py-8 flex flex-col justify-center gap-8 h-full">
-							<h1 className="xl:text-6xl lg:text-5xl text-3xl font-bold leading-tight text-gray-900">
+				<section className="max-lg:gap-8 flex min-h-[calc(100vh-111px)] flex-col-reverse lg:min-h-[calc(100vh-153px)] lg:flex-row">
+					<div className="max-lg:h-1/2 flex lg:flex-1">
+						<div className="flex h-full flex-col justify-center gap-8 px-8 py-8 lg:pl-[10vw] lg:pr-[5vw] lg:h-md:pb-[153px]">
+							<h1 className="text-3xl font-bold leading-tight text-gray-900 lg:text-5xl xl:text-6xl">
 								Skapa ett konto
 							</h1>
-							<p className="xl:text-xl text-base text-gray-600 max-w-full">
+							<p className="max-w-full text-base text-gray-600 xl:text-xl">
 								Med ett konto kan du spara dina brickor och
 								fortsätta designa dem senare.
 							</p>
 							<span>
 								{error && (
-									<p className="text-red-500 text-sm">
+									<p className="text-sm text-red-500">
 										{error}
 									</p>
 								)}
 							</span>
 							<form
 								onSubmit={handleSubmit}
-								className="flex flex-col gap-4">
+								className="flex flex-col gap-4"
+							>
 								<div className="flex flex-col gap-1">
 									<label htmlFor="email">Email</label>
 									<input
@@ -95,7 +96,7 @@ export default function Login() {
 										name="email"
 										id="email"
 										placeholder="namn@test.com"
-										className="border border-gray-300 rounded-md p-3 h-full"
+										className="h-full rounded-md border border-gray-300 p-3"
 										value={input.email}
 										onChange={(e) =>
 											setInput({
@@ -113,7 +114,7 @@ export default function Login() {
 										name="password"
 										id="password"
 										placeholder="********"
-										className="border border-gray-300 rounded-md p-3 h-full"
+										className="h-full rounded-md border border-gray-300 p-3"
 										value={input.password}
 										onChange={(e) =>
 											setInput({
@@ -127,23 +128,25 @@ export default function Login() {
 								<button
 									type="submit"
 									disabled={loading}
-									className="flex items-center gap-2 bg-primary text-white text-left w-fit text-lg font-semibold px-16 py-3 rounded-md disabled:bg-primary_dark transition-colors">
+									className="flex w-fit items-center gap-2 rounded-md bg-primary px-16 py-3 text-left text-lg font-semibold text-white transition-colors disabled:bg-primary_dark"
+								>
 									{loading && <Spinner />}
 									Skapa konto
 								</button>
 							</form>
-							<p className="text-gray-600 text-sm">
+							<p className="text-sm text-gray-600">
 								Har du redan ett konto?{" "}
 								<Link
 									href="/login"
-									className="text-primary font-semibold">
+									className="font-semibold text-primary"
+								>
 									Logga in
 								</Link>
 							</p>
 						</div>
 					</div>
-					<div className="flex-1 flex max-lg:h-1/2">
-						<div className="flex-1 bg-primary relative overflow-hidden">
+					<div className="max-lg:h-1/2 flex flex-1">
+						<div className="relative flex-1 overflow-hidden bg-primary">
 							<Image
 								src="/images/valnöt.jpg"
 								layout="fill"

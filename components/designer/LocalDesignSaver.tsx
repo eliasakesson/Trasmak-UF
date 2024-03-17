@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { DesignerContext } from "@/pages/designer";
-import { DesignProps, ObjectProps } from "@/utils/design/Interfaces";
+import { DesignProps, ObjectProps } from "@/utils/designer/Interfaces";
 import { motion } from "framer-motion";
 import { FaTimes } from "react-icons/fa";
 

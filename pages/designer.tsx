@@ -1,26 +1,27 @@
 import {
 	DesignEditor,
 	MoveDesignEditor,
-} from "@/components/design/DesignEditor";
+} from "@/components/designer/DesignEditor";
 import SavedDesigns from "@/components/design/SavedDesigns";
 import TemplateDesigns from "@/components/design/TemplateDesigns";
 import DesignerButtons from "@/components/designer/DesignerButtons";
 import LocalDesignSaver from "@/components/designer/LocalDesignSaver";
 import ToolBar from "@/components/designer/ToolBar";
-import Draw, { DrawSnapLineX, DrawSnapLineY } from "@/utils/design/Draw";
-import { LoadImages, SetTrayObject } from "@/utils/design/Helper";
-import { DesignProps, ObjectProps } from "@/utils/design/Interfaces";
-import SetupMouseEventsNew from "@/utils/design/MouseEventsNew";
-import GetProducts from "@/utils/getProducts";
+import Draw, { DrawSnapLineX, DrawSnapLineY } from "@/utils/designer/Draw";
+import { LoadImages, SetTrayObject } from "@/utils/designer/Helper";
+import { DesignProps, ObjectProps } from "@/utils/designer/Interfaces";
+import SetupMouseEvents from "@/utils/designer/MouseEvents";
+import GetProducts from "@/utils/stripe/getProducts";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { SiteContext } from "./_app";
+import DesignerGuide from "@/components/designer/DesignerGuide";
 
 export const DesignerContext = createContext<{
 	currentDesign: DesignProps;
 	setCurrentDesign: (currentDesign: DesignProps) => void;
-	traySize: { width: number; height: number };
+	trayObject: ObjectProps | null;
 	products: any[];
 	selectedObjectID: number | null;
 	setSelectedObjectID: (id: number | null) => void;
@@ -31,10 +32,7 @@ export const DesignerContext = createContext<{
 		objects: [],
 	},
 	setCurrentDesign: () => {},
-	traySize: {
-		width: 0,
-		height: 0,
-	},
+	trayObject: null,
 	products: [],
 	selectedObjectID: null,
 	setSelectedObjectID: () => {},
@@ -80,7 +78,6 @@ export default function Designer({ products }: { products: any[] }) {
 	}, [products, currentDesign.id, setTrayObject]);
 
 	useEffect(() => {
-		console.log(trayObject);
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 
@@ -104,7 +101,7 @@ export default function Designer({ products }: { products: any[] }) {
 
 		MoveDesignEditor(designEditorRef, canvas, tray, selectedObject);
 
-		const mouseEventCleanup = SetupMouseEventsNew(
+		const mouseEventCleanup = SetupMouseEvents(
 			canvas,
 			tray,
 			currentDesign,
@@ -182,16 +179,14 @@ export default function Designer({ products }: { products: any[] }) {
 				value={{
 					currentDesign,
 					setCurrentDesign,
-					traySize: {
-						width: trayObject?.width ?? 0,
-						height: trayObject?.height ?? 0,
-					},
+					trayObject,
 					products,
 					selectedObjectID,
 					setSelectedObjectID,
 				}}
 			>
 				<LocalDesignSaver />
+				<DesignerGuide />
 				<div>
 					<div className="relative h-[calc(100dvh-116px)] overflow-hidden">
 						<canvas

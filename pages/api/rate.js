@@ -1,10 +1,10 @@
 import { v4 as uuid } from "uuid";
-import { stripe } from "@/utils/stripe";
+import { stripe } from "@/utils/stripe/stripe";
 import { db } from "./firebase";
 
 export default async (req, res) => {
 	const { productID, rating, rateToken } = req.query;
-	
+
 	try {
 		const productExists = await ProductExists(productID);
 		if (!productExists) {

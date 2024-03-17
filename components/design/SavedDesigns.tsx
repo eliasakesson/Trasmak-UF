@@ -1,13 +1,13 @@
 import DesignsGrid from "@/components/design/DesignsGrid";
 import { Product } from "use-shopping-cart/core";
-import { DesignProps } from "../../utils/design/Interfaces";
+import { DesignProps } from "../../utils/designer/Interfaces";
 import { useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "@/firebase";
 import { onValue, ref } from "firebase/database";
-import { DeleteDesign, UploadTemplate } from "@/utils/design/DesignSaver";
+import { DeleteDesign, UploadTemplate } from "@/utils/designer/DesignSaver";
 import toast from "react-hot-toast";
-import useIsAdmin from "@/utils/useIsAdmin";
+import useIsAdmin from "@/utils/firebase/useIsAdmin";
 
 export default function SavedDesigns({
 	products,

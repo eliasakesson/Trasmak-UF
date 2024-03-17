@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { DesignProps } from "../../utils/design/Interfaces";
-import { GetTrayObjFromCanvas } from "../../utils/design/Helper";
-import Draw from "../../utils/design/Draw";
+import { DesignProps } from "../../utils/designer/Interfaces";
+import { GetTrayObjFromCanvas } from "../../utils/designer/Helper";
+import Draw from "../../utils/designer/Draw";
 import { FaTrash, FaUpload } from "react-icons/fa";
 
 export default function DesignsGrid({

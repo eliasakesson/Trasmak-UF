@@ -1,6 +1,6 @@
 import { RatingStars } from "@/components/Rating";
-import { GetProduct } from "@/utils/getProducts";
-import { stripe } from "@/utils/stripe";
+import { GetProduct } from "@/utils/stripe/getProducts";
+import { stripe } from "@/utils/stripe/stripe";
 import Image from "next/image";
 import { useState } from "react";
 import toast from "react-hot-toast";

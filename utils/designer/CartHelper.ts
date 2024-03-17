@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import { GetTrayObjFromCanvas } from "./Helper";
-import { uploadFromCanvas } from "../firebase";
-import { DrawRender } from "./Draw";
+import { uploadFromCanvas } from "../firebase/helper";
+import Draw, { DrawRender } from "./Draw";
 import { DesignProps } from "./Interfaces";
 import { MutableRefObject } from "react";
 
@@ -27,18 +27,19 @@ export default async function AddToCart(
 			product.id.substring(6, product.id.length) === currentDesign.id,
 	)?.metadata;
 
-	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-
 	const height = (metadata?.height ?? 33) * 0.393701 * 300;
-	const upScaleFactor = height / (canvas.height * 0.85);
 
-	const newCanvas = document.createElement("canvas");
-	newCanvas.width =
+	const renderCanvas = document.createElement("canvas");
+	renderCanvas.width =
 		height * ((metadata?.width ?? 1) / (metadata?.height ?? 1));
-	newCanvas.height = height;
+	renderCanvas.height = height;
+
+	const previewCanvas = document.createElement("canvas");
+	previewCanvas.width = 300;
+	previewCanvas.height = 300;
 
 	const renderTray = GetTrayObjFromCanvas(
-		newCanvas,
+		renderCanvas,
 		1,
 		metadata?.width,
 		metadata?.height,
@@ -47,7 +48,17 @@ export default async function AddToCart(
 		metadata?.edge,
 	);
 
-	if (!renderTray) {
+	const previewTray = GetTrayObjFromCanvas(
+		previewCanvas,
+		0.9,
+		metadata?.width,
+		metadata?.height,
+		metadata?.radius,
+		metadata?.bleed,
+		metadata?.edge,
+	);
+
+	if (!renderTray || !previewTray) {
 		toast.error("Något gick fel", { id: toastID });
 		console.error("Tray is null");
 		return;
@@ -74,34 +85,35 @@ export default async function AddToCart(
 			return;
 		}
 
-		await DrawRender(newCanvas, renderTray, currentDesign, upScaleFactor);
+		await Promise.all([
+			Draw(previewCanvas, previewTray, currentDesign),
+			DrawRender(renderCanvas, renderTray, currentDesign, 1),
+		]);
 
-		const coverImage = uploadFromCanvas(canvas);
-		const renderImage = uploadFromCanvas(newCanvas);
+		const [coverImageURL, renderImageURL] = await Promise.all([
+			uploadFromCanvas(previewCanvas),
+			uploadFromCanvas(renderCanvas),
+		]);
 
-		Promise.all([renderImage, coverImage])
-			.then((values) => {
-				toast.loading("Lägger till i kundvagnen...", {
-					id: toastID,
-				});
+		console.log(coverImageURL, renderImageURL);
 
-				console.log(values[0]);
+		toast.loading("Lägger till i kundvagnen...", {
+			id: toastID,
+		});
 
-				AddProductToCart(
-					product,
-					cartDetails,
-					addItem,
-					lastAddedImageURL,
-					toastID,
-					{
-						image: values[0],
-						cover: values[1],
-					},
-				);
-			})
-			.finally(() => {
-				isAddingToCart.current = false;
-			});
+		AddProductToCart(
+			product,
+			cartDetails,
+			addItem,
+			lastAddedImageURL,
+			toastID,
+			{
+				image: renderImageURL,
+				cover: coverImageURL,
+			},
+		);
+
+		isAddingToCart.current = false;
 	} catch (error) {
 		toast.error("Något gick fel", { id: toastID });
 		console.error(error);

@@ -1,13 +1,13 @@
 import { DesignerContext } from "@/pages/designer";
 import { useCallback, useContext } from "react";
 import defaultDesign from "@/data/defaultdesign.json";
-import { DesignProps } from "@/utils/design/Interfaces";
+import { DesignProps } from "@/utils/designer/Interfaces";
 import { ToolBarContext } from "./ToolBar";
 import { useDropzone } from "react-dropzone";
 import toast from "react-hot-toast";
 
 export default function ImagePopup() {
-	const { currentDesign, setCurrentDesign, traySize } =
+	const { currentDesign, setCurrentDesign, trayObject } =
 		useContext(DesignerContext);
 	const { setOpenMenu } = useContext(ToolBarContext);
 
@@ -20,10 +20,9 @@ export default function ImagePopup() {
 		const order =
 			Math.max(...currentDesign.objects.map((obj) => obj.order), 0) + 1;
 
-		const aspectRatio =
-			image.width / image.height / (traySize.width / traySize.height);
-		const width = aspectRatio > 1 ? 0.5 : aspectRatio * 0.5;
-		const height = aspectRatio > 1 ? aspectRatio * 0.5 : 0.5;
+		const aspectRatio = image.width / image.height;
+		const width = aspectRatio >= 1 ? 0.5 : aspectRatio * 0.5;
+		const height = aspectRatio < 1 ? 0.5 : aspectRatio * 0.5;
 
 		const x = 0.5 - width / 2;
 		const y = 0.5 - height / 2;

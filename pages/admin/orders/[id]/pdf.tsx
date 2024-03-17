@@ -1,8 +1,6 @@
 import AdminWrapper from "@/components/admin/AdminWrapper";
-import GetOrders, { GetOrder } from "@/utils/admin/getOrders";
+import { GetOrder } from "@/utils/stripe/getOrders";
 import Link from "next/link";
-import { formatCurrencyString } from "use-shopping-cart";
-
 import {
 	Document,
 	Page,
@@ -10,12 +8,13 @@ import {
 	View,
 	StyleSheet,
 	PDFViewer,
-	Image,
+	Image as PDFImage,
 } from "@react-pdf/renderer";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
+import Compressor from "compressorjs";
 
 export default function AdminOrder() {
 	return (
@@ -77,10 +76,10 @@ function Top({ orderNr }: { orderNr: number }) {
 	return (
 		<View style={styles.between}>
 			<View style={{ flex: 1, gap: 2 }}>
-				<Image
+				<PDFImage
 					src="/images/logo-big.png"
 					style={{ flex: 1, aspectRatio: 1 }}
-				></Image>
+				></PDFImage>
 				<Text>Träsmak UF</Text>
 			</View>
 			<View
@@ -154,6 +153,37 @@ function Info({ order }: { order: any }) {
 }
 
 function Products({ products }: { products: any }) {
+	const [productImages, setProductImages] = useState<any[]>([]);
+
+	useEffect(() => {
+		async function fetchImages() {
+			const images = await Promise.all(
+				products.map((product: any) => {
+					return new Promise((resolve, reject) => {
+						fetch(GetImagePath(product.image))
+							.then((res) => res.blob())
+							.then((blob: Blob) => {
+								new Compressor(blob, {
+									quality: 0.2,
+									success: (result) => {
+										resolve(result.arrayBuffer());
+									},
+									error: (err) => {
+										reject(err);
+									},
+								});
+							});
+					});
+				}),
+			);
+			setProductImages(images);
+		}
+
+		fetchImages();
+	}, [products]);
+
+	console.log(productImages);
+
 	return (
 		<View
 			style={{
@@ -211,8 +241,8 @@ function Products({ products }: { products: any }) {
 							).toFixed(2)}
 						</Text>
 					</View>
-					<Image
-						src={GetImagePath(product.image)}
+					<PDFImage
+						src={productImages[i]}
 						style={{
 							width: "20%",
 							border: 1,
@@ -358,7 +388,7 @@ const styles = StyleSheet.create({
 	},
 });
 
-function GetImagePath(image: string) {
+export function GetImagePath(image: string) {
 	return (
 		"https://firebasestorage.googleapis.com/v0/b/uf-ecom.appspot.com/o/images%2F" +
 		image +

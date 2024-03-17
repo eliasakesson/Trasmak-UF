@@ -1,6 +1,6 @@
 import AdminWrapper from "@/components/admin/AdminWrapper";
-import { ReactNode, use, useEffect, useMemo, useRef, useState } from "react";
-import GetOrders from "@/utils/admin/getOrders";
+import { ReactNode, useEffect, useMemo, useState } from "react";
+import GetOrders from "@/utils/stripe/getOrders";
 import { formatCurrencyString } from "use-shopping-cart";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
@@ -64,15 +64,6 @@ function TopCards({ orderTotal, orders }: { orderTotal: any; orders: any }) {
 	}, [orders]);
 
 	const [totalVisits, setTotalVisits] = useState(0);
-
-	useEffect(() => {
-		async function getAnalytics() {
-			// const analytics = await GetAnalytics();
-			// console.log(analytics);
-		}
-
-		getAnalytics();
-	}, []);
 
 	return (
 		<div className="grid grid-cols-4 gap-8">

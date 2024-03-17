@@ -1,6 +1,6 @@
 import DesignsGrid from "@/components/design/DesignsGrid";
 import { Product } from "use-shopping-cart/core";
-import { DesignProps, ObjectProps } from "../../utils/design/Interfaces";
+import { DesignProps, ObjectProps } from "../../utils/designer/Interfaces";
 import { useEffect, useRef, useState } from "react";
 import { db } from "@/firebase";
 import { onValue, ref } from "firebase/database";

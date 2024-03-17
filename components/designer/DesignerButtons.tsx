@@ -1,16 +1,22 @@
 import Link from "next/link";
 import { useContext, useEffect, useRef } from "react";
 import { DesignerContext } from "@/pages/designer";
-import AddToCart from "@/utils/design/CartHelper";
+import AddToCart from "@/utils/designer/CartHelper";
 import { useShoppingCart } from "use-shopping-cart";
 
 import { MdAddShoppingCart, MdBugReport } from "react-icons/md";
 import { CiShoppingTag } from "react-icons/ci";
-import { FaHeart, FaInfo, FaSave } from "react-icons/fa";
+import {
+	FaHeart,
+	FaInfo,
+	FaQuestion,
+	FaQuestionCircle,
+	FaSave,
+} from "react-icons/fa";
 import { HiTemplate } from "react-icons/hi";
 import { FaI } from "react-icons/fa6";
 import toast from "react-hot-toast";
-import { SaveDesign } from "@/utils/design/DesignSaver";
+import { SaveDesign } from "@/utils/designer/DesignSaver";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 import { useRouter } from "next/router";
@@ -78,13 +84,14 @@ function BottomLeftButtons() {
 function TopLeftButtons() {
 	return (
 		<div className="absolute left-4 top-4 flex flex-col items-start gap-4 lg:left-8 lg:top-8">
-			{/* <ButtonWithTooltip
+			{/* <LinkWithTooltip
+				href="/designer?t=guide"
 				position="right"
 				className="rounded-lg bg-slate-400 p-4 text-2xl text-white transition-colors hover:bg-slate-500"
 				tooltip="Visa guide"
 			>
-				<FaInfo className="text-2xl" />
-			</ButtonWithTooltip> */}
+				<FaQuestionCircle className="text-2xl" />
+			</LinkWithTooltip> */}
 			<LinkWithTooltip
 				href="/bug-report"
 				position="right"
@@ -109,7 +116,7 @@ function BottomRightButtons() {
 	}, [currentDesign]);
 
 	return (
-		<div className="absolute bottom-4 left-4 right-4 flex flex-row-reverse items-end justify-between gap-4 lg:pointer-events-none lg:bottom-8 lg:right-8 lg:flex-col-reverse">
+		<div className="absolute bottom-2 left-4 right-4 flex flex-row-reverse items-end justify-between gap-4 lg:pointer-events-none lg:bottom-8 lg:right-8 lg:flex-col-reverse">
 			<button
 				className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:pointer-events-auto"
 				onClick={() =>
@@ -182,10 +189,11 @@ function LinkWithTooltip({
 			href={href}
 			type="button"
 			className={`${className} group relative`}
+			shallow
 		>
 			{children}
 			<span
-				className={`${position === "left" ? "right-full group-hover:-translate-x-4" : "left-full group-hover:translate-x-4"} pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-400 px-3 py-1 text-lg font-semibold opacity-0 transition-all group-hover:opacity-100 group-hover:delay-100`}
+				className={`${position === "left" ? "right-full group-hover:-translate-x-4" : "left-full group-hover:translate-x-4"} pointer-events-none absolute top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-400 px-3 py-1 text-lg font-semibold opacity-0 transition-all group-hover:opacity-100 group-hover:delay-100 lg:block`}
 			>
 				{tooltip}
 			</span>

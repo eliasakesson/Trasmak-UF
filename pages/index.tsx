@@ -1,9 +1,9 @@
 import ProductRow from "@/components/ProductRow";
-import Hero from "@/components/Hero";
-import GetProducts from "@/utils/getProducts";
-import Section1 from "@/components/Section1";
+import Hero from "@/components/homepage/Hero";
+import GetProducts from "@/utils/stripe/getProducts";
+import Section1 from "@/components/homepage/Section1";
 import Head from "next/head";
-import Inspiration from "@/components/Inspiration";
+import Inspiration from "@/components/homepage/Inspiration";
 import TemplateDesigns from "@/components/design/TemplateDesigns";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -13,9 +13,9 @@ import { logEvent } from "firebase/analytics";
 import { useAnalytics } from "@/firebase";
 import { useContext, useEffect } from "react";
 import { SiteContext } from "./_app";
-import About from "@/components/About";
-import HowToDesign from "@/components/HowToDesign";
-import TellYourStory from "@/components/TellYourStory";
+import About from "@/components/homepage/About";
+import HowToDesign from "@/components/homepage/HowToDesign";
+import TellYourStory from "@/components/homepage/TellYourStory";
 
 export default function Home({ products }: { products: any }) {
 	const router = useRouter();

@@ -1,7 +1,5 @@
-import { DesignProps, ObjectProps } from "@/utils/design/Interfaces";
-import { GetObjectDimensions } from "./Helper";
-import defaultDesign from "../../data/defaultdesign.json";
-import { DrawSnapLineX } from "./Draw";
+import { DesignProps, ObjectProps } from "@/utils/designer/Interfaces";
+import { GetObjectDimensions, GetTextSize } from "./Helper";
 
 export default function SetupMouseEvents(
 	canvas: HTMLCanvasElement,
@@ -53,20 +51,21 @@ export default function SetupMouseEvents(
 				y: clickY - y,
 			};
 
-			if (
-				dragObject.type === "image" ||
-				dragObject.type === "rectangle"
-			) {
-				const resizeDir = GetResizeDirection(
-					clickX,
-					clickY,
-					x,
-					y,
-					width,
-					height,
-				);
+			const resizeDir = GetResizeDirection(
+				clickX,
+				clickY,
+				x,
+				y,
+				width,
+				height,
+			);
 
-				if (resizeDir) {
+			if (resizeDir) {
+				if (
+					dragObject.type !== "text" ||
+					resizeDir === "left" ||
+					resizeDir === "right"
+				) {
 					dragType = "resize";
 					resizeDirection = resizeDir;
 				} else {
@@ -131,38 +130,40 @@ export default function SetupMouseEvents(
 
 			const { clickX, clickY } = GetCoordsFromEvent(e, canvas);
 
-			if (
-				selectedObject.type === "image" ||
-				selectedObject.type === "rectangle"
-			) {
-				const resizeDir = GetResizeDirection(
-					clickX,
-					clickY,
-					x,
-					y,
-					width,
-					height,
-				);
+			const resizeDir = GetResizeDirection(
+				clickX,
+				clickY,
+				x,
+				y,
+				width,
+				height,
+			);
 
-				if (resizeDir) {
-					if (resizeDir === "top" || resizeDir === "bottom") {
-						canvas.style.cursor = "ns-resize";
-					} else if (resizeDir === "left" || resizeDir === "right") {
-						canvas.style.cursor = "ew-resize";
-					} else if (
-						resizeDir === "top-left" ||
-						resizeDir === "bottom-right"
-					) {
-						canvas.style.cursor = "nwse-resize";
-					} else if (
-						resizeDir === "top-right" ||
-						resizeDir === "bottom-left"
-					) {
-						canvas.style.cursor = "nesw-resize";
-					}
+			if (resizeDir) {
+				if (
+					(resizeDir === "top" || resizeDir === "bottom") &&
+					selectedObject.type !== "text"
+				) {
+					canvas.style.cursor = "ns-resize";
+				} else if (resizeDir === "left" || resizeDir === "right") {
+					canvas.style.cursor = "ew-resize";
+				} else if (
+					(resizeDir === "top-left" ||
+						resizeDir === "bottom-right") &&
+					selectedObject.type !== "text"
+				) {
+					canvas.style.cursor = "nwse-resize";
+				} else if (
+					(resizeDir === "top-right" ||
+						resizeDir === "bottom-left") &&
+					selectedObject.type !== "text"
+				) {
+					canvas.style.cursor = "nesw-resize";
 				} else {
 					canvas.style.cursor = "move";
 				}
+			} else {
+				canvas.style.cursor = "move";
 			}
 		}
 
@@ -204,6 +205,15 @@ export default function SetupMouseEvents(
 						(clickX - trayObject.x) / (trayObject.width || 1) -
 							dragObject.x,
 					);
+
+					if (dragObject.type === "text") {
+						const fontSize = GetTextSize(
+							ctx,
+							trayObject,
+							dragObject,
+						);
+						dragObject.size = fontSize / (trayObject.height || 1);
+					}
 				} else if (
 					resizeDirection === "top-left" ||
 					resizeDirection === "left" ||
@@ -219,6 +229,15 @@ export default function SetupMouseEvents(
 						0.001,
 						oldX - dragObject.x + (dragObject.width ?? 0),
 					);
+
+					if (dragObject.type === "text") {
+						const fontSize = GetTextSize(
+							ctx,
+							trayObject,
+							dragObject,
+						);
+						dragObject.size = fontSize / (trayObject.height || 1);
+					}
 				}
 
 				if (

@@ -9,8 +9,9 @@ export function GetObjectDimensions(
 	function MeasureTextWidth(
 		ctx: CanvasRenderingContext2D,
 		text: ObjectProps,
+		fontSize: number,
 	) {
-		ctx.font = `${text.size}px ${text.font ?? "sans-serif"}`;
+		ctx.font = `${fontSize}px ${text.font ?? "sans-serif"}`;
 		const lines = text.content.split("\n");
 		return Math.max(...lines.map((line) => ctx.measureText(line).width));
 	}
@@ -18,20 +19,22 @@ export function GetObjectDimensions(
 	function MeasureTextHeight(
 		ctx: CanvasRenderingContext2D,
 		text: ObjectProps,
+		fontSize: number,
 	) {
-		ctx.font = `${text.size}px ${text.font ?? "sans-serif"}`;
 		const lines = text.content.split("\n");
-		return lines.length * (text.size || 0);
+		return lines.length * fontSize;
 	}
+
+	const fontSize = (obj.size ?? 0.1) * (tray.height ?? 0);
 
 	if (absolute) {
 		const width =
 			obj.type === "text"
-				? MeasureTextWidth(ctx, obj) / (tray.width ?? 0)
+				? MeasureTextWidth(ctx, obj, fontSize) / (tray.width ?? 0)
 				: obj.width || 0;
 		const height =
 			obj.type === "text"
-				? MeasureTextHeight(ctx, obj) / (tray.height ?? 0)
+				? MeasureTextHeight(ctx, obj, fontSize) / (tray.height ?? 0)
 				: obj.height || 0;
 
 		const x = obj.x;
@@ -42,11 +45,11 @@ export function GetObjectDimensions(
 
 	const width =
 		obj.type === "text"
-			? MeasureTextWidth(ctx, obj)
+			? MeasureTextWidth(ctx, obj, fontSize)
 			: (obj.width || 0) * (tray.width || 0);
 	const height =
 		obj.type === "text"
-			? MeasureTextHeight(ctx, obj)
+			? MeasureTextHeight(ctx, obj, fontSize)
 			: (obj.height || 0) * (tray.height || 0);
 
 	const x = tray.x + (tray.width ?? 0) * obj.x;
@@ -163,26 +166,38 @@ export function SetTrayObject(
 	return tray;
 }
 
-export function LoopUntilSetTrayObject(
-	products: any,
-	currentDesignID: string,
-	trayObject: ObjectProps | null,
-	setTrayObject: (tray: ObjectProps) => void,
+export function GetTextSize(
+	ctx: CanvasRenderingContext2D,
+	tray: ObjectProps,
+	text: ObjectProps,
 ) {
-	function GetLoop() {
-		if (!trayObject) {
-			return setInterval(
-				() => SetTrayObject(products, currentDesignID, setTrayObject),
-				100,
+	if (text.width) {
+		const lines = text.content.split("\n");
+
+		if (lines.every((line) => !line)) return 0;
+
+		const maxWidth = text.width * (tray.width ?? 0);
+		let fontSize = 0;
+		let minSize = 1;
+		let maxSize = 500;
+
+		while (minSize <= maxSize) {
+			const midSize = Math.floor((minSize + maxSize) / 2);
+			ctx.font = `bold ${midSize}px ${text.font ?? "sans-serif"}`;
+			const textWidth = Math.max(
+				...lines.map((line) => ctx.measureText(line).width),
 			);
+
+			if (textWidth <= maxWidth) {
+				fontSize = midSize;
+				minSize = midSize + 1;
+			} else {
+				maxSize = midSize - 1;
+			}
 		}
 
-		return null;
+		return fontSize;
 	}
 
-	const loop: any = GetLoop();
-
-	return () => {
-		clearInterval(loop);
-	};
+	return text.size || 0;
 }

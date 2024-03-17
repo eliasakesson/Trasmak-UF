@@ -1,9 +1,9 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductRow from "@/components/ProductRow";
 import Stars from "@/components/Rating";
-import GetProducts, { GetProduct } from "@/utils/getProducts";
+import GetProducts, { GetProduct } from "@/utils/stripe/getProducts";
 import { useWindowSize } from "@/utils/hooks";
-import { stripe } from "@/utils/stripe";
+import { stripe } from "@/utils/stripe/stripe";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,7 +13,7 @@ import { FaEarthAmericas } from "react-icons/fa6";
 import { MdLocalShipping } from "react-icons/md";
 import { formatCurrencyString } from "use-shopping-cart";
 import { SiteContext } from "../_app";
-import { DesignProps } from "@/utils/design/Interfaces";
+import { DesignProps } from "@/utils/designer/Interfaces";
 
 export default function Product({
 	product,

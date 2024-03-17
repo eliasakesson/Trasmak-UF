@@ -5,7 +5,7 @@
         "order": 0,
         "x": 0.5,
         "y": 0.5,
-        "size": 50,
+        "size": 0.1,
         "color": "#000000",
         "font": "Cinzel"
     },

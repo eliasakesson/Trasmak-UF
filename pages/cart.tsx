@@ -4,10 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
-import { ref, get } from "firebase/database";
-import { db } from "../firebase";
-import GetProducts from "@/utils/getProducts";
-import GetConfig from "@/utils/getConfig";
+import GetProducts from "@/utils/stripe/getProducts";
+import GetConfig from "@/utils/firebase/getConfig";
 import Head from "next/head";
 
 export default function Cart({ products, config }: any) {
@@ -36,7 +34,7 @@ function CartItems({ products }: { products: any }) {
 
 	return (
 		<div className="col-span-2">
-			<div className="flex items-center justify-between py-4 pb-8">
+			<div className="flex flex-col justify-between gap-2 py-4 pb-8 lg:flex-row lg:items-center">
 				<h1 className="text-4xl font-bold">Min Varukorg</h1>
 				<p className="text-gray-500">
 					{cartCount} {cartCount > 1 ? "produkter" : "produkt"} i
@@ -125,7 +123,7 @@ function CartItem({ cartItem, products }: { cartItem: any; products: any }) {
 							})}
 						</p>
 					</div>
-					<div className="flex items-center gap-2 md:gap-8">
+					<div className="hidden items-center gap-2 md:gap-8 lg:flex">
 						<p className="flex-grow text-xl font-semibold md:flex-grow-0">
 							{formatCurrencyString({
 								value: cartItem.price * cartItem.quantity,

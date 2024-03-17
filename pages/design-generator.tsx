@@ -1,6 +1,6 @@
 import GeneratedDesigns from "@/components/design/GeneratedDesigns";
-import { DesignProps } from "@/utils/design/Interfaces";
-import GetProducts from "@/utils/getProducts";
+import { DesignProps } from "@/utils/designer/Interfaces";
+import GetProducts from "@/utils/stripe/getProducts";
 import { useRouter } from "next/router";
 import { useCallback, useContext, useState } from "react";
 import { useDropzone } from "react-dropzone";

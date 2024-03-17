@@ -1,4 +1,4 @@
-import { GetObjectDimensions } from "./Helper";
+import { GetObjectDimensions, GetTextSize } from "./Helper";
 import { DesignProps, ObjectProps } from "./Interfaces";
 
 export default async function Draw(
@@ -92,21 +92,21 @@ function DrawText(
 	scale: number = 1,
 ) {
 	ctx.fillStyle = text.color ?? "#000";
-	ctx.font = `bold ${(text.size ?? 1) * scale}px ${
-		text.font ?? "sans-serif"
-	}`;
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
+
+	const fontSize = (text.size ?? 0.1) * (tray.height ?? 0);
+	const lineHeight = fontSize * 1.2;
+
+	ctx.font = `bold ${fontSize}px ${text.font ?? "sans-serif"}`;
+
+	const offsetX = tray.x + (tray.width ?? 0) * text.x;
+	const offsetY = tray.y + (tray.height ?? 0) * text.y;
+
 	const lines = text.content.split("\n");
-
 	lines.forEach((line, i) => {
-		const x = (tray.x ?? 0) + (tray.width ?? 0) * text.x;
-		const y =
-			(tray.y ?? 0) +
-			(tray.height ?? 0) * text.y +
-			(text.size ?? 0) * scale * i;
-
-		ctx.fillText(line, x, y);
+		const y = offsetY + lineHeight * scale * i;
+		ctx.fillText(line, offsetX, y);
 	});
 }
 
@@ -321,15 +321,16 @@ async function DrawTray(
 	await new Promise<void>((resolve) => {
 		if (design.image) {
 			let img = new Image();
-			if (!design.imageElement) {
+			if (design.imageElement && design.imageElement.complete) {
+				DrawImage(design.imageElement, resolve);
+				return;
+			} else {
 				img.crossOrigin = "anonymous";
 				img.src = design.image ?? "";
 				img.onload = () => DrawImage(img, resolve);
 				img.onerror = () => {
 					resolve();
 				};
-			} else {
-				DrawImage(design.imageElement, resolve);
 			}
 		} else {
 			ctx.fillStyle = design.color ?? "#eeeeee";
@@ -503,13 +504,15 @@ function HighlightSelectedObject(
 		ctx.fill();
 
 		ctx.restore();
+	}
 
-		// Draw handles at the center of each side
-		ctx.save();
-		ctx.strokeStyle = "#166534";
-		ctx.fillStyle = "#ffffff";
-		ctx.lineWidth = 2;
+	// Draw handles at the center of each side
+	ctx.save();
+	ctx.strokeStyle = "#166534";
+	ctx.fillStyle = "#ffffff";
+	ctx.lineWidth = 2;
 
+	if (selectedObject.type !== "text") {
 		ctx.beginPath();
 		ctx.rect(
 			left + width / 2 - handleWidth / 2,
@@ -528,27 +531,28 @@ function HighlightSelectedObject(
 		);
 		ctx.stroke();
 		ctx.fill();
-		ctx.beginPath();
-		ctx.rect(
-			left - handleHeight / 2,
-			top + height / 2 - handleWidth / 2,
-			handleHeight,
-			handleWidth,
-		);
-		ctx.stroke();
-		ctx.fill();
-		ctx.beginPath();
-		ctx.rect(
-			left + width - handleHeight / 2,
-			top + height / 2 - handleWidth / 2,
-			handleHeight,
-			handleWidth,
-		);
-		ctx.stroke();
-		ctx.fill();
-
-		ctx.restore();
 	}
+
+	ctx.beginPath();
+	ctx.rect(
+		left - handleHeight / 2,
+		top + height / 2 - handleWidth / 2,
+		handleHeight,
+		handleWidth,
+	);
+	ctx.stroke();
+	ctx.fill();
+	ctx.beginPath();
+	ctx.rect(
+		left + width - handleHeight / 2,
+		top + height / 2 - handleWidth / 2,
+		handleHeight,
+		handleWidth,
+	);
+	ctx.stroke();
+	ctx.fill();
+
+	ctx.restore();
 }
 
 export function DrawSnapLineX(

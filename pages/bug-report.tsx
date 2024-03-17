@@ -1,7 +1,7 @@
 import { auth, db } from "@/firebase";
 import { ref, set } from "firebase/database";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import toast from "react-hot-toast";
 import { AiOutlineLoading } from "react-icons/ai";

@@ -17,6 +17,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/checkout-sessions/index.js", "utils/getProducts.js", "utils/stripe.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/api/checkout-sessions/index.js", "utils/stripe/getProducts.js", "utils/stripe/stripe.js"],
   "exclude": ["node_modules"]
 }

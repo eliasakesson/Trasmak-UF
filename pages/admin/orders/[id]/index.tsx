@@ -1,6 +1,6 @@
 import AdminWrapper from "@/components/admin/AdminWrapper";
 import { auth } from "@/firebase";
-import { GetOrder } from "@/utils/admin/getOrders";
+import { GetOrder } from "@/utils/stripe/getOrders";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";

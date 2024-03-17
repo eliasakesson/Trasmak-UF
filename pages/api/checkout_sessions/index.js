@@ -1,7 +1,7 @@
-import { stripe } from "@/utils/stripe";
+import { stripe } from "@/utils/stripe/stripe";
 import { validateCartItems } from "use-shopping-cart/utilities";
 import { db } from "../firebase";
-import { shortenDownloadURL } from "@/utils/firebase";
+import { shortenDownloadURL } from "@/utils/firebase/helper";
 
 export default async function handler(req, res) {
 	if (req.method === "POST") {

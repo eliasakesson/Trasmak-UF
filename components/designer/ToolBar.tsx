@@ -30,7 +30,7 @@ export default function ToolBar() {
 					className="fixed bottom-0 left-0 right-0 top-0"
 				></div>
 			)}
-			<div className="absolute bottom-24 left-1/2 z-20 -translate-x-1/2 lg:bottom-8">
+			<div className="absolute bottom-20 left-1/2 z-20 -translate-x-1/2 lg:bottom-8">
 				<div className="relative flex gap-2 rounded-xl bg-slate-300 p-2 lg:bg-slate-200">
 					<Tool tool="text" tooltip="Lägg till text">
 						<MdTextFields />
@@ -97,7 +97,7 @@ function ToolPopup({ tool }: { tool: string }) {
 	if (openMenu !== tool) return null;
 
 	return (
-		<div className="absolute bottom-20 left-1/2 z-20 -translate-x-1/2">
+		<div className="absolute bottom-20 left-1/2 z-30 -translate-x-1/2">
 			{Object.keys(popups).map((key: string) => {
 				return key === tool ? (
 					<motion.div

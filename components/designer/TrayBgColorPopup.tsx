@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { DesignProps } from "@/utils/design/Interfaces";
+import { DesignProps } from "@/utils/designer/Interfaces";
 import { motion } from "framer-motion";
 import { Colorful } from "@uiw/react-color/src/index";
 import { DesignerContext } from "@/pages/designer";
@@ -8,8 +8,8 @@ export default function TrayBgColorPopup() {
 	const { currentDesign, setCurrentDesign } = useContext(DesignerContext);
 
 	return (
-		<motion.div className="rounded-xl bg-slate-200">
-			<motion.div className="space-y-4 p-4">
+		<motion.div className="rounded-xl bg-slate-300 p-2">
+			<motion.div className="flex flex-col gap-4 rounded-lg">
 				<Colorful
 					color={currentDesign?.color || "#000"}
 					onChange={(color) =>
@@ -91,7 +91,7 @@ function ImageSwatch({ image }: { image: string }) {
 		<button
 			aria-label="Select birch image as tray background"
 			onClick={onClick}
-			className="h-8 w-full rounded-lg border border-slate-100"
+			className="h-8 w-full overflow-hidden rounded-lg border border-slate-100"
 		>
 			<img src={image} alt="" className="h-full w-full object-cover" />
 		</button>

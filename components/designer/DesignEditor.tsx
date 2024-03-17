@@ -7,16 +7,16 @@ import {
 	useCallback,
 	useContext,
 } from "react";
-import { DesignProps, ObjectProps } from "../../utils/design/Interfaces";
+import { DesignProps, ObjectProps } from "../../utils/designer/Interfaces";
 import debounce from "lodash.debounce";
 
 import { FaTrash, FaExpand } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
-import { GetObjectDimensions } from "../../utils/design/Helper";
+import { GetObjectDimensions } from "../../utils/designer/Helper";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
-import useIsAdmin from "@/utils/useIsAdmin";
+import useIsAdmin from "@/utils/firebase/useIsAdmin";
 import { DesignerContext } from "@/pages/designer";
 import {
 	TbChevronDownLeft,
@@ -161,7 +161,8 @@ export const DesignEditor = forwardRef<HTMLElement, HTMLProps<HTMLDivElement>>(
 								<NumberInput
 									label="Textstorlek (px)"
 									objKey="size"
-									range={{ min: 1, max: 250, step: 1 }}
+									range={{ min: 0.01, max: 0.5, step: 0.01 }}
+									percentage
 								/>
 								<Select
 									label="Font"

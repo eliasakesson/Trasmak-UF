@@ -1,4 +1,4 @@
-import { stripe } from "../../../utils/stripe";
+import { stripe } from "@/utils/stripe/stripe";
 
 export default async function handler(req, res) {
 	if (req.method === "GET") {
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 				id,
 				{
 					expand: ["payment_intent", "line_items"],
-				}
+				},
 			);
 			res.status(200).json(checkoutSession);
 		} catch (error) {

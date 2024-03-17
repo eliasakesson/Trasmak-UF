@@ -1,6 +1,6 @@
 import SavedDesigns from "@/components/design/SavedDesigns";
 import { auth } from "@/firebase";
-import GetProducts from "@/utils/getProducts";
+import GetProducts from "@/utils/stripe/getProducts";
 import Image from "next/image";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/router";

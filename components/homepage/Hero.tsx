@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Stars } from "./Rating";
+import { Stars } from "../Rating";
 
 export default function Hero() {
 	return (

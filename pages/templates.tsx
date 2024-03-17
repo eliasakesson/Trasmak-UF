@@ -1,5 +1,5 @@
 import TemplateDesigns from "@/components/design/TemplateDesigns";
-import GetProducts from "@/utils/getProducts";
+import GetProducts from "@/utils/stripe/getProducts";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useContext } from "react";

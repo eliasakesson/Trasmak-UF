@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ProductCard } from "@/components/ProductRow";
-import GetProducts from "@/utils/getProducts";
+import GetProducts from "@/utils/stripe/getProducts";
 import { useRouter } from "next/router";
 import Head from "next/head";
 
@@ -17,8 +17,8 @@ export default function Products({ products }: { products: any }) {
 				/>
 				<meta name="robots" content="index, follow" />
 			</Head>
-			<main className="max-w-7xl w-full mx-auto px-8 py-16 flex flex-col items-center space-y-8 min-h-[calc(100vh-108px)]">
-				<div className="text-center flex flex-col gap-4">
+			<main className="mx-auto flex min-h-[calc(100vh-108px)] w-full max-w-7xl flex-col items-center space-y-8 px-8 py-16">
+				<div className="flex flex-col gap-4 text-center">
 					<h1 className="text-4xl font-bold text-gray-900">
 						Våra produkter
 					</h1>
@@ -49,7 +49,7 @@ function ProductsAndFilterGrid({ products }: { products: any }) {
 
 	return (
 		<div className="w-full">
-			<div className="flex justify-between w-full border-b py-4">
+			<div className="flex w-full justify-between border-b py-4">
 				<span>{products.length} Resultat</span>
 				<label htmlFor="sort" className="sr-only">
 					Sortera efter
@@ -57,7 +57,8 @@ function ProductsAndFilterGrid({ products }: { products: any }) {
 				<select
 					id="sort"
 					onChange={(e) => setSortVal(e.target.value)}
-					className="px-2 py-1 border rounded-lg">
+					className="rounded-lg border px-2 py-1"
+				>
 					<option value="1" aria-label="">
 						Sortera efter
 					</option>
@@ -67,9 +68,9 @@ function ProductsAndFilterGrid({ products }: { products: any }) {
 					<option value="5">Pris (Högt till lågt)</option>
 				</select>
 			</div>
-			<div className="grid md:grid-cols-4 gap-4 py-4">
+			<div className="grid gap-4 py-4 md:grid-cols-4">
 				{/* <Filters setFilters={setFilters} /> */}
-				<div className="col-span-4 grid lg:grid-cols-3 grid-cols-2 gap-4">
+				<div className="col-span-4 grid grid-cols-2 gap-4 lg:grid-cols-3">
 					<ProductGrid
 						products={products}
 						sortVal={sortVal}
@@ -91,7 +92,7 @@ function Filters({ setFilters }: { setFilters: any }) {
 		} else {
 			setFilters((prev: any) => {
 				const newFilters = prev[type].filter(
-					(filter: string) => filter !== e.target.value
+					(filter: string) => filter !== e.target.value,
 				);
 
 				return {
@@ -107,11 +108,11 @@ function Filters({ setFilters }: { setFilters: any }) {
 			<h3 className="text-2xl font-bold text-gray-900">Filter</h3>
 			<div>
 				<h4 className="border-b py-1">Typ</h4>
-				<ul className="space-y-2 mt-2">
+				<ul className="mt-2 space-y-2">
 					<li className="flex items-center gap-2">
 						<input
 							type="checkbox"
-							className="w-4 h-4"
+							className="h-4 w-4"
 							value="common"
 							onChange={(e) => onFilterChange(e, "type")}
 						/>
@@ -120,7 +121,7 @@ function Filters({ setFilters }: { setFilters: any }) {
 					<li className="flex items-center gap-2">
 						<input
 							type="checkbox"
-							className="w-4 h-4"
+							className="h-4 w-4"
 							value="template"
 							onChange={(e) => onFilterChange(e, "type")}
 						/>
@@ -181,7 +182,7 @@ function ProductGrid({
 				return product.name
 					.toLowerCase()
 					.includes(
-						router.query.search_input.toString().toLowerCase()
+						router.query.search_input.toString().toLowerCase(),
 					);
 			} else {
 				return true;
@@ -199,14 +200,14 @@ function ProductGrid({
 			return sortVal === "4"
 				? a.price - b.price
 				: sortVal === "5"
-				? b.price - a.price
-				: 0;
+					? b.price - a.price
+					: 0;
 		});
 
 	if (filteredProducts.length === 0) {
 		return (
 			<>
-				<div className="col-span-full py-4 space-y-4">
+				<div className="col-span-full space-y-4 py-4">
 					<p className="text-muted">
 						Inga produkter matchade din sökning.
 					</p>

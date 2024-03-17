@@ -1,7 +1,7 @@
 import { DesignerContext } from "@/pages/designer";
 import { useContext } from "react";
 import defaultDesign from "@/data/defaultdesign.json";
-import { DesignProps } from "@/utils/design/Interfaces";
+import { DesignProps } from "@/utils/designer/Interfaces";
 import { ToolBarContext } from "./ToolBar";
 import { FaStar } from "react-icons/fa";
 

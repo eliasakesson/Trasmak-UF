@@ -1,5 +1,5 @@
-import GetProducts from "../getProducts";
-import { stripe } from "../stripe";
+import GetProducts from "./getProducts";
+import { stripe } from "./stripe";
 
 export default async function GetOrders() {
 	const sessions = await stripe.checkout.sessions.list({
@@ -14,7 +14,9 @@ export default async function GetOrders() {
 }
 
 export async function GetOrder(id) {
-	const session = await stripe.checkout.sessions.retrieve(id);
+	const session = await stripe.checkout.sessions.retrieve(id, {
+		expand: ["payment_intent"],
+	});
 
 	const stripeProducts = await GetProducts();
 	const metadataProducts = JSON.parse(session.metadata.products);
@@ -36,6 +38,7 @@ export async function GetOrder(id) {
 	return {
 		...session,
 		total: session.amount_total,
+		subtotal: session.amount_subtotal,
 		currency: session.currency,
 		customer: session.customer_details,
 		products,

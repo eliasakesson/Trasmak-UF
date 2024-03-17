@@ -1,8 +1,9 @@
-import { storage } from "../firebase";
+import { storage } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { signIn } from "next-auth/react";
 
 export async function uploadBlob(blob) {
 	const imageRef = ref(storage, `images/${uuidv4()}`);
@@ -48,11 +49,22 @@ export function shortenDownloadURL(url) {
 }
 
 export function signInWithGoogle() {
-
 	const provider = new GoogleAuthProvider();
-	return signInWithPopup(auth, provider).then((result) => {
-		return result.user;
-	}).catch((error) => {
-		return error;
-	});
+	return signInWithPopup(auth, provider)
+		.then((result) => {
+			signIn(
+				"credentials",
+				{ user: JSON.stringify(result.user) },
+				{ redirect: false },
+			)
+				.then((response) => {
+					return response;
+				})
+				.catch((error) => {
+					return error;
+				});
+		})
+		.catch((error) => {
+			return error;
+		});
 }
