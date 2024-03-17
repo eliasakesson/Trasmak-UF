@@ -7,7 +7,6 @@ import Footer from "@/components/Footer";
 import { createContext, useState } from "react";
 import { DesignProps } from "@/utils/designer/Interfaces";
 import CookieConsent from "@/components/CookieConsent";
-import { SessionProvider } from "next-auth/react";
 
 export const SiteContext = createContext<{
 	design: DesignProps | null;
@@ -20,21 +19,19 @@ export default function App({ Component, pageProps }: AppProps) {
 	const [design, setDesign] = useState<DesignProps | null>(null);
 
 	return (
-		<SessionProvider session={pageProps.session}>
-			<CartProvider
-				cartMode="checkout-session"
-				stripe={stripeKey}
-				currency="SEK"
-				shouldPersist
-			>
-				<Toaster />
-				<Header />
-				<CookieConsent />
-				<SiteContext.Provider value={{ design, setDesign }}>
-					<Component {...pageProps} />
-				</SiteContext.Provider>
-				<Footer />
-			</CartProvider>
-		</SessionProvider>
+		<CartProvider
+			cartMode="checkout-session"
+			stripe={stripeKey}
+			currency="SEK"
+			shouldPersist
+		>
+			<Toaster />
+			<Header />
+			<CookieConsent />
+			<SiteContext.Provider value={{ design, setDesign }}>
+				<Component {...pageProps} />
+			</SiteContext.Provider>
+			<Footer />
+		</CartProvider>
 	);
 }
