@@ -5,7 +5,7 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-const DesignPage: NextPage = () => {
+export default function DesignPage() {
 	const router = useRouter();
 
 	useEffect(() => {
@@ -13,4 +13,4 @@ const DesignPage: NextPage = () => {
 	}, []);
 
 	return null;
-};
+}
