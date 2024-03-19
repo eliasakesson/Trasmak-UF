@@ -95,8 +95,6 @@ export default async function AddToCart(
 			uploadFromCanvas(renderCanvas),
 		]);
 
-		console.log(coverImageURL, renderImageURL);
-
 		toast.loading("Lägger till i kundvagnen...", {
 			id: toastID,
 		});

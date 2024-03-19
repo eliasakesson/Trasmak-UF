@@ -20,7 +20,9 @@ export async function uploadBlob(blob: Blob) {
 	});
 }
 
-export async function uploadFromCanvas(canvas: HTMLCanvasElement) {
+export async function uploadFromCanvas(
+	canvas: HTMLCanvasElement,
+): Promise<string> {
 	return new Promise((resolve, reject) => {
 		canvas.toBlob((blob) => {
 			if (!blob) {
@@ -30,7 +32,7 @@ export async function uploadFromCanvas(canvas: HTMLCanvasElement) {
 
 			uploadBlob(blob)
 				.then((url) => {
-					resolve(url);
+					resolve(url as string);
 				})
 				.catch((error) => {
 					reject(error);
