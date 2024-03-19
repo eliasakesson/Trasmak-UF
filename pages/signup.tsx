@@ -3,15 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useAnalytics, auth } from "@/firebase";
+import { auth } from "@/firebase";
 import Spinner from "@/components/Spinner";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
-import { logEvent } from "firebase/analytics";
 
 export default function Login() {
 	const router = useRouter();
-	const { analytics } = useAnalytics();
 
 	const [input, setInput] = useState({
 		email: "",
@@ -40,10 +38,6 @@ export default function Login() {
 			);
 
 			toast.success("Kontot har skapats");
-			analytics &&
-				logEvent(analytics, "signup", {
-					method: "email",
-				});
 			router.push("/");
 		} catch (err: any) {
 			const error = err.code as keyof typeof errorMessages;

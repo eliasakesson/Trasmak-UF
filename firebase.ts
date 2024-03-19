@@ -3,7 +3,6 @@ import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
-import { Analytics, getAnalytics } from "firebase/analytics";
 import { useState } from "react";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -28,25 +27,3 @@ export const db = getDatabase(app);
 export const storage = getStorage(app);
 
 export const auth = getAuth(app);
-
-export const useAnalytics = () => {
-	const [analytics, setAnalytics] = useState<Analytics | undefined>(
-		undefined,
-	);
-
-	function activateAnalytics() {
-		if (app.name && typeof window !== "undefined") {
-			setAnalytics(getAnalytics(app));
-		}
-	}
-
-	function deActivateAnalytics() {
-		setAnalytics(undefined);
-	}
-
-	return {
-		analytics,
-		activateAnalytics,
-		deActivateAnalytics,
-	};
-};

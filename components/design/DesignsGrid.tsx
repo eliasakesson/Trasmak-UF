@@ -61,18 +61,18 @@ export default function DesignsGrid({
 	}, [designs, products, canvasClassKey]);
 
 	return (
-		<ul className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+		<ul className="grid grid-cols-2 gap-2 md:gap-8 xl:grid-cols-3">
 			{designs.map((design, i) => (
 				<li key={i} className="relative list-none">
 					<button
 						aria-label={`Select design ${design.id}`}
 						onClick={() => onSelect(design)}
-						className="aspect-video w-full rounded-xl bg-gray-100"
+						className="aspect-video w-full bg-gray-100"
 					>
 						<canvas
-							className={`${canvasClassKey} w-full rounded-xl bg-[#AFC0CE]`}
+							className={`${canvasClassKey} w-full bg-[#AFC0CE]`}
 							width={1280}
-							height={720}
+							height={960}
 						></canvas>
 						<span className="absolute bottom-2 right-2 text-lg text-white"></span>
 					</button>

@@ -21,6 +21,7 @@
 </div>
 
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 <div style="display:flex;gap:8px">
@@ -33,16 +34,18 @@
 Träsmak UF is a ecommerce website combined with a custom design tool built with Next.js, Firebase and Stripe, hosted on Vercel. It is built for the company Träsmak UF, a company that lets the user design and order custom wooden trays.
 
 The frontend features:
-* A custom design tool, where the user can customize and design a wooden tray with images and text
-* Authentication & User saved designs
-* Dynamic product ratings
-* Custom design generation & Design templates
+
+-   A custom design tool, where the user can customize and design a wooden tray with images and text
+-   Authentication & User saved designs
+-   Dynamic product ratings
+-   Custom design generation & Design templates
 
 The backend features:
-* Stripe for payments
-* Firebase for authentication, database and storage
-* REST API for communicating between the frontend and backend
-* Google Analytics is used for tracking user data
+
+-   Stripe for payments
+-   Firebase for authentication, database and storage
+-   REST API for communicating between the frontend and backend
+-   Vercel hosting and analytics
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -50,25 +53,25 @@ The backend features:
 
 Here are the main frameworks and libraries i've used for this project:
 
-* ![Next][Next.js]
-* ![React][React.js]
-* ![Stripe][Stripe]
-* ![Firebase][Firebase]
-* ![Typescript][Typescript]
-* ![Tailwind CSS][Tailwind]
+-   ![Next][Next.js]
+-   ![React][React.js]
+-   ![Stripe][Stripe]
+-   ![Firebase][Firebase]
+-   ![Typescript][Typescript]
+-   ![Tailwind CSS][Tailwind]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- LICENSE -->
+
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- CONTACT -->
+
 ## Contact
 
 <div style="display:flex;gap:8px"> 
@@ -78,22 +81,20 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- ACKNOWLEDGMENTS -->
+
 ## Acknowledgments
 
 Here are a few of the libraries and tools i used for this project:
 
-* [Img Shields](https://shields.io)
-* [Font Awesome](https://fontawesome.com)
-* [React Icons](https://react-icons.github.io/react-icons/search)
+-   [Img Shields](https://shields.io)
+-   [Font Awesome](https://fontawesome.com)
+-   [React Icons](https://react-icons.github.io/react-icons/search)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
 <!-- MARKDOWN LINKS & IMAGES -->
+
 [logo]: public/images/logo.png
 [product-screenshot]: public/images/home-page.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white

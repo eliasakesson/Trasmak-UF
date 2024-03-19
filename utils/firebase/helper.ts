@@ -4,7 +4,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "../../firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-export async function uploadBlob(blob) {
+export async function uploadBlob(blob: Blob) {
 	const imageRef = ref(storage, `images/${uuidv4()}`);
 
 	return new Promise((resolve, reject) => {
@@ -20,9 +20,14 @@ export async function uploadBlob(blob) {
 	});
 }
 
-export async function uploadFromCanvas(canvas) {
+export async function uploadFromCanvas(canvas: HTMLCanvasElement) {
 	return new Promise((resolve, reject) => {
 		canvas.toBlob((blob) => {
+			if (!blob) {
+				reject("Error converting canvas to blob");
+				return;
+			}
+
 			uploadBlob(blob)
 				.then((url) => {
 					resolve(url);
@@ -34,7 +39,7 @@ export async function uploadFromCanvas(canvas) {
 	});
 }
 
-export function shortenDownloadURL(url) {
+export function shortenDownloadURL(url: string) {
 	if (!url) {
 		return "";
 	}

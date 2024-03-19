@@ -31,8 +31,8 @@ export default function About() {
 							Motiven trycks med miljövänlig
 						</span>{" "}
 						UV-print, vilket ger vibranta färger och en snygg
-						finish. Motivet är sedan skyddat med ett melaminlager
-						som gör brickan slitstark och tålig mot värme.
+						finish. Motivet är sedan skyddat med UV-lackering vilket
+						gör brickan slitstark och tålig mot värme.
 					</p>
 				</div>
 			</div>

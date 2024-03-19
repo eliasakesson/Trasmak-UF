@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { createContext, useState } from "react";
 import { DesignProps } from "@/utils/designer/Interfaces";
-import CookieConsent from "@/components/CookieConsent";
+import { Analytics } from "@vercel/analytics/react";
 
 export const SiteContext = createContext<{
 	design: DesignProps | null;
@@ -19,19 +19,21 @@ export default function App({ Component, pageProps }: AppProps) {
 	const [design, setDesign] = useState<DesignProps | null>(null);
 
 	return (
-		<CartProvider
-			cartMode="checkout-session"
-			stripe={stripeKey}
-			currency="SEK"
-			shouldPersist
-		>
-			<Toaster />
-			<Header />
-			<CookieConsent />
-			<SiteContext.Provider value={{ design, setDesign }}>
-				<Component {...pageProps} />
-			</SiteContext.Provider>
-			<Footer />
-		</CartProvider>
+		<>
+			<CartProvider
+				cartMode="checkout-session"
+				stripe={stripeKey}
+				currency="SEK"
+				shouldPersist
+			>
+				<Toaster />
+				<Header />
+				<SiteContext.Provider value={{ design, setDesign }}>
+					<Component {...pageProps} />
+				</SiteContext.Provider>
+				<Footer />
+			</CartProvider>
+			<Analytics />
+		</>
 	);
 }

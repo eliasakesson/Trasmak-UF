@@ -7,6 +7,7 @@ import { auth } from "@/firebase";
 import { useRouter } from "next/router";
 import { TbBrandCashapp } from "react-icons/tb";
 import { FaShoppingCart, FaUsers } from "react-icons/fa";
+import useOrderInfo, { updateOrderStatus } from "@/utils/firebase/getOrderInfo";
 
 export default function Admin({ ...props }) {
 	return (
@@ -63,10 +64,25 @@ function TopCards({ orderTotal, orders }: { orderTotal: any; orders: any }) {
 		}, 0);
 	}, [orders]);
 
+	useEffect(() => {
+		let startDate = new Date();
+		startDate.setMonth(startDate.getMonth() - 1);
+		let endDate = new Date();
+
+		fetch(`/api/analytics?startDate=${startDate}&endDate=${endDate}`)
+			.then((res) => res.json())
+			.then((data) => {
+				if (!data) return;
+
+				console.log(data);
+				setTotalVisits(data.devices);
+			});
+	}, []);
+
 	const [totalVisits, setTotalVisits] = useState(0);
 
 	return (
-		<div className="grid grid-cols-4 gap-8">
+		<div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-8">
 			<Card
 				title="Total omsättning"
 				value={formatCurrencyString({
@@ -82,7 +98,7 @@ function TopCards({ orderTotal, orders }: { orderTotal: any; orders: any }) {
 				icon={<FaShoppingCart />}
 			/>
 			<Card
-				title="Totalt antal besök"
+				title="Besökare senaste månaden"
 				value={totalVisits.toString()}
 				icon={<FaUsers />}
 			/>
@@ -103,12 +119,12 @@ export function Card({
 }) {
 	return (
 		<div
-			className={`flex flex-col justify-between gap-8 rounded-lg bg-slate-300 p-8 ${className}`}
+			className={`flex flex-col justify-between rounded-lg bg-slate-300 p-4 lg:gap-8 lg:p-8 ${className}`}
 		>
 			<div className="text-6xl">{icon}</div>
 			<div className="flex flex-col gap-2">
 				<span className="text-lg">{title}</span>
-				<span className="text-4xl font-bold">{value}</span>
+				<span className="text-2xl font-bold lg:text-4xl">{value}</span>
 			</div>
 		</div>
 	);
@@ -146,8 +162,33 @@ function Orders({ orders }: { orders: any[] }) {
 	);
 }
 
+const statusOptions = {
+	delivered: { text: "Levererad", color: "#4CAF50" },
+	sent: { text: "Skickad", color: "#FFA000" },
+	complete: { text: "Betald", color: "#9C27B0" },
+	incomplete: { text: "Ej betald", color: "#F44336" },
+};
+
 function OrderRow({ order, nr }: { order: any; nr: number }) {
 	const router = useRouter();
+
+	const orderInfo = useOrderInfo(order.id);
+
+	const status = useMemo(() => {
+		if (orderInfo?.status) {
+			if (orderInfo.status === "sent") return statusOptions.sent;
+			if (orderInfo.status === "delivered")
+				return statusOptions.delivered;
+		}
+
+		if (order.status === "complete") return statusOptions.complete;
+
+		return statusOptions.incomplete;
+	}, [order, orderInfo]);
+
+	function handleStatusChange(e: any) {
+		updateOrderStatus(order.id, e.target.value);
+	}
 
 	return (
 		<tr
@@ -164,24 +205,48 @@ function OrderRow({ order, nr }: { order: any; nr: number }) {
 			</td>
 			<td className="space-x-2 space-y-2">
 				{order.products.map((product: any, i: number) => (
-					<span
-						key={i}
-						className="rounded-full bg-slate-300 px-2 py-1"
-					>
+					<span key={i} className="rounded-lg bg-slate-300 px-2 py-1">
 						{product.metadata.width}x{product.metadata.height}
 					</span>
 				))}
 			</td>
 			<td>{new Date(order.created * 1000).toLocaleDateString()}</td>
 			<td>
-				{order.status === "complete" ? (
-					<div className="flex items-center gap-1">
-						<span className="size-2 rounded-full bg-green-500"></span>
-						<span className="text-sm">Betald</span>
-					</div>
-				) : (
-					<span className="text-red-500">Ej betald</span>
-				)}
+				<select
+					value={Object.keys(statusOptions).find(
+						(key) =>
+							(statusOptions as any)[key].text === status?.text,
+					)}
+					onChange={handleStatusChange}
+					onClick={(e) => e.stopPropagation()}
+					style={{
+						backgroundColor: `${status?.color}22`,
+						color: status?.color,
+					}}
+					className="appearance-none rounded-lg bg-transparent p-2 font-semibold outline-none drop-shadow-md transition-all hover:brightness-110"
+				>
+					{Object.entries(statusOptions).map(([key, value]) => {
+						if (key === "incomplete" && order.status === "complete")
+							return null;
+
+						return (
+							<option
+								key={key}
+								value={key}
+								className="appearance-none bg-slate-200 text-black"
+							>
+								{value.text}
+							</option>
+						);
+					})}
+				</select>
+				{/* <div className="flex items-center gap-1">
+					<span
+						className="size-2 rounded-full"
+						style={{ backgroundColor: status?.color }}
+					></span>
+					<span className="text-sm">{status?.text}</span>
+				</div> */}
 			</td>
 			<td className="font-semibold text-muted">
 				{formatCurrencyString({

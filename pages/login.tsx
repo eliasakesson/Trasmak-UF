@@ -2,16 +2,14 @@ import { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useAnalytics, auth } from "@/firebase";
+import { auth } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import Spinner from "@/components/Spinner";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
-import { logEvent } from "firebase/analytics";
 
 export default function Login() {
 	const router = useRouter();
-	const { analytics } = useAnalytics();
 
 	const [input, setInput] = useState({
 		email: "",
@@ -37,10 +35,6 @@ export default function Login() {
 			await signInWithEmailAndPassword(auth, input.email, input.password);
 
 			toast.success("Du är nu inloggad");
-			analytics &&
-				logEvent(analytics, "login", {
-					method: "email",
-				});
 			router.push("/");
 		} catch (err: any) {
 			const error = err.code as keyof typeof errorMessages;

@@ -50,7 +50,6 @@ export default function Product({
 					type={product.metadata.type}
 					ignore={product.id}
 					rows={width >= 768 ? 1 : 2}
-					toProductPage
 				/>
 			</main>
 		</>

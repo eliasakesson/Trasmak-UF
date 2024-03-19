@@ -9,9 +9,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useWindowSize } from "@/utils/hooks";
 import { FaArrowRight } from "react-icons/fa";
-import { logEvent } from "firebase/analytics";
-import { useAnalytics } from "@/firebase";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { SiteContext } from "./_app";
 import About from "@/components/homepage/About";
 import HowToDesign from "@/components/homepage/HowToDesign";
@@ -19,13 +17,8 @@ import TellYourStory from "@/components/homepage/TellYourStory";
 
 export default function Home({ products }: { products: any }) {
 	const router = useRouter();
-	const { analytics } = useAnalytics();
 	const { width } = useWindowSize();
 	const { setDesign } = useContext(SiteContext);
-
-	useEffect(() => {
-		analytics && logEvent(analytics, "homepage_view");
-	}, [analytics]);
 
 	return (
 		<>

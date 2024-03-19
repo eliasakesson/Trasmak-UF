@@ -1,10 +1,7 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { FaArrowRight, FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
-import { ObjectProps } from "@/utils/designer/Interfaces";
-import { logEvent } from "firebase/analytics";
-import { useAnalytics } from "@/firebase";
 
 export default function DesignerGuide() {
 	const router = useRouter();
@@ -66,8 +63,6 @@ function Welcome({
 }: {
 	setShow: (show: "tutorial" | "hide") => void;
 }) {
-	const { analytics } = useAnalytics();
-
 	function SetHasVisitedDesigner() {
 		localStorage.setItem("hasVisitedDesigner", "true");
 	}
@@ -86,10 +81,6 @@ function Welcome({
 					onClick={() => {
 						setShow("tutorial");
 						SetHasVisitedDesigner();
-						analytics &&
-							logEvent(analytics, "designer_guide", {
-								action: "start_tutorial",
-							});
 					}}
 					className="w-full rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:w-fit 2xl:px-16"
 				>
@@ -99,10 +90,6 @@ function Welcome({
 					onClick={() => {
 						setShow("hide");
 						SetHasVisitedDesigner();
-						analytics &&
-							logEvent(analytics, "designer_guide", {
-								action: "hide_guide",
-							});
 					}}
 					className="w-full rounded-lg border-2 px-8 py-4 font-semibold transition-colors hover:bg-slate-100 lg:w-fit 2xl:px-16"
 				>

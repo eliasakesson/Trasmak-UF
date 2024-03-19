@@ -15,7 +15,6 @@ export default function ProductRow({
 	metadata,
 	type,
 	ignore,
-	toProductPage,
 	h2,
 }: {
 	title: string;
@@ -26,7 +25,6 @@ export default function ProductRow({
 	metadata?: string;
 	type?: string;
 	ignore?: string;
-	toProductPage?: boolean;
 	h2?: boolean;
 }) {
 	return (
@@ -65,7 +63,6 @@ export default function ProductRow({
 							price={product.price}
 							image={product.image}
 							currency={product.currency}
-							toProductPage={toProductPage}
 							h2={h2}
 						/>
 					))}
@@ -80,7 +77,6 @@ export function ProductCard({
 	price,
 	image,
 	currency,
-	toProductPage,
 	h2,
 }: {
 	id: string;
@@ -88,11 +84,8 @@ export function ProductCard({
 	price: number;
 	image: string;
 	currency: string;
-	toProductPage?: boolean;
 	h2?: boolean;
 }) {
-	const { width } = useWindowSize();
-
 	return (
 		<Link href={`/products/${id.substring(6, id.length)}`}>
 			<div className="flex h-full flex-col">

@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
-import Compressor from "compressorjs";
+import axios from "axios";
 
 export default function AdminOrder() {
 	return (
@@ -155,31 +155,33 @@ function Info({ order }: { order: any }) {
 function Products({ products }: { products: any }) {
 	const [productImages, setProductImages] = useState<any[]>([]);
 
-	useEffect(() => {
-		async function fetchImages() {
-			const images = await Promise.all(
-				products.map((product: any) => {
-					return new Promise((resolve, reject) => {
-						fetch(GetImagePath(product.image))
-							.then((res) => res.blob())
-							.then((blob: Blob) => {
-								new Compressor(blob, {
-									quality: 0.2,
-									success: (result) => {
-										resolve(result.arrayBuffer());
-									},
-									error: (err) => {
-										reject(err);
-									},
-								});
-							});
-					});
-				}),
-			);
-			setProductImages(images);
-		}
+	async function GetImages() {
+		const images = products.map((product: any) =>
+			GetImagePath(product.image),
+		);
 
-		fetchImages();
+		axios
+			.post("/api/compressImages", { images })
+			.then((res) => {
+				const convertedImages = res.data.compressedImages.map(
+					(image: string) => {
+						const binaryString = atob(image);
+						const byteArray = new Uint8Array(binaryString.length);
+						for (let i = 0; i < binaryString.length; i++) {
+							byteArray[i] = binaryString.charCodeAt(i);
+						}
+						return byteArray;
+					},
+				);
+				setProductImages(convertedImages);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}
+
+	useEffect(() => {
+		GetImages();
 	}, [products]);
 
 	console.log(productImages);
@@ -242,7 +244,7 @@ function Products({ products }: { products: any }) {
 						</Text>
 					</View>
 					<PDFImage
-						src={productImages[i]}
+						src={Buffer.from(productImages[i] || "")}
 						style={{
 							width: "20%",
 							border: 1,
