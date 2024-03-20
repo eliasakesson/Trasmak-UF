@@ -186,7 +186,7 @@ export default function Designer({ products }: { products: any[] }) {
 				}}
 			>
 				<LocalDesignSaver />
-				<DesignerGuide />
+				{/* <DesignerGuide /> */}
 				<div>
 					<div className="relative h-[calc(100dvh-116px)] overflow-hidden">
 						<canvas
