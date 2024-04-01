@@ -180,11 +180,9 @@ function Products({ products }: { products: any }) {
 			});
 	}
 
-	useEffect(() => {
-		GetImages();
-	}, [products]);
-
-	console.log(productImages);
+	// useEffect(() => {
+	// 	GetImages();
+	// }, [products]);
 
 	return (
 		<View
@@ -244,7 +242,7 @@ function Products({ products }: { products: any }) {
 						</Text>
 					</View>
 					<PDFImage
-						src={Buffer.from(productImages[i] || "")}
+						src={GetImagePath(product.image)}
 						style={{
 							width: "20%",
 							border: 1,

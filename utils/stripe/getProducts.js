@@ -9,6 +9,7 @@ export default async function GetProducts(randomize = false) {
 		.filter((product) => product.product.active)
 		.map((product) => {
 			return {
+				...product,
 				id: product.id,
 				price: product.unit_amount,
 				currency: product.currency,
@@ -39,6 +40,7 @@ export async function GetProduct(id) {
 	}
 
 	return {
+		...product,
 		id: product.id,
 		price: product.unit_amount,
 		currency: product.currency,
