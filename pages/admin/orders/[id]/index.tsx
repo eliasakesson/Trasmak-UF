@@ -37,7 +37,6 @@ function AdminPage() {
 
 		async function getOrders() {
 			const order = await GetOrder(router.query.id as string);
-			console.log(order);
 			setOrder(order);
 		}
 
