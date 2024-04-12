@@ -8,6 +8,14 @@ export default function Footer() {
 				<ul className="xs:gap-2 flex h-8  justify-center gap-1 sm:gap-8">
 					<li className="relative aspect-video">
 						<Image
+							src="https://hjarnkraft.se/wp-content/uploads/2023/04/Swish-Logo-Secondary-Light-BG.png"
+							alt="Swish"
+							fill
+							className="h-full rounded border-2 border-gray-300 object-contain px-1"
+						/>
+					</li>
+					<li className="relative aspect-video">
+						<Image
 							src="https://images.asos-media.com/navigation/klarna-gb-png"
 							alt="Klarna"
 							fill
