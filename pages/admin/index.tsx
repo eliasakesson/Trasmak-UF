@@ -7,7 +7,10 @@ import { auth } from "@/firebase";
 import { useRouter } from "next/router";
 import { TbBrandCashapp } from "react-icons/tb";
 import { FaShoppingCart, FaUsers } from "react-icons/fa";
-import useOrderInfo, { updateOrderStatus } from "@/utils/firebase/getOrderInfo";
+import useOrderInfo, {
+	setOrderNr,
+	setOrderStatus,
+} from "@/utils/firebase/getOrderInfo";
 
 export default function Admin({ ...props }) {
 	return (
@@ -166,6 +169,7 @@ const statusOptions = {
 	sent: { text: "Skickad", color: "#FFA000" },
 	complete: { text: "Betald", color: "#9C27B0" },
 	incomplete: { text: "Ej betald", color: "#F44336" },
+	refunded: { text: "Återbetald", color: "#F44336" },
 };
 
 function OrderRow({ order, nr }: { order: any; nr: number }) {
@@ -178,6 +182,7 @@ function OrderRow({ order, nr }: { order: any; nr: number }) {
 			if (orderInfo.status === "sent") return statusOptions.sent;
 			if (orderInfo.status === "delivered")
 				return statusOptions.delivered;
+			if (orderInfo.status === "refunded") return statusOptions.refunded;
 		}
 
 		if (order.status === "complete") return statusOptions.complete;
@@ -185,22 +190,28 @@ function OrderRow({ order, nr }: { order: any; nr: number }) {
 		return statusOptions.incomplete;
 	}, [order, orderInfo]);
 
-	const sizes = useMemo(() => {
-		return order.products
-			.map((product: any) => ({
-				amount: product.quantity,
-				text: `${product.metadata.width}x${product.metadata.height}`,
-			}))
-			.reduce((acc: any, curr: any) => {
-				const size = acc.find((size: any) => size.text === curr.text);
-				if (size) size.amount += 1;
-				else acc.push(curr);
-				return acc;
-			}, []);
+	// Array of unique product sizes with count
+	const productSizes = useMemo(() => {
+		const sizes = order.products.map((product: any) => {
+			return `${product.metadata.width}x${product.metadata.height}`;
+		});
+
+		const uniqueSizes = Array.from(new Set(sizes));
+
+		return uniqueSizes.map((size) => {
+			return {
+				size,
+				count: sizes.filter((s: any) => s === size).length,
+			};
+		});
 	}, [order.products]);
 
 	function handleStatusChange(e: any) {
-		updateOrderStatus(order.id, e.target.value);
+		setOrderStatus(order.id, e.target.value);
+	}
+
+	function handleNrChange(e: any) {
+		setOrderNr(order.id, e.target.value);
 	}
 
 	return (
@@ -209,7 +220,12 @@ function OrderRow({ order, nr }: { order: any; nr: number }) {
 			className="cursor-pointer"
 		>
 			<td className="py-2">
-				<span className="font-semibold">{nr}</span>
+				<input
+					value={orderInfo?.orderNr}
+					onChange={handleNrChange}
+					onClick={(e) => e.stopPropagation()}
+					className="w-[6ch] bg-transparent font-semibold outline-none"
+				/>
 			</td>
 			<td className="py-2">
 				<span className="font-semibold">{order.customer.name}</span>
@@ -217,14 +233,14 @@ function OrderRow({ order, nr }: { order: any; nr: number }) {
 				<span className="text-muted">{order.customer.email}</span>
 			</td>
 			<td className="space-x-2 space-y-2">
-				{sizes.map((size: any, i: number) => (
-					<span key={i} className="rounded-lg bg-slate-300 px-2 py-1">
-						{size.amount > 1 && (
-							<span className="mr-2 rounded-full bg-white px-2 font-semibold text-muted">
-								{size.amount}
+				{productSizes.map((product: any, i: number) => (
+					<span key={i} className="rounded-lg bg-slate-200 px-2 py-1">
+						{product.size}
+						{product.count > 1 && (
+							<span className="ml-2 rounded-full bg-slate-100 px-2 text-sm font-semibold">
+								{product.count}
 							</span>
 						)}
-						{size.text}{" "}
 					</span>
 				))}
 			</td>
@@ -258,13 +274,6 @@ function OrderRow({ order, nr }: { order: any; nr: number }) {
 						);
 					})}
 				</select>
-				{/* <div className="flex items-center gap-1">
-					<span
-						className="size-2 rounded-full"
-						style={{ backgroundColor: status?.color }}
-					></span>
-					<span className="text-sm">{status?.text}</span>
-				</div> */}
 			</td>
 			<td className="font-semibold text-muted">
 				{formatCurrencyString({

@@ -8,6 +8,7 @@ const nextConfig = {
 			"firebasestorage.googleapis.com",
 			"lh3.googleusercontent.com",
 			"images.asos-media.com",
+			"hjarnkraft.se"
 		],
 	},
 };

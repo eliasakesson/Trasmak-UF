@@ -15,6 +15,7 @@ import { useRouter } from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 import axios from "axios";
+import useOrderInfo from "@/utils/firebase/getOrderInfo";
 
 export default function AdminOrder() {
 	return (
@@ -29,7 +30,8 @@ function AdminPage() {
 	const [user] = useAuthState(auth);
 
 	const [order, setOrder] = useState<any>(null);
-	const [orderNr, setOrderNr] = useState(1000);
+
+	const orderInfo = useOrderInfo(router.query.id as string);
 
 	useEffect(() => {
 		if (!user) return;
@@ -46,12 +48,7 @@ function AdminPage() {
 
 	return (
 		<div className="mx-auto flex max-w-7xl flex-col items-start gap-8 px-8 py-16">
-			<Link href="/admin">{"<- Admin"}</Link>
-			<input
-				type="number"
-				value={orderNr}
-				onChange={(e) => setOrderNr(parseInt(e.target.value))}
-			/>
+			<Link href={`/admin/orders/${router.query.id}`}>{"<- Order"}</Link>
 			<PDFViewer className="h-screen w-full">
 				<Document>
 					<Page
@@ -60,7 +57,7 @@ function AdminPage() {
 						wrap={true}
 						style={styles.page}
 					>
-						<Top orderNr={orderNr} />
+						<Top orderNr={orderInfo?.orderNr || 1000} />
 						<Info order={order} />
 						<Products products={order.products} />
 						<Summary order={order} />

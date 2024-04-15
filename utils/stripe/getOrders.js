@@ -1,16 +1,27 @@
+import { GetOrderInfo } from "../firebase/getOrderInfo";
 import GetProducts from "./getProducts";
 import { stripe } from "./stripe";
 
-export default async function GetOrders() {
+export default async function GetOrders(hideRefunded = true) {
 	const sessions = await stripe.checkout.sessions.list({
 		status: "complete",
 	});
 
 	const orders = await Promise.all(
 		sessions.data.map((session) => GetOrder(session.id)),
-	);
+	)
 
-	return orders;
+	if (!hideRefunded) {
+		return orders;
+	}
+
+	const ordersInfos = await Promise.all(
+		orders.map((order) => GetOrderInfo(order.id)),
+	)
+
+	return orders.filter((_, index) => {
+		return ordersInfos[index].status !== "refunded";
+	});
 }
 
 export async function GetOrder(id) {
