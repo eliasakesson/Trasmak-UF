@@ -24,15 +24,6 @@ function AdminPage() {
 	const [user] = useAuthState(auth);
 
 	const [orders, setOrders] = useState<any[]>([]);
-	const orderTotal = useMemo(() => {
-		return orders.reduce(
-			(acc: any, order: any) => {
-				acc.total += order.total;
-				return acc;
-			},
-			{ total: 0, currency: "SEK" },
-		);
-	}, [orders]);
 
 	useEffect(() => {
 		if (!user) return;
@@ -54,17 +45,49 @@ function AdminPage() {
 				</span>
 				. Här är din översikt.
 			</span>
-			<TopCards orderTotal={orderTotal} orders={orders} />
+			<TopCards orders={orders} />
 			<Orders orders={orders} />
 		</div>
 	);
 }
 
-function TopCards({ orderTotal, orders }: { orderTotal: any; orders: any }) {
+function TopCards({ orders }: { orders: any }) {
 	const productsSold = useMemo(() => {
 		return orders.reduce((acc: number, order: any) => {
 			return acc + order.products.length;
 		}, 0);
+	}, [orders]);
+
+	const orderTotal = useMemo(() => {
+		return orders.reduce(
+			(acc: any, order: any) => {
+				acc.total += order.total;
+				return acc;
+			},
+			{ total: 0, currency: "SEK" },
+		);
+	}, [orders]);
+
+	const totalProfit = useMemo(() => {
+		return orders.reduce(
+			(acc: any, order: any) => {
+				acc.total += order.total;
+				acc.total -= order.products.reduce(
+					(acc: number, product: any) => {
+						return (
+							acc +
+							product.metadata.gross * 100 * product.quantity
+						);
+					},
+					0,
+				);
+				if (order.shipping_cost.amount_total == 0) {
+					acc.total -= 8900;
+				}
+				return acc;
+			},
+			{ total: 0, currency: "SEK" },
+		);
 	}, [orders]);
 
 	useEffect(() => {
@@ -93,6 +116,14 @@ function TopCards({ orderTotal, orders }: { orderTotal: any; orders: any }) {
 				})}
 				icon={<TbBrandCashapp />}
 				className="!bg-primary text-white"
+			/>
+			<Card
+				title="Total vinst"
+				value={formatCurrencyString({
+					value: totalProfit.total,
+					currency: totalProfit.currency,
+				})}
+				icon={<TbBrandCashapp />}
 			/>
 			<Card
 				title="Antal produkter sålda"
@@ -221,7 +252,7 @@ function OrderRow({ order, nr }: { order: any; nr: number }) {
 		>
 			<td className="py-2">
 				<input
-					value={orderInfo?.orderNr}
+					value={orderInfo?.orderNr || nr + 1000}
 					onChange={handleNrChange}
 					onClick={(e) => e.stopPropagation()}
 					className="w-[6ch] bg-transparent font-semibold outline-none"
