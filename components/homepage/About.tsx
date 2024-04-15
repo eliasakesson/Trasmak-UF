@@ -9,7 +9,7 @@ export default function About() {
 				</h2>
 				<div className="relative order-1 aspect-square w-full flex-1 md:order-2">
 					<Image
-						src="/images/green.jpg"
+						src="/images/familj.jpg"
 						alt="Bild på produktion"
 						fill
 						sizes="100%"

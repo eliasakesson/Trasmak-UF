@@ -10,7 +10,7 @@ export default function Section1() {
 				<div className="flex flex-1">
 					<div className="relative h-[40vh] flex-1 bg-primary lg:h-[60vh] lg:rounded-tr-[10vh]">
 						<Image
-							src="/images/section1.jpg"
+							src="/images/sally2.jpg"
 							alt=""
 							className="h-full w-full rounded-tr-[10vh] object-cover p-2"
 							fill

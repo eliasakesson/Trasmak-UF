@@ -37,7 +37,6 @@ function AdminPage() {
 
 		async function getOrders() {
 			const order = await GetOrder(router.query.id as string);
-			console.log(order);
 			setOrder(order);
 		}
 
@@ -108,6 +107,7 @@ function Products({ products }: { products: any[] }) {
 						<th className="pb-4 text-left">Nr</th>
 						<th className="pb-4 text-left">Bild</th>
 						<th className="pb-4 text-left">Namn</th>
+						<th className="pb-4 text-left">Antal</th>
 						<th className="pb-4 text-left">Art nr</th>
 						<th className="pb-4 text-left">Pris</th>
 					</tr>
@@ -143,6 +143,9 @@ function ProductRow({ product, nr }: { product: any; nr: number }) {
 				<span className="font-semibold">{product.name}</span>
 				<br />
 				<span className="text-muted">Design {nr}</span>
+			</td>
+			<td>
+				<span className="text-muted">{product.quantity}</span>
 			</td>
 			<td className="space-y-2">
 				<span className="font-semibold">{product.metadata.artnr}</span>

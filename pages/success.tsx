@@ -167,7 +167,11 @@ export default function Success({
 								<p className="">Frakt</p>
 								<p>
 									{formatCurrencyString({
-										value: config?.shippingCost,
+										value:
+											order?.total >=
+											config?.freeShippingThreshold
+												? 0
+												: config?.shippingCost,
 										currency: order?.currency ?? "sek",
 									})}
 								</p>

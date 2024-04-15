@@ -2,9 +2,9 @@ import Image from "next/image";
 
 export default function Inspiration() {
 	const images = [
-		"/images/section1.jpg",
-		"/images/valnöt.jpg",
-		"/images/hero.jpg",
+		"/images/norway.jpg",
+		"/images/familj.jpg",
+		"/images/sally.png",
 	];
 
 	return (
@@ -18,14 +18,14 @@ export default function Inspiration() {
 				{images.map((image, index) => (
 					<div
 						key={index}
-						className={`relative aspect-video overflow-hidden rounded-xl lg:rounded-2xl`}
+						className={`relative aspect-[4/3] overflow-hidden rounded-xl lg:rounded-2xl`}
 					>
 						<Image
 							src={image}
 							alt=""
 							fill
 							sizes="100%"
-							className="object-cover"
+							className={`object-cover ${index === 1 ? "object-bottom" : ""}`}
 							quality={100}
 						/>
 					</div>

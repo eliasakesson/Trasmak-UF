@@ -153,38 +153,41 @@ function Info({ order }: { order: any }) {
 }
 
 function Products({ products }: { products: any }) {
-	const [productImages, setProductImages] = useState<any[]>([]);
+	// const [productImages, setProductImages] = useState<any[]>([]);
 
-	async function GetImages() {
-		const images = products.map((product: any) =>
-			GetImagePath(product.image),
-		);
+	// async function GetImages() {
+	// 	const images = products.map((product: any) =>
+	// 		GetImagePath(product.image),
+	// 	);
 
-		axios
-			.post("/api/compressImages", { images })
-			.then((res) => {
-				const convertedImages = res.data.compressedImages.map(
-					(image: string) => {
-						const binaryString = atob(image);
-						const byteArray = new Uint8Array(binaryString.length);
-						for (let i = 0; i < binaryString.length; i++) {
-							byteArray[i] = binaryString.charCodeAt(i);
-						}
-						return byteArray;
-					},
-				);
-				setProductImages(convertedImages);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	}
+	// 	axios
+	// 		.post("/api/compressImages", { images })
+	// 		.then((res) => {
+	// 			console.log("Compressed images");
+	// 			const convertedImages = res.data.compressedImages.map(
+	// 				(image: string) => {
+	// 					const binaryString = atob(image);
+	// 					const byteArray = new Uint8Array(binaryString.length);
+	// 					for (let i = 0; i < binaryString.length; i++) {
+	// 						if (i < binaryString.length) {
+	// 							byteArray[i] = binaryString.charCodeAt(i);
+	// 						}
+	// 					}
+	// 					console.log(byteArray);
+	// 					return byteArray;
+	// 				},
+	// 			);
+	// 			setProductImages(convertedImages);
+	// 		})
+	// 		.catch((err) => {
+	// 			console.error("Error compressing images");
+	// 			console.error(err);
+	// 		});
+	// }
 
-	useEffect(() => {
-		GetImages();
-	}, [products]);
-
-	console.log(productImages);
+	// useEffect(() => {
+	// 	GetImages();
+	// }, [products]);
 
 	return (
 		<View
@@ -244,7 +247,7 @@ function Products({ products }: { products: any }) {
 						</Text>
 					</View>
 					<PDFImage
-						src={Buffer.from(productImages[i] || "")}
+						src={GetImagePath(product.image)}
 						style={{
 							width: "20%",
 							border: 1,

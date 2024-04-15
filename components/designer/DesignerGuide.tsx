@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { FaArrowRight, FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
+import useSwipe from "@/utils/useSwipe";
+import { title } from "process";
 
 export default function DesignerGuide() {
 	const router = useRouter();
@@ -145,6 +147,11 @@ function StartTutorial({
 function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 	const [step, setStep] = useState(0);
 
+	const { onTouchStart, onTouchMove, onTouchEnd } = useSwipe({
+		onSwipedLeft: () => nextStep(),
+		onSwipedRight: () => prevStep(),
+	});
+
 	function nextStep() {
 		if (step === tutorialSteps.length - 1) {
 			setShow("hide");
@@ -153,8 +160,19 @@ function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 		}
 	}
 
+	function prevStep() {
+		if (step > 0) {
+			setStep((step) => step - 1);
+		}
+	}
+
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-[2px]">
+		<div
+			onTouchStart={onTouchStart}
+			onTouchMove={onTouchMove}
+			onTouchEnd={onTouchEnd}
+			className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-25 backdrop-blur-[2px]"
+		>
 			<div className="relative flex h-full w-full max-w-3xl flex-col justify-between gap-8 rounded-xl bg-white p-8 lg:h-fit lg:p-16">
 				<button
 					aria-label="Stäng guide"
@@ -168,30 +186,40 @@ function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 						{tutorialSteps[step].title}
 					</h1>
 					<div className="order-1 lg:order-2">
-						<video
-							autoPlay
-							loop
-							muted
-							playsInline
-							className="hidden aspect-video w-full lg:block lg:border-y"
-						>
-							<source
+						{tutorialSteps[step].video && (
+							<video
+								autoPlay
+								loop
+								muted
+								playsInline
 								src={tutorialSteps[step].video}
-								type="video/mp4"
-							/>
-						</video>
-						<video
-							autoPlay
-							loop
-							muted
-							playsInline
-							className="aspect-square w-full lg:hidden"
-						>
-							<source
+								className="hidden aspect-video w-full lg:block lg:border-y"
+							></video>
+						)}
+						{tutorialSteps[step].videoMobile && (
+							<video
+								autoPlay
+								loop
+								muted
+								playsInline
 								src={tutorialSteps[step].videoMobile}
-								type="video/mp4"
+								className="aspect-square w-full lg:hidden"
+							></video>
+						)}
+						{tutorialSteps[step].image && (
+							<img
+								src={tutorialSteps[step].image}
+								alt=""
+								className="hidden aspect-video w-full lg:block lg:border-y"
 							/>
-						</video>
+						)}
+						{tutorialSteps[step].imageMobile && (
+							<img
+								src={tutorialSteps[step].imageMobile}
+								alt=""
+								className="mx-auto aspect-square w-[90%] lg:hidden"
+							/>
+						)}
 					</div>
 					<p className="order-3 text-center lg:text-left">
 						{tutorialSteps[step].description}
@@ -211,8 +239,17 @@ function Tutorial({ setShow }: { setShow: (show: "hide") => void }) {
 						onClick={nextStep}
 						className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:w-fit 2xl:px-16"
 					>
-						Nästa steg
-						<FaArrowRight />
+						{step === tutorialSteps.length - 1 ? (
+							<>
+								Avsluta guiden
+								<FaArrowRight />
+							</>
+						) : (
+							<>
+								Nästa steg
+								<FaArrowRight />
+							</>
+						)}
 					</button>
 				</div>
 			</div>
@@ -230,9 +267,23 @@ const tutorialSteps = [
 	},
 	{
 		title: "Lägg till bild",
-		video: "/videos/GuideAddImage.mp4",
-		videoMobile: "/videos/GuideAddImageMobile.mp4",
+		video: "/videos/GuideImage.mp4",
+		videoMobile: "/videos/GuideImageMobile.mp4",
 		description:
 			"Klicka på knappen för att lägga till en bild. Du kan därefter ändra storlek och position på bilden genom att dra direkt på brickan. ",
+	},
+	{
+		title: "Lägg till text",
+		video: "/videos/GuideText.mp4",
+		videoMobile: "/videos/GuideTextMobile.mp4",
+		description:
+			"Klicka på knappen för att lägga till text. Du kan därefter ändra texten och flytta den genom att dra direkt på brickan.",
+	},
+	{
+		title: "Beställ eller spara design",
+		image: "/images/GuideBuySave.png",
+		imageMobile: "/images/GuideBuySaveMobile.png",
+		description:
+			"När du är nöjd med din design kan du beställa den. Om du inte är redo att beställa kan du spara designen för att komma tillbaka till den senare, genom att spara den till ditt konto.",
 	},
 ];

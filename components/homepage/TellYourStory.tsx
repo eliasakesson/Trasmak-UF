@@ -35,7 +35,7 @@ export default function TellYourStory() {
 			<div className="grid aspect-square w-full flex-1 grid-cols-3 grid-rows-3 gap-4 sm:w-2/3 md:w-full">
 				<div className="relative col-span-3 w-full bg-primary">
 					<Image
-						src="/images/bread.jpg"
+						src="/images/bench.jpg"
 						alt="Bild på produktion"
 						fill
 						sizes="100%"
@@ -46,7 +46,7 @@ export default function TellYourStory() {
 				</div>
 				<div className="relative col-span-2 row-span-2 w-full overflow-hidden bg-primary md:rounded-bl-[10vh]">
 					<Image
-						src="/images/kiwi.jpg"
+						src="/images/norway2.jpg"
 						alt="Bild på produktion"
 						fill
 						sizes="100%"

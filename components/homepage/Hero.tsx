@@ -8,7 +8,7 @@ export default function Hero() {
 			<div className="relative grid max-h-[50vh] min-h-[25vh] gap-8 md:flex-grow md:grid-cols-3">
 				<div className="relative bg-primary md:col-span-2">
 					<Image
-						src="/images/valnöt.jpg"
+						src="/images/norway.jpg"
 						alt="TRÄSMAK"
 						fill
 						className="object-cover"
@@ -18,7 +18,7 @@ export default function Hero() {
 				</div>
 				<div className="relative hidden bg-primary py-8 md:block">
 					<Image
-						src="/images/black.jpg"
+						src="/images/sally.png"
 						alt="TRÄSMAK"
 						fill
 						className="object-cover"
@@ -65,11 +65,11 @@ export default function Hero() {
 				</div>
 				<div className="relative hidden md:block">
 					<Image
-						src="/images/section1.jpg"
+						src="/images/familj.jpg"
 						alt="TRÄSMAK"
 						fill
 						sizes="100%"
-						className="object-cover"
+						className="object-cover object-[50%75%]"
 						quality={100}
 						priority
 					/>

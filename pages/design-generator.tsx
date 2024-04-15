@@ -61,7 +61,7 @@ export default function DesignGenerator({ products }: { products: any[] }) {
 			<main className="mx-auto min-h-[calc(100vh-108px)] max-w-7xl space-y-8 px-8 py-16">
 				<div className="flex flex-col gap-4 text-center">
 					<h1 className="text-4xl font-bold text-gray-900">
-						Ladda upp en bild, vi gör resten
+						Ladda upp en bild, vi skapar designförslag
 					</h1>
 					<p className="mx-auto max-w-prose text-muted">
 						Vi genererar ett urval av designförslag baserat på din
@@ -69,15 +69,15 @@ export default function DesignGenerator({ products }: { products: any[] }) {
 						du kan anpassa den efter dina önskemål.
 					</p>
 				</div>
-				<div className="mx-auto flex max-w-7xl grow flex-col gap-1">
+				<div className="mx-auto flex flex-col gap-1">
 					<label
 						{...getRootProps()}
-						className="cursor-pointer rounded-md border border-gray-300 px-4 py-8 hover:border-gray-200"
+						className="cursor-pointer rounded-md border border-muted_light px-16 py-8 hover:border-gray-300"
 						htmlFor="image-upload"
 					>
 						<div className="flex h-full flex-col items-center justify-center gap-2">
 							<svg
-								className="h-12 w-12 text-muted_light"
+								className="h-12 w-12 text-muted"
 								aria-hidden="true"
 								xmlns="http://www.w3.org/2000/svg"
 								fill="none"
@@ -92,7 +92,7 @@ export default function DesignGenerator({ products }: { products: any[] }) {
 								/>
 							</svg>
 							<div>
-								<p className="whitespace-nowrap font-semibold text-muted_light">
+								<p className="whitespace-nowrap font-semibold text-muted">
 									Klicka för att ladda upp bild
 								</p>
 								<p className="whitespace-nowrap text-muted_light">

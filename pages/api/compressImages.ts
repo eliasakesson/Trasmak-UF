@@ -6,10 +6,6 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse,
 ) {
-	if (req.method !== "POST") {
-		return res.status(405).json({ message: "Method Not Allowed" });
-	}
-
 	const imageUrls = req.body.images;
 	const compressedImages = await downloadAndCompressImages(imageUrls);
 
@@ -24,17 +20,16 @@ const downloadAndCompressImages = async (imageUrls: string[]) => {
 			),
 		);
 
-		const compressedImages = await Promise.all(
+		return await Promise.all(
 			imageResponses.map(async (res: any) => {
-				const buffer = Buffer.from(res.data, "binary");
+				const buffer = Buffer.from(res.data);
 				const compressedBuffer = await sharp(buffer)
-					.resize({ width: 200 }) // Adjust dimensions as needed
+					.resize({ width: 200 })
+					.jpeg({ quality: 50 }) // Adjust dimensions as needed
 					.toBuffer();
 				return compressedBuffer.toString("base64");
 			}),
 		);
-
-		return compressedImages;
 	} catch (error) {
 		console.error("Error downloading or compressing images:", error);
 		throw error;

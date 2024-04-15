@@ -38,12 +38,8 @@ const SelectedObjectContext = createContext({
 
 export const DesignEditor = forwardRef<HTMLElement, HTMLProps<HTMLDivElement>>(
 	(props, ref) => {
-		const {
-			currentDesign,
-			setCurrentDesign,
-			selectedObjectID,
-			setSelectedObjectID,
-		} = useContext(DesignerContext);
+		const { currentDesign, setCurrentDesign, selectedObjectID } =
+			useContext(DesignerContext);
 		const [user] = useAuthState(auth);
 		const isAdmin = useIsAdmin(user);
 
@@ -62,20 +58,12 @@ export const DesignEditor = forwardRef<HTMLElement, HTMLProps<HTMLDivElement>>(
 			setCurrentDesign({ ...currentDesign, objects });
 		}
 
-		function removeObject() {
-			const objects = currentDesign.objects.filter(
-				(o) => o.id !== selectedObjectID,
-			);
-			setCurrentDesign({ ...currentDesign, objects });
-			setSelectedObjectID(null);
-		}
-
 		return (
 			<SelectedObjectContext.Provider value={{ object, setObject }}>
 				<div
 					ref={ref as LegacyRef<HTMLDivElement> | undefined}
 					style={!object ? { display: "none" } : {}}
-					className="absolute z-30 flex max-w-full flex-col gap-2 rounded-md border bg-white p-4"
+					className="fixed z-30 flex max-w-full flex-col gap-2 rounded-md border bg-white p-4 lg:absolute"
 					id="editor"
 				>
 					{object && (
@@ -97,62 +85,12 @@ export const DesignEditor = forwardRef<HTMLElement, HTMLProps<HTMLDivElement>>(
 										className="h-16"
 									/>
 								)}
-								<div className="relative flex h-16 flex-wrap items-center justify-center gap-4 rounded-md border border-gray-300 px-4 pt-4">
-									<Label
-										label={
-											object?.type !== "text"
-												? "Expandera & Ordning"
-												: "Ordning"
-										}
-									/>
-									{object?.type !== "text" && (
-										<button
-											onClick={() =>
-												setObject({
-													...object,
-													x: 0,
-													y: 0,
-													width: 1,
-													height: 1,
-												})
-											}
-										>
-											<FaExpand />
-										</button>
-									)}
-									<button
-										onClick={() =>
-											ChangeOrder(
-												currentDesign,
-												setCurrentDesign,
-												object,
-												1,
-											)
-										}
-									>
-										<TbStackPop className="text-xl" />
-									</button>
-									<button
-										onClick={() =>
-											ChangeOrder(
-												currentDesign,
-												setCurrentDesign,
-												object,
-												-1,
-											)
-										}
-									>
-										<TbStackPush className="text-xl" />
-									</button>
-									<button onClick={() => removeObject()}>
-										<FaTrash />
-									</button>
-								</div>
 								<DirectionInput
 									label="Riktning"
 									objKeyX="imageX"
 									objKeyY="imageY"
 								/>
+								<ExpandOrderDelete />
 							</div>
 							<div className="flex flex-wrap gap-2">
 								{object?.type === "text" && (
@@ -280,6 +218,69 @@ function ChangeOrder(
 	});
 }
 
+function ExpandOrderDelete() {
+	const { object, setObject } = useContext(SelectedObjectContext);
+	const {
+		currentDesign,
+		setCurrentDesign,
+		selectedObjectID,
+		setSelectedObjectID,
+	} = useContext(DesignerContext);
+
+	function removeObject() {
+		const objects = currentDesign.objects.filter(
+			(o) => o.id !== selectedObjectID,
+		);
+		setCurrentDesign({ ...currentDesign, objects });
+		setSelectedObjectID(null);
+	}
+
+	return (
+		<div className="relative flex h-16 flex-wrap items-center justify-center gap-4 rounded-md border border-gray-300 px-4 pt-4">
+			<Label
+				label={
+					object?.type !== "text" ? "Expandera & Ordning" : "Ordning"
+				}
+			/>
+			{object?.type !== "text" && (
+				<button
+					onClick={() =>
+						object &&
+						setObject({
+							...object,
+							x: 0,
+							y: 0,
+							width: 1,
+							height: 1,
+						})
+					}
+				>
+					<FaExpand />
+				</button>
+			)}
+			<button
+				onClick={() =>
+					object &&
+					ChangeOrder(currentDesign, setCurrentDesign, object, 1)
+				}
+			>
+				<TbStackPop className="text-xl" />
+			</button>
+			<button
+				onClick={() =>
+					object &&
+					ChangeOrder(currentDesign, setCurrentDesign, object, -1)
+				}
+			>
+				<TbStackPush className="text-xl" />
+			</button>
+			<button onClick={() => removeObject()}>
+				<FaTrash />
+			</button>
+		</div>
+	);
+}
+
 function TextArea({
 	label,
 	objKey,
@@ -306,31 +307,6 @@ function TextArea({
 				onChange={(e) =>
 					setObject({
 						...(object as ObjectProps),
-						[objKey]: e.target.value,
-					})
-				}
-			/>
-		</div>
-	);
-}
-
-function TextInput({ label, objKey }: { label: string; objKey: "content" }) {
-	const { object, setObject } = useContext(SelectedObjectContext);
-
-	if (!object || !(objKey in object)) return null;
-
-	return (
-		<div className="flex grow flex-col gap-1">
-			<Label label={label} />
-			<input
-				type="text"
-				name={label}
-				id={label}
-				className="h-full rounded-md border border-gray-300 p-2"
-				value={(objKey in object ? object[objKey] : "") as string}
-				onChange={(e) =>
-					setObject({
-						...object,
 						[objKey]: e.target.value,
 					})
 				}
@@ -704,6 +680,14 @@ export function MoveDesignEditor(
 	selectedObject: ObjectProps | undefined,
 ) {
 	if (!designEditorRef.current || !selectedObject) return;
+
+	if (window.innerWidth < 1024) {
+		designEditorRef.current.style.left = "16px";
+		designEditorRef.current.style.right = "16px";
+		designEditorRef.current.style.bottom = "16px";
+		designEditorRef.current.style.top = "unset";
+		return;
+	}
 
 	const ctx = canvas.getContext("2d");
 	const rect = canvas.getBoundingClientRect();

@@ -31,15 +31,15 @@ export default function HowToDesign() {
 					</p>
 					<br />
 					<div className="flex flex-col gap-2 lg:flex-row lg:gap-4">
-						{/* <Link
+						<Link
 							href="/designer?t=guide"
 							className="w-full rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:w-fit 2xl:px-16"
 						>
-							Starta guiden
-						</Link> */}
+							Lär mig designa
+						</Link>
 						<Link
 							href="/designer"
-							className="w-full rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:w-fit 2xl:px-16"
+							className="w-fit rounded-lg border-2 px-8 py-4 font-semibold transition-colors hover:bg-slate-100 2xl:px-16"
 						>
 							Designa själv
 						</Link>
@@ -77,7 +77,7 @@ export default function HowToDesign() {
 					</p>
 					<br />
 					<Link
-						href="/templates"
+						href="/design-generator"
 						className="w-full rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:w-fit 2xl:px-16"
 					>
 						Ta mig till bildverktyget

@@ -19,6 +19,7 @@ import {
 } from "react-icons/fa";
 import {
 	RiFunctionFill,
+	RiGuideFill,
 	RiImageFill,
 	RiPencilFill,
 	RiStackFill,
@@ -691,14 +692,14 @@ const DesignNav = forwardRef<HTMLUListElement>((props, ref) => {
 					href="/templates"
 				/>
 			</li>
-			{/* <li className="order-1 md:order-1">
+			<li className="order-1 md:order-1">
 				<NavItem
 					title="Lär dig designern"
 					description="Lär dig hur du använder vårt designverktyg"
 					Icon={RiGuideFill}
 					href="/designer?t=guide"
 				/>
-			</li> */}
+			</li>
 			<li className="order-4">
 				<NavItem
 					title="Designa från bild"

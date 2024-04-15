@@ -74,7 +74,6 @@ function TopCards({ orderTotal, orders }: { orderTotal: any; orders: any }) {
 			.then((data) => {
 				if (!data) return;
 
-				console.log(data);
 				setTotalVisits(data.devices);
 			});
 	}, []);
@@ -186,6 +185,20 @@ function OrderRow({ order, nr }: { order: any; nr: number }) {
 		return statusOptions.incomplete;
 	}, [order, orderInfo]);
 
+	const sizes = useMemo(() => {
+		return order.products
+			.map((product: any) => ({
+				amount: product.quantity,
+				text: `${product.metadata.width}x${product.metadata.height}`,
+			}))
+			.reduce((acc: any, curr: any) => {
+				const size = acc.find((size: any) => size.text === curr.text);
+				if (size) size.amount += 1;
+				else acc.push(curr);
+				return acc;
+			}, []);
+	}, [order.products]);
+
 	function handleStatusChange(e: any) {
 		updateOrderStatus(order.id, e.target.value);
 	}
@@ -204,9 +217,14 @@ function OrderRow({ order, nr }: { order: any; nr: number }) {
 				<span className="text-muted">{order.customer.email}</span>
 			</td>
 			<td className="space-x-2 space-y-2">
-				{order.products.map((product: any, i: number) => (
+				{sizes.map((size: any, i: number) => (
 					<span key={i} className="rounded-lg bg-slate-300 px-2 py-1">
-						{product.metadata.width}x{product.metadata.height}
+						{size.amount > 1 && (
+							<span className="mr-2 rounded-full bg-white px-2 font-semibold text-muted">
+								{size.amount}
+							</span>
+						)}
+						{size.text}{" "}
 					</span>
 				))}
 			</td>

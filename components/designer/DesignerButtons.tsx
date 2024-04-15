@@ -4,17 +4,10 @@ import { DesignerContext } from "@/pages/designer";
 import AddToCart from "@/utils/designer/CartHelper";
 import { useShoppingCart } from "use-shopping-cart";
 
-import { MdAddShoppingCart, MdBugReport } from "react-icons/md";
+import { MdAddShoppingCart, MdFeedback } from "react-icons/md";
 import { CiShoppingTag } from "react-icons/ci";
-import {
-	FaHeart,
-	FaInfo,
-	FaQuestion,
-	FaQuestionCircle,
-	FaSave,
-} from "react-icons/fa";
+import { FaHeart, FaQuestionCircle, FaSave } from "react-icons/fa";
 import { HiTemplate } from "react-icons/hi";
-import { FaI } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { SaveDesign } from "@/utils/designer/DesignSaver";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -84,21 +77,21 @@ function BottomLeftButtons() {
 function TopLeftButtons() {
 	return (
 		<div className="absolute left-4 top-4 flex flex-col items-start gap-4 lg:left-8 lg:top-8">
-			{/* <LinkWithTooltip
+			<LinkWithTooltip
 				href="/designer?t=guide"
 				position="right"
 				className="rounded-lg bg-slate-400 p-4 text-2xl text-white transition-colors hover:bg-slate-500"
 				tooltip="Visa guide"
 			>
 				<FaQuestionCircle className="text-2xl" />
-			</LinkWithTooltip> */}
+			</LinkWithTooltip>
 			<LinkWithTooltip
-				href="/bug-report"
+				href="/feedback"
 				position="right"
 				className="rounded-lg bg-slate-400 p-4 text-2xl text-white transition-colors hover:bg-slate-500"
-				tooltip="Rapportera bugg"
+				tooltip="Skicka feedback"
 			>
-				<MdBugReport className="text-2xl" />
+				<MdFeedback className="text-2xl" />
 			</LinkWithTooltip>
 		</div>
 	);
