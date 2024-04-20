@@ -25,7 +25,7 @@
 ## About The Project
 
 <div style="display:flex;gap:8px">
-  <img src="https://raw.githubusercontent.com/eliasakesson/Trasmak-UF/main/public/images/home-page.png" alt="" width="49%" />
+  <img src="https://raw.githubusercontent.com/eliasakesson/Trasmak-UF/main/public/images/mockup.png" alt="" width="49%" />
   <img src="https://raw.githubusercontent.com/eliasakesson/Trasmak-UF/main/public/images/designer.png" alt="" width="49%" />
 </div>
 

@@ -12,17 +12,17 @@ export default function Hero() {
 						alt="TRÄSMAK"
 						fill
 						className="object-cover"
-						quality={100}
+						quality={80}
 						priority
 					/>
 				</div>
 				<div className="relative hidden bg-primary py-8 md:block">
 					<Image
-						src="/images/sally.png"
+						src="/images/sally.jpg"
 						alt="TRÄSMAK"
 						fill
 						className="object-cover"
-						quality={100}
+						quality={80}
 						priority
 					/>
 				</div>
@@ -70,7 +70,7 @@ export default function Hero() {
 						fill
 						sizes="100%"
 						className="object-cover object-[50%75%]"
-						quality={100}
+						quality={80}
 						priority
 					/>
 				</div>
