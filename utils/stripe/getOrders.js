@@ -9,7 +9,7 @@ export default async function GetOrders(hideRefunded = true) {
 
 	const orders = await Promise.all(
 		sessions.data.map((session) => GetOrder(session.id)),
-	)
+	);
 
 	if (!hideRefunded) {
 		return orders;
@@ -17,10 +17,10 @@ export default async function GetOrders(hideRefunded = true) {
 
 	const ordersInfos = await Promise.all(
 		orders.map((order) => GetOrderInfo(order.id)),
-	)
+	);
 
 	return orders.filter((_, index) => {
-		return ordersInfos[index].status !== "refunded";
+		return ordersInfos[index]?.status !== "refunded";
 	});
 }
 

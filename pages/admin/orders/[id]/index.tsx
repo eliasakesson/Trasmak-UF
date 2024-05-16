@@ -32,6 +32,19 @@ function AdminPage() {
 		}, 0);
 	}, [order]);
 
+	const totalProfit = useMemo(() => {
+		if (!order) return { total: 0, currency: "SEK" };
+
+		let total = order.total;
+		total -= order.products.reduce((acc: number, product: any) => {
+			return acc + product.metadata.gross * 100 * product.quantity;
+		}, 0);
+		if (order.shipping_cost.amount_total == 0) {
+			total -= 8900;
+		}
+		return { total, currency: order.currency };
+	}, [order]);
+
 	useEffect(() => {
 		if (!user) return;
 
@@ -59,6 +72,14 @@ function AdminPage() {
 					}
 					icon={<TbBrandCashapp />}
 					className="!bg-primary text-white"
+				/>
+				<Card
+					title="Total vinst"
+					value={formatCurrencyString({
+						value: totalProfit.total,
+						currency: totalProfit.currency,
+					})}
+					icon={<TbBrandCashapp />}
 				/>
 				<Card
 					title="Antal produkter"

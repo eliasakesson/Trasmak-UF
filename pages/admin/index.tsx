@@ -54,7 +54,12 @@ function AdminPage() {
 function TopCards({ orders }: { orders: any }) {
 	const productsSold = useMemo(() => {
 		return orders.reduce((acc: number, order: any) => {
-			return acc + order.products.length;
+			return (
+				acc +
+				order.products.reduce((acc: number, product: any) => {
+					return acc + product.quantity;
+				}, 0)
+			);
 		}, 0);
 	}, [orders]);
 
@@ -165,7 +170,7 @@ export function Card({
 
 function Orders({ orders }: { orders: any[] }) {
 	return (
-		<div className="pt-16">
+		<div className="overflow-x-scroll pt-16">
 			<table className="w-full divide-y">
 				<thead>
 					<tr>
@@ -223,18 +228,28 @@ function OrderRow({ order, nr }: { order: any; nr: number }) {
 
 	// Array of unique product sizes with count
 	const productSizes = useMemo(() => {
-		const sizes = order.products.map((product: any) => {
-			return `${product.metadata.width}x${product.metadata.height}`;
-		});
+		const sizes: { size: string; count: number }[] = order.products.map(
+			(product: any) => {
+				return {
+					size: `${product.metadata.width}x${product.metadata.height}`,
+					count: product.quantity,
+				};
+			},
+		);
 
-		const uniqueSizes = Array.from(new Set(sizes));
+		const uniqueSizes = sizes.reduce((acc: any, size: any) => {
+			const existingSize = acc.find((s: any) => s.size === size.size);
 
-		return uniqueSizes.map((size) => {
-			return {
-				size,
-				count: sizes.filter((s: any) => s === size).length,
-			};
-		});
+			if (existingSize) {
+				existingSize.count += size.count;
+			} else {
+				acc.push(size);
+			}
+
+			return acc;
+		}, []);
+
+		return uniqueSizes;
 	}, [order.products]);
 
 	function handleStatusChange(e: any) {
