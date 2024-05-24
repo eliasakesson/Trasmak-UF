@@ -4,7 +4,7 @@ export default function Inspiration() {
 	const images = [
 		"/images/norway.jpg",
 		"/images/familj.jpg",
-		"/images/sally.png",
+		"/images/sally.jpg",
 	];
 
 	return (

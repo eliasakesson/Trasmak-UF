@@ -11,6 +11,16 @@ import useOrderInfo, {
 	setOrderNr,
 	setOrderStatus,
 } from "@/utils/firebase/getOrderInfo";
+import {
+	statusOptions,
+	useGetVisits,
+	useOrderStatus,
+	useOrderTotal,
+	useProductSizes,
+	useProductCount,
+	useProductsSoldPeriod,
+	useTotalProfit,
+} from "@/utils/admin";
 
 export default function Admin({ ...props }) {
 	return (
@@ -52,64 +62,11 @@ function AdminPage() {
 }
 
 function TopCards({ orders }: { orders: any }) {
-	const productsSold = useMemo(() => {
-		return orders.reduce((acc: number, order: any) => {
-			return (
-				acc +
-				order.products.reduce((acc: number, product: any) => {
-					return acc + product.quantity;
-				}, 0)
-			);
-		}, 0);
-	}, [orders]);
-
-	const orderTotal = useMemo(() => {
-		return orders.reduce(
-			(acc: any, order: any) => {
-				acc.total += order.total;
-				return acc;
-			},
-			{ total: 0, currency: "SEK" },
-		);
-	}, [orders]);
-
-	const totalProfit = useMemo(() => {
-		return orders.reduce(
-			(acc: any, order: any) => {
-				acc.total += order.total;
-				acc.total -= order.products.reduce(
-					(acc: number, product: any) => {
-						return (
-							acc +
-							product.metadata.gross * 100 * product.quantity
-						);
-					},
-					0,
-				);
-				if (order.shipping_cost.amount_total == 0) {
-					acc.total -= 8900;
-				}
-				return acc;
-			},
-			{ total: 0, currency: "SEK" },
-		);
-	}, [orders]);
-
-	useEffect(() => {
-		let startDate = new Date();
-		startDate.setMonth(startDate.getMonth() - 1);
-		let endDate = new Date();
-
-		fetch(`/api/analytics?startDate=${startDate}&endDate=${endDate}`)
-			.then((res) => res.json())
-			.then((data) => {
-				if (!data) return;
-
-				setTotalVisits(data.devices);
-			});
-	}, []);
-
-	const [totalVisits, setTotalVisits] = useState(0);
+	const orderTotal = useOrderTotal(orders);
+	const totalProfit = useTotalProfit(orders);
+	const productsSold = useProductCount(orders);
+	const productsSoldMonth = useProductsSoldPeriod(orders, "month");
+	const visits = useGetVisits();
 
 	return (
 		<div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-8">
@@ -119,25 +76,26 @@ function TopCards({ orders }: { orders: any }) {
 					value: orderTotal.total,
 					currency: orderTotal.currency,
 				})}
-				icon={<TbBrandCashapp />}
-				className="!bg-primary text-white"
-			/>
-			<Card
-				title="Total vinst"
-				value={formatCurrencyString({
+				title2="Total vinst"
+				value2={formatCurrencyString({
 					value: totalProfit.total,
 					currency: totalProfit.currency,
 				})}
 				icon={<TbBrandCashapp />}
+				className="!bg-primary text-white"
 			/>
 			<Card
 				title="Antal produkter sålda"
-				value={productsSold}
+				value={productsSold.toString()}
+				title2="Senaste månaden"
+				value2={productsSoldMonth.toString()}
 				icon={<FaShoppingCart />}
 			/>
 			<Card
 				title="Besökare senaste månaden"
-				value={totalVisits.toString()}
+				value={visits.month.toString()}
+				title2="Besökare senaste veckan"
+				value2={visits.week.toString()}
 				icon={<FaUsers />}
 			/>
 		</div>
@@ -147,11 +105,15 @@ function TopCards({ orders }: { orders: any }) {
 export function Card({
 	title,
 	value,
+	title2,
+	value2,
 	icon,
 	className,
 }: {
 	title: string;
 	value: string;
+	title2?: string;
+	value2?: string;
 	icon: ReactNode;
 	className?: string;
 }) {
@@ -160,9 +122,17 @@ export function Card({
 			className={`flex flex-col justify-between rounded-lg bg-slate-300 p-4 lg:gap-8 lg:p-8 ${className}`}
 		>
 			<div className="text-6xl">{icon}</div>
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col">
 				<span className="text-lg">{title}</span>
 				<span className="text-2xl font-bold lg:text-4xl">{value}</span>
+				{title2 && value2 && (
+					<>
+						<span className="mt-4 text-sm">{title2}</span>
+						<span className="text-lg font-bold lg:text-2xl">
+							{value2}
+						</span>
+					</>
+				)}
 			</div>
 		</div>
 	);
@@ -170,7 +140,7 @@ export function Card({
 
 function Orders({ orders }: { orders: any[] }) {
 	return (
-		<div className="overflow-x-scroll pt-16">
+		<div className="overflow-x-auto pt-16">
 			<table className="w-full divide-y">
 				<thead>
 					<tr>
@@ -200,57 +170,12 @@ function Orders({ orders }: { orders: any[] }) {
 	);
 }
 
-const statusOptions = {
-	delivered: { text: "Levererad", color: "#4CAF50" },
-	sent: { text: "Skickad", color: "#FFA000" },
-	complete: { text: "Betald", color: "#9C27B0" },
-	incomplete: { text: "Ej betald", color: "#F44336" },
-	refunded: { text: "Återbetald", color: "#F44336" },
-};
-
 function OrderRow({ order, nr }: { order: any; nr: number }) {
 	const router = useRouter();
 
 	const orderInfo = useOrderInfo(order.id);
-
-	const status = useMemo(() => {
-		if (orderInfo?.status) {
-			if (orderInfo.status === "sent") return statusOptions.sent;
-			if (orderInfo.status === "delivered")
-				return statusOptions.delivered;
-			if (orderInfo.status === "refunded") return statusOptions.refunded;
-		}
-
-		if (order.status === "complete") return statusOptions.complete;
-
-		return statusOptions.incomplete;
-	}, [order, orderInfo]);
-
-	// Array of unique product sizes with count
-	const productSizes = useMemo(() => {
-		const sizes: { size: string; count: number }[] = order.products.map(
-			(product: any) => {
-				return {
-					size: `${product.metadata.width}x${product.metadata.height}`,
-					count: product.quantity,
-				};
-			},
-		);
-
-		const uniqueSizes = sizes.reduce((acc: any, size: any) => {
-			const existingSize = acc.find((s: any) => s.size === size.size);
-
-			if (existingSize) {
-				existingSize.count += size.count;
-			} else {
-				acc.push(size);
-			}
-
-			return acc;
-		}, []);
-
-		return uniqueSizes;
-	}, [order.products]);
+	const status = useOrderStatus(order, orderInfo);
+	const productSizes = useProductSizes(order);
 
 	function handleStatusChange(e: any) {
 		setOrderStatus(order.id, e.target.value);

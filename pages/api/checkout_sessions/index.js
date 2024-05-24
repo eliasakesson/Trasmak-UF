@@ -95,6 +95,7 @@ export default async function handler(req, res) {
 						},
 					},
 				],
+				allow_promotion_codes: true,
 			});
 			res.status(200).json({ id: session.id });
 		} catch (error) {

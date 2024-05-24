@@ -10,6 +10,7 @@ import { formatCurrencyString } from "use-shopping-cart";
 import { Card } from "../..";
 import { TbBrandCashapp } from "react-icons/tb";
 import { FaShoppingCart } from "react-icons/fa";
+import { useOrderProductCount, useProductProfit } from "@/utils/admin";
 
 export default function AdminOrder() {
 	return (
@@ -24,26 +25,9 @@ function AdminPage() {
 	const [user] = useAuthState(auth);
 
 	const [order, setOrder] = useState<any>(null);
-	const productCount = useMemo(() => {
-		return order?.products.reduce((acc: any, product: any) => {
-			acc += product.quantity;
 
-			return acc;
-		}, 0);
-	}, [order]);
-
-	const totalProfit = useMemo(() => {
-		if (!order) return { total: 0, currency: "SEK" };
-
-		let total = order.total;
-		total -= order.products.reduce((acc: number, product: any) => {
-			return acc + product.metadata.gross * 100 * product.quantity;
-		}, 0);
-		if (order.shipping_cost.amount_total == 0) {
-			total -= 8900;
-		}
-		return { total, currency: order.currency };
-	}, [order]);
+	const productCount = useOrderProductCount(order);
+	const totalProfit = useProductProfit(order);
 
 	useEffect(() => {
 		if (!user) return;
