@@ -5,11 +5,14 @@ import { stripe } from "./stripe";
 export default async function GetOrders(hideRefunded = true) {
 	const sessions = await stripe.checkout.sessions.list({
 		status: "complete",
+		limit: 100,
 	});
 
 	const orders = await Promise.all(
 		sessions.data.map((session) => GetOrder(session.id)),
 	);
+
+	console.log(orders);
 
 	if (!hideRefunded) {
 		return orders;
