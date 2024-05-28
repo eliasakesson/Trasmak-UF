@@ -74,9 +74,9 @@ function Announcement() {
 				{freeShippingThreshold > 0 ? (
 					<p className="flex gap-2 text-center text-sm font-semibold">
 						<span className="rounded-full bg-white px-2 text-primary">
-							Fri Frakt
+							Skynda
 						</span>{" "}
-						Vid Köp Över {freeShippingThreshold / 100} KR
+						Försäljningen slutar 30/5!
 					</p>
 				) : (
 					"‎"
