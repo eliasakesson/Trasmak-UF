@@ -54,33 +54,30 @@ const Header = () => {
 };
 
 function Announcement() {
-	const [freeShippingThreshold, setFreeShippingThreshold] = useState(0);
+	const [countdown, setCountdown] = useState<string>("00:00:00");
 
 	useEffect(() => {
-		GetConfig()
-			.then((config) => {
-				if (config?.freeShippingThreshold) {
-					setFreeShippingThreshold(config.freeShippingThreshold);
-				}
-			})
-			.catch((err) => {
-				console.error(err);
-			});
+		const interval = setInterval(() => {
+			const now = new Date();
+			const endDate = new Date("2022-05-29T23:59:59");
+			const timer = new Date(endDate.getTime() - now.getTime());
+			setCountdown(
+				`${timer.getHours()}:${timer.getMinutes()}:${timer.getSeconds()}`,
+			);
+		}, 1000);
+
+		return () => clearInterval(interval);
 	}, []);
 
 	return (
 		<div className="bg-primary py-2 text-white">
 			<div className="container mx-auto flex items-center justify-center">
-				{freeShippingThreshold > 0 ? (
-					<p className="flex gap-2 text-center text-sm font-semibold">
-						<span className="rounded-full bg-white px-2 text-primary">
-							Skynda
-						</span>{" "}
-						Försäljningen slutar 30/5!
-					</p>
-				) : (
-					"‎"
-				)}
+				<p className="flex gap-2 text-center text-sm font-semibold">
+					<span className="rounded-full bg-white px-2 text-primary">
+						Skynda
+					</span>{" "}
+					Försäljningen slutar om {countdown}
+				</p>
 			</div>
 		</div>
 	);
