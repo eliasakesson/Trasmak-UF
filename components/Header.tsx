@@ -65,7 +65,12 @@ function Announcement() {
 
 			setIsOver(now.getTime() > endDate.getTime());
 			setCountdown(
-				`${timer.getHours()}:${timer.getMinutes()}:${timer.getSeconds()}`,
+				timer.toLocaleTimeString("sv-SE", {
+					hour12: false,
+					hour: "2-digit",
+					minute: "2-digit",
+					second: "2-digit",
+				}),
 			);
 		}, 1000);
 
