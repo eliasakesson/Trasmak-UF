@@ -60,7 +60,7 @@ function Announcement() {
 	useEffect(() => {
 		const interval = setInterval(() => {
 			const now = new Date();
-			const endDate = new Date("2024-05-29T23:59:59");
+			const endDate = new Date("2024-05-29T22:59:59");
 			const timer = new Date(endDate.getTime() - now.getTime());
 
 			setIsOver(now.getTime() > endDate.getTime());
