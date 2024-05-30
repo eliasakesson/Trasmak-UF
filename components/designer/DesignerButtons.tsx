@@ -112,15 +112,16 @@ function BottomRightButtons() {
 		<div className="absolute bottom-2 left-4 right-4 flex flex-row-reverse items-end justify-between gap-4 lg:pointer-events-none lg:bottom-8 lg:right-8 lg:flex-col-reverse">
 			<button
 				className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light lg:pointer-events-auto"
-				onClick={() =>
-					AddToCart(
-						products,
-						currentDesign,
-						cartDetails,
-						addItem,
-						isAddingToCart,
-						lastAddedImageURL,
-					)
+				onClick={
+					() => toast.error("Försäljningen har stängt")
+					// AddToCart(
+					// 	products,
+					// 	currentDesign,
+					// 	cartDetails,
+					// 	addItem,
+					// 	isAddingToCart,
+					// 	lastAddedImageURL,
+					// )
 				}
 			>
 				<MdAddShoppingCart className="text-2xl" />
