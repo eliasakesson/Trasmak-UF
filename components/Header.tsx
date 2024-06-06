@@ -54,45 +54,11 @@ const Header = () => {
 };
 
 function Announcement() {
-	const [isOver, setIsOver] = useState(false);
-	const [countdown, setCountdown] = useState<string>("00:00:00");
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			const now = new Date();
-			const endDate = new Date("2024-05-29T22:59:59");
-			const timer = new Date(endDate.getTime() - now.getTime());
-
-			setIsOver(now.getTime() > endDate.getTime());
-			setCountdown(
-				timer.toLocaleTimeString("sv-SE", {
-					hour12: false,
-					hour: "2-digit",
-					minute: "2-digit",
-					second: "2-digit",
-				}),
-			);
-		}, 1000);
-
-		return () => clearInterval(interval);
-	}, []);
-
 	return (
-		<div
-			className={`${isOver ? "bg-red-600" : "bg-primary"} py-2 text-white`}
-		>
+		<div className={`bg-red-600 py-2 text-white`}>
 			<div className="container mx-auto flex items-center justify-center">
 				<p className="flex gap-2 text-center text-sm font-semibold">
-					{!isOver ? (
-						<>
-							<span className="rounded-full bg-white px-2 text-primary">
-								Skynda
-							</span>{" "}
-							Försäljningen slutar om {countdown}
-						</>
-					) : (
-						"Försäljningen är över"
-					)}
+					Försäljningen är över
 				</p>
 			</div>
 		</div>

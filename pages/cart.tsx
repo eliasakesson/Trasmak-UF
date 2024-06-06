@@ -7,6 +7,7 @@ import { formatCurrencyString, useShoppingCart } from "use-shopping-cart";
 import GetProducts from "@/utils/stripe/getProducts";
 import GetConfig from "@/utils/firebase/getConfig";
 import Head from "next/head";
+import toast from "react-hot-toast";
 
 export default function Cart({ products, config }: any) {
 	return (
@@ -282,7 +283,12 @@ function CartSummary({ config }: { config: any }) {
 					disabled={
 						isRedirecting || cartCount <= 0 || !hasAcceptedTerms
 					}
-					onClick={onCheckout}
+					onClick={
+						() =>
+							toast.error(
+								"Försäljningen har slutat, kassan nedstängd",
+							) /*onCheckout*/
+					}
 					type="button"
 					className="rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light disabled:bg-primary_dark"
 				>
