@@ -1,4 +1,4 @@
-import { stripe } from "@/utils/stripe/stripe";
+import { stripe, testStripe } from "@/utils/stripe/stripe";
 import { validateCartItems } from "use-shopping-cart/utilities";
 import { db } from "../firebase";
 import { shortenDownloadURL } from "@/utils/firebase/helper";
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
 				),
 			};
 
-			const session = await stripe.checkout.sessions.create({
+			const session = await testStripe.checkout.sessions.create({
 				mode: "payment",
 				payment_method_types: ["card", "klarna"],
 				line_items: lineItems,

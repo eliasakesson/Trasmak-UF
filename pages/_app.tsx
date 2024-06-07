@@ -13,7 +13,7 @@ export const SiteContext = createContext<{
 	setDesign: (design: DesignProps | null) => void;
 }>({ design: null, setDesign: () => {} });
 
-const stripeKey = process.env.NEXT_PUBLIC_STRIPE_API_KEY as string;
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_TEST_API_KEY as string;
 
 export default function App({ Component, pageProps }: AppProps) {
 	const [design, setDesign] = useState<DesignProps | null>(null);

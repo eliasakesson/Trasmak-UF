@@ -204,7 +204,10 @@ function CartSummary({ config }: { config: any }) {
 	async function onCheckout(e: any) {
 		e.preventDefault();
 
-		if (cartCount <= 0) return;
+		if (cartCount <= 0) {
+			toast.error("Varukorgen är tom");
+			return;
+		}
 		setIsRedirecting(true);
 
 		try {
@@ -293,6 +296,17 @@ function CartSummary({ config }: { config: any }) {
 					className="rounded-lg bg-primary px-8 py-4 font-semibold text-white transition-colors hover:bg-primary_light disabled:bg-primary_dark"
 				>
 					Gå till kassan
+				</button>
+				<button
+					onClick={onCheckout}
+					type="button"
+					className="flex flex-col items-center rounded-lg border-2 px-8 py-4 text-center font-semibold transition-colors hover:bg-white"
+				>
+					{isRedirecting ? "Öppnar kassan..." : "Köp i testläge"}
+					<span className="text-xs font-normal">
+						Detta är inget bindande köp, detta genomförs i testläge
+						för att visa hur kassan fungerar.
+					</span>
 				</button>
 				<Link
 					href="/products"

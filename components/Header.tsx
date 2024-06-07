@@ -320,54 +320,56 @@ function UserButton() {
 	}, [isOpen]);
 
 	return (
-		<div className="relative hidden md:block">
+		<>
 			<div
 				onClick={() => setIsOpen(false)}
 				className={`${
 					isOpen ? "" : "hidden"
-				} fixed bottom-0 left-0 right-0 top-0 z-20`}
+				} fixed bottom-0 left-0 right-0 top-0 z-30`}
 			></div>
-			<button
-				aria-label="User menu"
-				className={`${
-					user?.photoURL ? "" : "p-2"
-				} text-gray-700 hover:text-gray-900 focus:outline-none`}
-				onClick={() => setIsOpen((open) => !open)}
-			>
-				{user?.photoURL ? (
-					<Image
-						src={user.photoURL}
-						alt=""
-						width={32}
-						height={32}
-						className="rounded-full"
-					/>
-				) : (
-					<FaUser className="h-6 w-6" />
-				)}
-			</button>
-			<motion.div
-				initial={{ scaleY: 0 }}
-				animate={controls}
-				className="absolute right-0 top-8 z-30 min-w-[256px] origin-top rounded-xl border bg-white"
-			>
-				<motion.div
-					initial={{ opacity: 0, translateY: -20 }}
-					animate={innerControls}
-					className="space-y-4 p-4"
+			<div className="relative hidden md:block">
+				<button
+					aria-label="User menu"
+					className={`${
+						user?.photoURL ? "" : "p-2"
+					} text-gray-700 hover:text-gray-900 focus:outline-none`}
+					onClick={() => setIsOpen((open) => !open)}
 				>
-					<span className="whitespace-nowrap text-xl font-semibold">
-						{user ? "Min profil" : "Du är inte inloggad"}
-					</span>
-					<div className="flex flex-col gap-2">
-						<UserButtons
-							user={user}
-							onClick={() => setIsOpen(false)}
+					{user?.photoURL ? (
+						<Image
+							src={user.photoURL}
+							alt=""
+							width={32}
+							height={32}
+							className="rounded-full"
 						/>
-					</div>
+					) : (
+						<FaUser className="h-6 w-6" />
+					)}
+				</button>
+				<motion.div
+					initial={{ scaleY: 0 }}
+					animate={controls}
+					className="absolute right-0 top-8 z-30 min-w-[256px] origin-top rounded-xl border bg-white"
+				>
+					<motion.div
+						initial={{ opacity: 0, translateY: -20 }}
+						animate={innerControls}
+						className="space-y-4 p-4"
+					>
+						<span className="whitespace-nowrap text-xl font-semibold">
+							{user ? "Min profil" : "Du är inte inloggad"}
+						</span>
+						<div className="flex flex-col gap-2">
+							<UserButtons
+								user={user}
+								onClick={() => setIsOpen(false)}
+							/>
+						</div>
+					</motion.div>
 				</motion.div>
-			</motion.div>
-		</div>
+			</div>
+		</>
 	);
 }
 

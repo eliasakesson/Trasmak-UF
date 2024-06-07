@@ -4,7 +4,7 @@ import axios from "axios";
 import { useShoppingCart, formatCurrencyString } from "use-shopping-cart";
 import Head from "next/head";
 import GetConfig from "@/utils/firebase/getConfig";
-import { GetOrder } from "@/utils/stripe/getOrders";
+import { GetOrder, GetTestOrder } from "@/utils/stripe/getOrders";
 import Image from "next/image";
 import { GetImagePath } from "./admin/orders/[id]/pdf";
 import { useEffect } from "react";
@@ -214,7 +214,7 @@ export async function getServerSideProps({
 	try {
 		const [config, order] = await Promise.all([
 			GetConfig(),
-			GetOrder(sessionId),
+			GetTestOrder(sessionId),
 		]);
 
 		return {
