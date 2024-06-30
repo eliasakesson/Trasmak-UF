@@ -158,16 +158,17 @@ export default function Footer() {
 					<p className="text-muted">
 						© 2024 Träsmak UF. All rights reserved.
 					</p>
-					{/* <p className="text-gray-500">
+					<p className="text-gray-500">
 						Created by{" "}
 						<a
 							href="https://eliasakesson.me"
 							className="text-gray-600"
 							rel="noopener noreferrer"
-							target="_blank">
+							target="_blank"
+						>
 							Elias Åkesson
 						</a>
-					</p> */}
+					</p>
 				</div>
 			</div>
 		</footer>
