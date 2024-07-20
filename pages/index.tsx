@@ -14,6 +14,7 @@ import { SiteContext } from "./_app";
 import About from "@/components/homepage/About";
 import HowToDesign from "@/components/homepage/HowToDesign";
 import TellYourStory from "@/components/homepage/TellYourStory";
+import Popup from "./popup";
 
 export default function Home({ products }: { products: any }) {
 	const router = useRouter();
@@ -32,6 +33,7 @@ export default function Home({ products }: { products: any }) {
 			</Head>
 			<main className="relative overflow-hidden pb-16">
 				<article className="flex flex-col gap-16 lg:gap-32">
+				<Popup />
 					<Hero />
 					<TellYourStory />
 					<About />
